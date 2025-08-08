@@ -1,0 +1,13 @@
+//yes1
+no
+//yes yes2
+no //yes3
+//yes yes4
+no
+/*yes5*/ no
+/*yes yes 
+yes can do it 6*/ no no
+/*no 
+//yes 7
+no 
+
