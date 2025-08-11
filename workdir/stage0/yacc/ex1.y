@@ -1,43 +1,102 @@
 %{
-    #include<stdio.h>
-    #include<stdlib.h>
-    int nesting=0;
-    char yylex();
-    void yyerror();
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+int yylex();
+int yyerror(const char *);
+int lvl = 0;
 %}
-%token RELOP ID NUM IF STMT NL
-%%
 
-start: if_stmt NL {printf("Levels of nesting are %d\n", nesting);exit(0);}
-     ;
-
-if_stmt: IF '(' cond ')' '{' stmt '}' {nesting++;}
-       ;
-
-stmt: STMT
-    | if_stmt
-    ;
-
-cond: x RELOP x
-    ;
-
-x: ID
- | NUM
- ;
+%token IF LBRACE RBRACE RELOP DIGIT ALPHA 
 
 %%
-char yylex()
-{
+start : stmt {exit(0);}
+      ;
 
-}
-void yyerror() 
+stmt  : IF '(' text ')' LBRACE { lvl++; printf("%d - level if\n", lvl); }
+        stmt
+        RBRACE { lvl--; }
+      | text
+      ;
+text  : ALPHA text
+      | RELOP text
+      | DIGIT text
+      | /*epsilon*/
+      ;
+
+%%
+
+int yylex()
 {
-    printf("\nIts not a identifier!\n");
-    return;
+    int c;
+
+    // Skip whitespace
+    while ((c = getchar()) == ' ' || c == '\t' || c == '\n')
+        ;
+
+    if (c == EOF) return 0;
+
+    // Parentheses
+    if (c == '(') return '(';
+    if (c == ')') return ')';
+
+    // Braces
+    if (c == '{') return LBRACE;
+    if (c == '}') return RBRACE;
+
+    // IF keyword detection
+    if (c == 'i') {
+        int d = getchar();
+        if (d == 'f') {
+            int next = getchar();
+            if (!isalpha(next) && !isdigit(next)) {
+                ungetc(next, stdin);
+                return IF;
+            }
+            ungetc(next, stdin);
+            ungetc('f', stdin);
+            goto alpha_label;
+        } else {
+            ungetc(d, stdin);
+            goto alpha_label;
+        }
+    }
+
+    // Relational operators
+    if (c == '<' || c == '>' || c == '=' || c == '!') {
+        
+        return RELOP;
+    }
+
+    // Digits
+    if (isdigit(c)) {
+        while (isdigit(c = getchar()))
+            ;
+        ungetc(c, stdin);
+        return DIGIT;
+    }
+
+    // Alphabets
+    if (isalpha(c)) {
+alpha_label:
+        while (isalnum(c = getchar()))
+            ;
+        ungetc(c, stdin);
+        return ALPHA;
+    }
+
+    // Fallback: return char as-is
+    return c;
 }
-int main() 
+
+int yyerror(const char *s)
 {
-    printf("\nEnter:");
+    printf("Error: %s\n", s);
+    return 1;
+}
+
+int main()
+{
     yyparse();
     return 0;
 }

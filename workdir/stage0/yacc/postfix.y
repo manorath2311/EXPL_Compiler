@@ -5,7 +5,6 @@
     int yyerror();
     int yylex();
 
-
 %}
 %token DIGIT
 %left '+'
