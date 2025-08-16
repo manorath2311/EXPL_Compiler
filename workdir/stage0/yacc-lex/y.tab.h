@@ -49,24 +49,24 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NL = 258,
-    CHAR = 259,
-    OP = 260
+    OP = 258,
+    STR = 259,
+    NL = 260
   };
 #endif
 /* Tokens.  */
-#define NL 258
-#define CHAR 259
-#define OP 260
+#define OP 258
+#define STR 259
+#define NL 260
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 7 "ex1.y"
+#line 10 "ex3.y"
 
-    char c;
-    int i;
+    char* s;
+    char op;
 
 #line 72 "y.tab.h"
 

@@ -8,7 +8,6 @@
     char c;
     int i;
 }
-
 %left '+' '-'
 %left '/' '%' '*'
 %token NL

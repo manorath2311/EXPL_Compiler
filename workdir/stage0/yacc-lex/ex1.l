@@ -9,6 +9,7 @@ opn [-+*/()]
 {chars} {yylval.c=yytext[0]; return CHAR;}
 {new_line} {return NL;}
 {opn} {return yytext[0];}
+[ \t]+  {} 
 . {printf("INVALID CHAR %s",yytext);}
 %%
 int yywrap()
