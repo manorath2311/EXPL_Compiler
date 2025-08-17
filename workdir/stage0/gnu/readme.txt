@@ -1,0 +1,4 @@
+lex lex.l
+yacc -d parser.y
+gcc -g lex.yy.c y.tab.c
+ gdb --args a.out input1.txt
