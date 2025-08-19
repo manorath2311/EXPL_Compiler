@@ -1,0 +1,6 @@
+s -- next instruction
+c -- breakpoint to breakpoint
+r -- shows register values
+st -- stack top 10 to 12
+v virtual addr --- value at locn
+
