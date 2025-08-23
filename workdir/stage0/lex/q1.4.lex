@@ -1,5 +1,6 @@
 %{
     #include<stdio.h>
+
 %}
 one_line \/\/([^\n])*
 multi_line \/\*([^*]|\*+[^*/])*\*+\/ 

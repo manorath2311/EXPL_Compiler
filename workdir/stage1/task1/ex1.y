@@ -1,10 +1,11 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include "ex1.h"
 	#include "ex1.c"
+	#include "ex1.h"
 	int yylex(void);
     int yyerror(const char*);
+	extern FILE* yyin;
 %}
 
 %union{
@@ -44,8 +45,19 @@ int yyerror(char const *s)
 }
 
 
-int main(void) {
+int main(void) 
+{
+	
+	/* FILE *fp = fopen("input1.txt", "r");
+	if (fp == NULL) 
+	{
+		
+		perror("Error opening file");
+		return 1;
+	}
+	yyin=fp; */
 	yyparse();
+	
 	
 	return 0;
 }

@@ -1,3 +1,8 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "ex1.h"
+
 struct tnode* makeLeafNode(int n)
 {
     struct tnode *temp;
@@ -27,7 +32,8 @@ int evaluate(struct tnode *t)
         return t->val;
     }
     else{
-        switch(*(t->op)){
+        switch(*(t->op))
+        {
             case '+' : return evaluate(t->left) + evaluate(t->right);
                        break;
             case '-' : return evaluate(t->left) - evaluate(t->right);

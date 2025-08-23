@@ -6,7 +6,7 @@
 0
 0
 0
-MOV R0, 2
+MOV R0, 3
 MOV R1, 3
 ADD R0, R1
 MOV [4096], R0

@@ -5,13 +5,20 @@
 #define MAX_REGS 20
 static int reg_used[MAX_REGS];
 
-void initializeRegs(){
-    for(int i=0;i<MAX_REGS;i++) reg_used[i]=0;
+void initializeRegs()
+{
+    for(int i=0;i<MAX_REGS;i++)
+    {
+        reg_used[i]=0;
+    }
 }
 
-int getReg(void){
-    for(int i=0;i<MAX_REGS;i++){
-        if(reg_used[i]==0){
+int getReg(void)
+{
+    for(int i=0;i<MAX_REGS;i++)
+    {
+        if(reg_used[i]==0)
+        {
             reg_used[i]=1;
             return i;
         }
@@ -20,9 +27,12 @@ int getReg(void){
     exit(1);
 }
 
-void freeReg(void){
-    for(int i=MAX_REGS-1;i>=0;i--){
-        if(reg_used[i]==1){
+void freeReg(void)
+{
+    for(int i=MAX_REGS-1;i>=0;i--)
+    {
+        if(reg_used[i]==1)
+        {
             reg_used[i]=0;
             return;
         }
@@ -49,30 +59,37 @@ tnode* makeOperatorNode(char c, tnode *l, tnode *r)
     temp->right = r;
     return temp;
 }
-
-int codeGen(tnode *t, FILE *target_file)
+int generateCode(struct tnode *node, FILE *outFile)
 {
-    if(t->left == NULL && t->right == NULL)
+    if (node->left == NULL && node->right == NULL) 
     {
-        int p = getReg();
-        fprintf(target_file, "MOV R%d, %d\n", p, t->val);
-        return p;
+        int regIndex = getReg();
+        fprintf(outFile, "MOV R%d, %d\n", regIndex, node->val);
+        return regIndex;
     }
-    else 
+
+    int leftReg  = generateCode(node->left, outFile);
+    int rightReg = generateCode(node->right, outFile);
+
+    switch (node->op) 
     {
-        int i = codeGen(t->left, target_file);
-        int j = codeGen(t->right, target_file);
-        switch(t->op)
-        {
-            case '+': fprintf(target_file, "ADD R%d, R%d\n", i, j); break;
-            case '-': fprintf(target_file, "SUB R%d, R%d\n", i, j); break;
-            case '*': fprintf(target_file, "MUL R%d, R%d\n", i, j); break;
-            case '/': fprintf(target_file, "DIV R%d, R%d\n", i, j); break;
-            default:
-                fprintf(stderr, "Unknown operator %c\n", t->op);
-                exit(1);
-        }
-        freeReg();
-        return i;
+        case '+':
+            fprintf(outFile, "ADD R%d, R%d\n", leftReg, rightReg);
+            break;
+        case '-':
+            fprintf(outFile, "SUB R%d, R%d\n", leftReg, rightReg);
+            break;
+        case '*':
+            fprintf(outFile, "MUL R%d, R%d\n", leftReg, rightReg);
+            break;
+        case '/':
+            fprintf(outFile, "DIV R%d, R%d\n", leftReg, rightReg);
+            break;
+        default:
+            fprintf(stderr, "Error: Unsupported operator '%c'\n", node->op);
+            exit(1);
     }
+
+    freeReg();
+    return leftReg;
 }
