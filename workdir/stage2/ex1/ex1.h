@@ -25,3 +25,7 @@ void print_tree(struct tnode *, int lvl, int isRight);
 #define WRITE_NODE_CONST 5
 #define STATEMENT_NODE_CONST 6
 #define ASSIGN_NODE_CONST 7
+
+int getreg();
+void freereg();
+//int counter=-1;

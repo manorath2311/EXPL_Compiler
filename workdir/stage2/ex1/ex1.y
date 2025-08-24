@@ -2,8 +2,8 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include<string.h>
-	#include "task1.h"
-	#include "task1.c"
+	#include "ex1.h"
+	#include "ex1.c"
     //extern FILE* yyin;
     void yyerror(char const *s);
 	int yylex(void);
@@ -24,8 +24,9 @@
 program : BEGIN_T stmt_list END_T ';' {
 								$$ = $2;
 								printf("Parsing Successful\n");
-								print_tree($2, 0, 0);
+								//print_tree($2, 0, 0);
 								//preorder($2);
+                                evaluate($2);
 								printf("\n");
 
 								exit(1);

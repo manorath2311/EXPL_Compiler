@@ -66,13 +66,13 @@
 
 
 /* First part of user prologue.  */
-#line 1 "task1.y"
+#line 1 "task2.y"
 
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include<string.h>
-	#include "task1.h"
-	#include "task1.c"
+	#include "task2.h"
+	#include "task2.c"
     //extern FILE* yyin;
     void yyerror(char const *s);
 	int yylex(void);
@@ -153,7 +153,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "task1.y"
+#line 12 "task2.y"
 
 	struct tnode *node;
 
@@ -533,8 +533,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    24,    24,    33,    39,    40,    42,    43,    44,    46,
-      47,    48,    49,    50,    51,    52
+       0,    24,    24,    35,    41,    42,    44,    45,    46,    48,
+      49,    50,    51,    52,    53,    54
 };
 #endif
 
@@ -1340,103 +1340,105 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 24 "task1.y"
+#line 24 "task2.y"
                                       {
 								(yyval.node) = (yyvsp[-2].node);
 								printf("Parsing Successful\n");
-								print_tree((yyvsp[-2].node), 0, 0);
+								//print_tree($2, 0, 0);
 								//preorder($2);
+                                generate_xsm((yyvsp[-2].node));
+								//evaluate($2);
 								printf("\n");
 
 								exit(1);
 							}
-#line 1354 "y.tab.c"
+#line 1356 "y.tab.c"
     break;
 
   case 3:
-#line 33 "task1.y"
+#line 35 "task2.y"
                                     {
 			printf("Empty Program\n");
 			printf("Parsing Successful\n");
 			exit(1);
 		}
-#line 1364 "y.tab.c"
+#line 1366 "y.tab.c"
     break;
 
   case 4:
-#line 39 "task1.y"
+#line 41 "task2.y"
                               {(yyval.node) = makeStmtNode(STATEMENT_NODE_CONST, (yyvsp[-2].node), (yyvsp[-1].node));}
-#line 1370 "y.tab.c"
+#line 1372 "y.tab.c"
     break;
 
   case 5:
-#line 40 "task1.y"
+#line 42 "task2.y"
                    {(yyval.node) = (yyvsp[-1].node);}
-#line 1376 "y.tab.c"
+#line 1378 "y.tab.c"
     break;
 
   case 6:
-#line 42 "task1.y"
+#line 44 "task2.y"
                            { (yyval.node) = makeStmtNode(READ_NODE_CONST, (yyvsp[-1].node), (struct tnode *)NULL); }
-#line 1382 "y.tab.c"
+#line 1384 "y.tab.c"
     break;
 
   case 7:
-#line 43 "task1.y"
+#line 45 "task2.y"
                                { (yyval.node) = makeStmtNode(WRITE_NODE_CONST, (yyvsp[-1].node), (struct tnode *)NULL); }
-#line 1388 "y.tab.c"
+#line 1390 "y.tab.c"
     break;
 
   case 8:
-#line 44 "task1.y"
+#line 46 "task2.y"
                         { (yyval.node) = makeExprNode(ASSIGN_NODE_CONST, '=', (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1394 "y.tab.c"
+#line 1396 "y.tab.c"
     break;
 
   case 9:
-#line 46 "task1.y"
+#line 48 "task2.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '+',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed PLUS expression\n");}
-#line 1400 "y.tab.c"
+#line 1402 "y.tab.c"
     break;
 
   case 10:
-#line 47 "task1.y"
+#line 49 "task2.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '-',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed MINUS expression\n");}
-#line 1406 "y.tab.c"
+#line 1408 "y.tab.c"
     break;
 
   case 11:
-#line 48 "task1.y"
+#line 50 "task2.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '*',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed MUL expression\n");}
-#line 1412 "y.tab.c"
+#line 1414 "y.tab.c"
     break;
 
   case 12:
-#line 49 "task1.y"
+#line 51 "task2.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '/',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed DIV expression\n");}
-#line 1418 "y.tab.c"
+#line 1420 "y.tab.c"
     break;
 
   case 13:
-#line 50 "task1.y"
+#line 52 "task2.y"
                         {(yyval.node) = (yyvsp[-1].node);}
-#line 1424 "y.tab.c"
+#line 1426 "y.tab.c"
     break;
 
   case 14:
-#line 51 "task1.y"
+#line 53 "task2.y"
                         {(yyval.node) = (yyvsp[0].node);}
-#line 1430 "y.tab.c"
+#line 1432 "y.tab.c"
     break;
 
   case 15:
-#line 52 "task1.y"
+#line 54 "task2.y"
                 {(yyval.node) = (yyvsp[0].node);}
-#line 1436 "y.tab.c"
+#line 1438 "y.tab.c"
     break;
 
 
-#line 1440 "y.tab.c"
+#line 1442 "y.tab.c"
 
       default: break;
     }
@@ -1668,7 +1670,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 54 "task1.y"
+#line 56 "task2.y"
 
 
 void yyerror(char const *s)

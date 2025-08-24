@@ -457,13 +457,13 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "task1.l"
-#line 2 "task1.l"
+#line 1 "task2.l"
+#line 2 "task2.l"
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include<string.h>
 	#include "y.tab.h"
-	#include "task1.h"
+	#include "task2.h"
 	int yyerror(const char *s);
 	int number;
 	char variable;
@@ -685,7 +685,7 @@ YY_DECL
 		}
 
 	{
-#line 12 "task1.l"
+#line 12 "task2.l"
 
 
 #line 692 "lex.yy.c"
@@ -747,73 +747,73 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 14 "task1.l"
+#line 14 "task2.l"
 {return BEGIN_T;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 15 "task1.l"
+#line 15 "task2.l"
 {return END_T;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 16 "task1.l"
+#line 16 "task2.l"
 {return READ_T;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "task1.l"
+#line 17 "task2.l"
 {return WRITE_T;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 18 "task1.l"
+#line 18 "task2.l"
 {variable = *yytext; yylval.node = makeVariableNode(ID_NODE_CONST ,yytext); return ID_T;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 19 "task1.l"
+#line 19 "task2.l"
 {number = atoi(yytext); yylval.node = makeConstantNode(INT_NODE_CONST,number); return NUM_T;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 20 "task1.l"
+#line 20 "task2.l"
 {return PLUS_T;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 21 "task1.l"
+#line 21 "task2.l"
 {return MINUS_T;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 22 "task1.l"
+#line 22 "task2.l"
 {return MUL_T;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 23 "task1.l"
+#line 23 "task2.l"
 {return DIV_T;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 24 "task1.l"
+#line 24 "task2.l"
 {return *yytext;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 25 "task1.l"
+#line 25 "task2.l"
 { return *yytext; }
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 26 "task1.l"
+#line 26 "task2.l"
 {}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 27 "task1.l"
+#line 27 "task2.l"
 {
     yyerror("unknown character\n");
     exit(1);
@@ -821,7 +821,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "task1.l"
+#line 32 "task2.l"
 ECHO;
 	YY_BREAK
 #line 828 "lex.yy.c"
@@ -1829,7 +1829,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 32 "task1.l"
+#line 32 "task2.l"
 
 
 int yywrap() 

@@ -28,6 +28,7 @@ struct tnode *makeExprNode(int type, char op, struct tnode *left, struct tnode *
     new_node->right = right;
     new_node->type = type;
     new_node->nodetype = op;
+    new_node->op = op;
     return new_node;
 }
 struct tnode *makeStmtNode(int type, struct tnode *left, struct tnode *right)
@@ -66,7 +67,7 @@ void print_tree(struct tnode *node, int lvl, int isRight)
     }
     else if(node->type==OP_NODE_CONST)
     {
-        printf("OP: %c\n", node->nodetype);
+        printf("OP: %c\n", node->op);
     }
     else if(node->type==READ_NODE_CONST)
     {
@@ -78,7 +79,9 @@ void print_tree(struct tnode *node, int lvl, int isRight)
     }
     else if(node->type==STATEMENT_NODE_CONST)
     {
-        printf("STATEMENT\n");
+        //printf("STATEMENT\n");
+        printf("OP: %c\n", node->op);
+
     }
     else if(node->type==ASSIGN_NODE_CONST)
     {

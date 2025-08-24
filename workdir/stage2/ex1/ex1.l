@@ -3,7 +3,7 @@
 	#include <stdio.h>
 	#include<string.h>
 	#include "y.tab.h"
-	#include "task1.h"
+	#include "ex1.h"
 	int yyerror(const char *s);
 	int number;
 	char variable;
