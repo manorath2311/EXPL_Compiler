@@ -1,50 +1,41 @@
-typedef struct tnode 
-{ 
-	int val;	// value of a number for NUM nodes.
-	int type;	//type of variable
-	char* varname;	//name of a variable for ID nodes  
-	int nodetype;  // information about non-leaf nodes - read/write/connector/+/* etc.  
-	struct tnode *left,*right,*middle;	//left and right branches   
-	char op;
-}tnode;
+#define NODE_CONNECTOR 0
+#define NODE_PLUS 1
+#define NODE_MINUS 2
+#define NODE_MUL 3
+#define NODE_DIV 4
+#define NODE_ID 5
+#define NODE_NUM 6
+#define NODE_ASSGN 7
+#define NODE_READ 8
+#define NODE_WRITE 9
+#define NODE_IF 10
+#define NODE_IF_ELSE 11
+#define NODE_WHILE 12
+#define NODE_LT 13
+#define NODE_GT 14
+#define NODE_LE 15
+#define NODE_GE 16
+#define NODE_EQ 17
+#define NODE_NEQ 18
+#define NODE_BREAK 19
+#define NODE_CONT 20
 
-//struct tnode* createTree(int val, int type, char* c, struct tnode *l, struct tnode *r);
+#define TYPE_VOID 0
+#define TYPE_INT 1
+#define TYPE_BOOL 2
 
-struct tnode *makeConstantNode(int type, int val);
-struct tnode *makeVariableNode(int type, char* varname);
-struct tnode *makeExprNode(int type, char op, struct tnode *left, struct tnode *right);
-struct tnode *makeStmtNode(int type, struct tnode *left, struct tnode *right);
-struct tnode* createTree(int type, int val, int nodetype, char* name, struct tnode *l, struct tnode *r, struct tnode *mid) ;
-void print_tree(struct tnode *, int lvl, int isRight);
-
-#define ID_NODE_CONST 1
-#define INT_NODE_CONST 2
-#define OP_NODE_CONST 3
-#define READ_NODE_CONST 4
-#define WRITE_NODE_CONST 5
-#define STATEMENT_NODE_CONST 6
-#define ASSIGN_NODE_CONST 7
-
-#define PLUS_NODE_CONST 8
-#define MINUS_NODE_CONST 9
-#define MUL_NODE_CONST 10
-#define DIV_NODE_CONST 11
-
-#define TYPE_INT_NODE_CONST 12
-#define TYPE_BOOL_NODE_CONST 13
-#define TYPE_VOID_NODE_CONST 24
-#define TYPE_VOID 24
-
-#define IF_NODE_CONST 14
-#define WHILE_NODE_CONST 15
-#define ELSE_NODE_CONST 16
-#define IF_ELSE_NODE_CONST 17
-
-#define LT_NODE_CONST 18
-#define GT_NODE_CONST 19
-#define LE_NODE_CONST 20
-#define GE_NODE_CONST 21
-#define NE_NODE_CONST 22
-#define EQ_NODE_CONST 23
-
-#define NODE_CONNECTOR 25
+struct tnode{
+    int val; //value of the expression tree
+    int type; //type of variable
+    char* varname; //Name of variable for ID names
+    int nodetype; //Information of non-leaf nodes. Ex NODE_PLUS
+    struct tnode *left, *middle, *right; //left and right branches, middle for NODE_IF_ELSE
+};
+	
+/*Create a node tnode*/
+struct tnode* createTree(int type, int val, int nodetype, char* name, struct tnode *l, struct tnode *r, struct tnode *mid);
+	
+/*To evaluate an expression tree*/
+//int evaluate(struct tnode *t);
+int codegen(struct tnode *t);
+void initialize();

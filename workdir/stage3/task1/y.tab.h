@@ -49,65 +49,71 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    PLUS_T = 258,
-    MINUS_T = 259,
-    MUL_T = 260,
-    DIV_T = 261,
-    BEGIN_T = 262,
-    END_T = 263,
-    READ_T = 264,
-    WRITE_T = 265,
-    ID_T = 266,
-    NUM_T = 267,
-    IF_T = 268,
-    ELSE_T = 269,
-    THEN_T = 270,
-    ENDIF_T = 271,
-    WHILE_T = 272,
-    DO_T = 273,
-    ENDWHILE_T = 274,
-    LT_T = 275,
-    GT_T = 276,
-    LE_T = 277,
-    GE_T = 278,
-    NE_T = 279,
-    EQ_T = 280
+    START = 258,
+    END = 259,
+    READ = 260,
+    WRITE = 261,
+    PLUS = 262,
+    MINUS = 263,
+    MUL = 264,
+    DIV = 265,
+    ASSGN = 266,
+    NUM = 267,
+    ID = 268,
+    IF = 269,
+    THEN = 270,
+    ELSE = 271,
+    ENDIF = 272,
+    WHILE = 273,
+    DO = 274,
+    ENDWHILE = 275,
+    EQ = 276,
+    NEQ = 277,
+    LE = 278,
+    GE = 279,
+    LT = 280,
+    GT = 281,
+    BREAK = 282,
+    CONT = 283
   };
 #endif
 /* Tokens.  */
-#define PLUS_T 258
-#define MINUS_T 259
-#define MUL_T 260
-#define DIV_T 261
-#define BEGIN_T 262
-#define END_T 263
-#define READ_T 264
-#define WRITE_T 265
-#define ID_T 266
-#define NUM_T 267
-#define IF_T 268
-#define ELSE_T 269
-#define THEN_T 270
-#define ENDIF_T 271
-#define WHILE_T 272
-#define DO_T 273
-#define ENDWHILE_T 274
-#define LT_T 275
-#define GT_T 276
-#define LE_T 277
-#define GE_T 278
-#define NE_T 279
-#define EQ_T 280
+#define START 258
+#define END 259
+#define READ 260
+#define WRITE 261
+#define PLUS 262
+#define MINUS 263
+#define MUL 264
+#define DIV 265
+#define ASSGN 266
+#define NUM 267
+#define ID 268
+#define IF 269
+#define THEN 270
+#define ELSE 271
+#define ENDIF 272
+#define WHILE 273
+#define DO 274
+#define ENDWHILE 275
+#define EQ 276
+#define NEQ 277
+#define LE 278
+#define GE 279
+#define LT 280
+#define GT 281
+#define BREAK 282
+#define CONT 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "task1.y"
+#line 16 "task1.y"
 
-	struct tnode *node;
+	struct tnode *nptr;
 
-#line 111 "y.tab.h"
+#line 117 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

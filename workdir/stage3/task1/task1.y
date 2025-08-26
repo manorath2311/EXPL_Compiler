@@ -1,90 +1,153 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include<string.h>
+	#include <string.h>
 	#include "task1.h"
 	#include "task1.c"
-    //extern FILE* yyin;
-    void yyerror(char const *s);
+
 	int yylex(void);
+        extern FILE *yyin;
+        FILE *fp;
+        FILE *intermediate;
+        void print(int);
 %}
 
-%union{
-	struct tnode *node;
+%union 
+{
+	struct tnode *nptr;
 }
 
-%type <node> program stmt_list stmt expr ID_T NUM_T E Ifstmt Whilestmt
-%token PLUS_T MINUS_T MUL_T DIV_T
-%token BEGIN_T END_T READ_T WRITE_T ID_T NUM_T IF_T ELSE_T THEN_T ENDIF_T WHILE_T DO_T ENDWHILE_T
-%token LT_T GT_T LE_T GE_T NE_T EQ_T
-%left PLUS_T MINUS_T
-%left MUL_T DIV_T
+%token START END READ WRITE PLUS MINUS MUL DIV ASSGN NUM ID
+%token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
+%token BREAK CONT
+%left PLUS MINUS
+%left MUL DIV
+%right ASSGN
+%nonassoc LT GT LE GE
+%right EQ NEQ
+
+%type <nptr> NUM ID START END READ WRITE PLUS MINUS MUL DIV ASSGN
+%type <nptr> IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT BREAK CONT
+%type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr IfStmt WhileStmt
+%type <nptr> BrkStmt ContStmt 
 
 %%
 
-program : BEGIN_T stmt_list END_T ';' {
-								$$ = $2;
-                                    //print_dot($2);
-                                    // fprintf(intermediate, "MAIN:\n");
-                                    // codegen($2); 
-                                    // fprintf(intermediate, "RET\n");
-                                    // fclose(intermediate);
-									print_dot($2);
+program: START Slist END ';'    {
+                                    $$ = $3;
+									print_dot_aux($2);
+                                }
+       | START END ';'          {$$ = $2;}
+       ;
 
-								exit(1);
-							}
-		| BEGIN_T END_T ';' {
-			printf("Empty Program\n");
-			printf("Parsing Successful\n");
-			exit(1);
-		}
-		;
-
-stmt_list: stmt_list stmt {$$ = createTree(VOID_NODE_CONST, 0, NODE_CONNECTOR, NULL, $1, $2, NULL);}
-	| stmt {$$ = $1;}
-	;
-
-stmt : READ_T '(' ID_T ')' ';' { $$ = createTree(TYPE_VOID, 0, READ_NODE_CONST, NULL, $3, NULL, NULL);}	
-	| WRITE_T '(' expr ')' ';' { $$ = createTree(TYPE_VOID, 0, WRITE_NODE_CONST, NULL, $3, NULL, NULL);}	
-	| ID_T '=' expr ';' { $$ = createTree(TYPE_VOID, 0, ASSIGN_NODE_CONST, NULL, $1, $3, NULL);}	
-	| Ifstmt
-	| Whilestmt 
-	;
-
-expr : expr PLUS_T expr		{$$ = createTree(STATEMENT_NODE_CONST, 0, PLUS_NODE_CONST, NULL, $1, $3, NULL);  printf("Parsed PLUS expression\n");}
-	| expr MINUS_T expr  	{$$ = createTree(STATEMENT_NODE_CONST, 0, MINUS_NODE_CONST, NULL, $1, $3, NULL);  printf("Parsed MINUS expression\n");}
-	| expr MUL_T expr	{$$ = createTree(STATEMENT_NODE_CONST, 0, MUL_NODE_CONST, NULL, $1, $3, NULL);  printf("Parsed MUL expression\n");}
-	| expr DIV_T expr	{$$ = createTree(STATEMENT_NODE_CONST, 0, DIV_NODE_CONST, NULL, $1, $3, NULL);  printf("Parsed DIV expression\n");}
-	| '(' expr ')' 	{$$ = $2;}
-	| E {$$=$1;}
+Slist: Slist Stmt       {$$ = createTree(TYPE_VOID, 0, NODE_CONNECTOR, NULL, $1, $2, NULL);}
+    | Stmt              {$$ = $1;}
     ;
-Ifstmt : IF_T '(' E ')' THEN_T stmt_list ELSE_T stmt_list ENDIF_T {$$ = createTree(TYPE_VOID, 0, IF_ELSE_NODE_CONST, NULL, $3, $8, $6);}
-		| IF_T '(' E ')' THEN_T stmt_list ENDIF_T  {$$ = createTree(TYPE_VOID, 0,IF_NODE_CONST, NULL, $3, $6, NULL);}
-		;
-Whilestmt : WHILE_T '(' E ')' DO_T stmt_list ENDWHILE_T {$$ = createTree(TYPE_VOID, 0, NODE_WHILE, NULL, $3, $6, NULL);}
-		  ;
 
- E : E LT_T E { $$ = createTree(TYPE_BOOL_NODE_CONST, 0,LT_NODE_CONST, NULL, $1, $3, NULL);}
-   | E GT_T E {$$ = createTree(TYPE_BOOL_NODE_CONST, 0,GT_NODE_CONST, NULL, $1, $3, NULL); }
-   | E LE_T E {$$ = createTree(TYPE_BOOL_NODE_CONST, 0,LE_NODE_CONST, NULL, $1, $3, NULL);}
-   | E GE_T E {$$ = createTree(TYPE_BOOL_NODE_CONST, 0,GE_NODE_CONST, NULL, $1, $3, NULL);}
-   | E NE_T E {$$ = createTree(TYPE_BOOL_NODE_CONST, 0,NE_NODE_CONST, NULL, $1, $3, NULL);}
-   | E EQ_T E {$$ = createTree(TYPE_BOOL_NODE_CONST, 0,EQ_NODE_CONST, NULL, $1, $3, NULL);}
-   | ID_T  {$$=$1;}
-   | NUM_T  {$$=$1;}
-   ; 
+Stmt: InputStmt         {$$ = $1;}
+    | OutputStmt        {$$ = $1;}
+    | AsgStmt           {$$ = $1;}
+    | IfStmt            {$$ = $1;}
+    | WhileStmt         {$$ = $1;}
+    | BrkStmt           {$$ = $1;}
+    | ContStmt          {$$ = $1;}
+    ;
+
+IfStmt: IF '(' expr ')' THEN Slist ELSE Slist ENDIF ';'     {
+                                                                typecheck($3->type, TYPE_BOOL, 'e');
+                                                                $$ = createTree(TYPE_VOID, 0, NODE_IF_ELSE, NULL, $3, $8, $6);
+                                                            }
+      | IF '(' expr ')' THEN Slist ENDIF ';'                {
+                                                                typecheck($3->type, TYPE_BOOL, 'i');
+                                                                $$ = createTree(TYPE_VOID, 0, NODE_IF, NULL, $3, $6, NULL);
+                                                            }
+
+WhileStmt: WHILE '(' expr ')' DO Slist ENDWHILE ';'         {
+                                                                typecheck($3->type, TYPE_BOOL, 'w');
+                                                                $$ = createTree(TYPE_VOID, 0, NODE_WHILE, NULL, $3, $6, NULL);
+                                                            }
+BrkStmt: BREAK ';'                  {$$ = createTree(TYPE_VOID, 0, NODE_BREAK, NULL, NULL, NULL, NULL);}
+
+ContStmt: CONT ';'                  {$$ = createTree(TYPE_VOID, 0, NODE_CONT, NULL, NULL, NULL, NULL);}
+
+InputStmt: READ '(' ID ')' ';'      {$$ = createTree(TYPE_VOID, 0, NODE_READ, NULL, $3, NULL, NULL);}
+         ;
+
+OutputStmt: WRITE '(' expr ')' ';'  {$$ = createTree(TYPE_VOID, 0, NODE_WRITE, NULL, $3, NULL, NULL);}
+          ;
+
+AsgStmt: ID ASSGN expr ';'          {
+                                        typecheck($1->type, $3->type, '=');
+                                        $$ = createTree(TYPE_VOID, 0, NODE_ASSGN, NULL, $1, $3, NULL);
+                                    }
+       ;
+
+expr : expr PLUS expr	{
+                            typecheck($1->type, $3->type, 'a');
+                            $$ = createTree(TYPE_INT, 0, NODE_PLUS, NULL, $1, $3, NULL);
+                        }
+     | expr MINUS expr  {
+                            typecheck($1->type, $3->type, 'a');
+                            $$ = createTree(TYPE_INT, 0, NODE_MINUS, NULL, $1, $3, NULL);
+                        }
+     | expr MUL expr	{
+                            typecheck($1->type, $3->type, 'a');
+                            $$ = createTree(TYPE_INT, 0, NODE_MUL, NULL, $1, $3, NULL);
+                        }
+     | expr DIV expr	{
+                            typecheck($1->type, $3->type, 'a');
+                            $$ = createTree(TYPE_INT, 0, NODE_DIV, NULL, $1, $3, NULL);
+                        }
+     | expr LT expr     {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_LT, NULL, $1, $3, NULL);
+                        }
+     | expr GT expr     {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_GT, NULL, $1, $3, NULL);
+                        }
+     | expr LE expr     {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_LE, NULL, $1, $3, NULL);
+                        }
+     | expr GE expr     {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_GE, NULL, $1, $3, NULL);
+                        }
+     | expr NEQ expr    {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_NEQ, NULL, $1, $3, NULL);
+                        }
+     | expr EQ expr     {
+                            typecheck($1->type, $3->type, 'b');
+                            $$ = createTree(TYPE_BOOL, 0, NODE_EQ, NULL, $1, $3, NULL);
+                        }
+     | '(' expr ')'	{$$ = $2;}
+     | NUM		{$$ = $1;}
+     | ID		{$$ = $1;}
+     ;
 
 %%
 
-void yyerror(char const *s)
+int yyerror(char const *s) 
 {
     printf("yyerror %s",s);
+	return 1;
 }
 
-
-int main(void) 
-{
-	yyparse();
-	
-	return 0;
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Please provide an input filename\n");
+        exit(1);
+    } else {
+        fp = fopen(argv[1], "r");
+        if (!fp) {
+            printf("Invalid input file specified\n");
+            exit(1);
+        } else {
+            yyin = fp;
+        }
+    }
+    yyparse();
+    return 0;
 }
