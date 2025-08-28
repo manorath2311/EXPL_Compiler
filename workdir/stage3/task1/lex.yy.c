@@ -926,7 +926,7 @@ case 29:
 YY_RULE_SETUP
 #line 51 "task1.l"
 {
-                yyerror("unknown character\n");
+                perror("unknown character\n");
                 exit(1);
             }
 	YY_BREAK
@@ -1943,6 +1943,7 @@ void yyfree (void * ptr )
 #line 56 "task1.l"
 
 
-int yywrap(void) {
+int yywrap(void) 
+{
 	return 1;
 }

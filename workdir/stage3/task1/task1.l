@@ -49,12 +49,13 @@
 [ \t\n]	    {}
 [();]       {return *yytext;}
 .	    {
-                yyerror("unknown character\n");
+                perror("unknown character\n");
                 exit(1);
             }
 
 %%
 
-int yywrap(void) {
+int yywrap(void) 
+{
 	return 1;
 }

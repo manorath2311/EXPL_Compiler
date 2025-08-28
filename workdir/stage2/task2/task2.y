@@ -1,69 +1,88 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include<string.h>
 	#include "task2.h"
 	#include "task2.c"
-    //extern FILE* yyin;
-    void yyerror(char const *s);
+	#include <string.h>
 	int yylex(void);
+        extern FILE *yyin;
+        FILE *fp;
+        FILE *intermediate;
+        void print(int);
+		int yyerror(const char*);
 %}
 
-%union{
-	struct tnode *node;
+%union {
+	struct tnode *nptr;
 }
 
-%type <node> program stmt_list stmt expr ID_T NUM_T
-%token PLUS_T MINUS_T MUL_T DIV_T
-%token BEGIN_T END_T READ_T WRITE_T ID_T NUM_T
-%left PLUS_T MINUS_T
-%left MUL_T DIV_T
+%token <nptr> NUM ID
+%token START END READ WRITE PLUS MINUS MUL DIV ASSGN
+
+%left PLUS MINUS
+%left MUL DIV
+
+%type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr
 
 %%
 
-program : BEGIN_T stmt_list END_T ';' {
-								$$ = $2;
-								printf("Parsing Successful\n");
-								//print_tree($2, 0, 0);
-								//preorder($2);
-                                generate_xsm($2);
-								//evaluate($2);
-								printf("\n");
+program: START Slist END ';'    {
+                                    $$ = $2;
+                                    initialize();
+                                    codegen($2); 
+                                    fclose(intermediate);
+                                }
+       | START END ';'          {$$ = NULL;}
+       ;
 
-								exit(1);
-							}
-		| BEGIN_T END_T ';' {
-			printf("Empty Program\n");
-			printf("Parsing Successful\n");
-			exit(1);
-		}
+Slist: Slist Stmt       {$$ = createTree(1, 0, NODE_CONNECTOR, NULL, $1, $2);}
+    | Stmt              {$$ = $1;}
+    ;
 
-stmt_list: stmt_list stmt ';' {$$ = makeStmtNode(STATEMENT_NODE_CONST, $1, $2);}
-	| stmt ';' {$$ = $1;}
+Stmt: InputStmt         {$$ = $1;}
+    | OutputStmt        {$$ = $1;}
+    | AsgStmt           {$$ = $1;}
+    ;
 
-stmt : READ_T '(' ID_T ')' { $$ = makeStmtNode(READ_NODE_CONST, $3, (struct tnode *)NULL); }
-	| WRITE_T '(' expr ')' { $$ = makeStmtNode(WRITE_NODE_CONST, $3, (struct tnode *)NULL); }
-	| ID_T '=' expr { $$ = makeExprNode(ASSIGN_NODE_CONST, '=', $1, $3); }
+InputStmt: READ '(' ID ')' ';'  {$$ = createTree(1, 0, NODE_READ, NULL, $3, NULL);}
+         ;
 
-expr : expr PLUS_T expr		{$$ = makeExprNode(STATEMENT_NODE_CONST, '+',$1, $3);  printf("Parsed PLUS expression\n");}
-	| expr MINUS_T expr  	{$$ = makeExprNode(STATEMENT_NODE_CONST, '-',$1, $3);  printf("Parsed MINUS expression\n");}
-	| expr MUL_T expr	{$$ = makeExprNode(STATEMENT_NODE_CONST, '*',$1, $3);  printf("Parsed MUL expression\n");}
-	| expr DIV_T expr	{$$ = makeExprNode(STATEMENT_NODE_CONST, '/',$1, $3);  printf("Parsed DIV expression\n");}
-	| '(' expr ')' 	{$$ = $2;}
-	| NUM_T		{$$ = $1;}
-	| ID_T	{$$ = $1;}
+OutputStmt: WRITE '(' expr ')' ';' {$$ = createTree(1, 0, NODE_WRITE, NULL, $3, NULL);}
+          ;
+
+AsgStmt: ID ASSGN expr ';'      {$$ = createTree(1, 0, NODE_ASSGN, NULL, $1, $3);}
+       ;
+
+expr : expr PLUS expr	{$$ = createTree(1, 0, NODE_PLUS, NULL, $1, $3);}
+     | expr MINUS expr  {$$ = createTree(1, 0, NODE_MINUS, NULL, $1, $3);}
+     | expr MUL expr	{$$ = createTree(1, 0, NODE_MUL, NULL, $1, $3);}
+     | expr DIV expr	{$$ = createTree(1, 0, NODE_DIV, NULL, $1, $3);}
+     | '(' expr ')'	{$$ = $2;}
+     | NUM		{$$ = $1;}
+     | ID		{$$ = $1;}
+     ;
 
 %%
 
-void yyerror(char const *s)
+int yyerror(char const *s) 
 {
     printf("yyerror %s",s);
+	return 0;
 }
 
-
-int main(void) 
-{
-	yyparse();
-	
-	return 0;
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Please provide an input filename\n");
+        exit(1);
+    } else {
+        fp = fopen(argv[1], "r");
+        if (!fp) {
+            printf("Invalid input file specified\n");
+            exit(1);
+        } else {
+            yyin = fp;
+        }
+    }
+    yyparse();
+    return 0;
 }

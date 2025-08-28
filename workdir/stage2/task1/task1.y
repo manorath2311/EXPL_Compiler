@@ -13,11 +13,12 @@
 	struct tnode *node;
 }
 
-%type <node> program stmt_list stmt expr ID_T NUM_T
 %token PLUS_T MINUS_T MUL_T DIV_T
-%token BEGIN_T END_T READ_T WRITE_T ID_T NUM_T
+%token BEGIN_T END_T READ_T WRITE_T 
 %left PLUS_T MINUS_T
 %left MUL_T DIV_T
+%type <node> program stmt_list stmt expr 
+%token <node> ID_T NUM_T
 
 %%
 
@@ -59,9 +60,30 @@ void yyerror(char const *s)
 }
 
 
-int main(void) 
+FILE *fp;
+extern FILE *yyin;
+
+int main(int argc, char *argv[]) 
 {
+	output=fopen("output.txt","w");
+	if (argc < 2) 
+	{
+		printf("Please provide an input filename\n");
+		exit(1);
+	}
+	else 
+	{
+		fp = fopen(argv[1], "r");
+		if (!fp) 
+		{
+			printf("Invalid input file specified\n");
+			exit(1);
+		} 
+		else 
+		{
+			yyin = fp;
+		}
+	}
 	yyparse();
-	
 	return 0;
 }

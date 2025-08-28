@@ -9,7 +9,7 @@ struct tnode *makeConstantNode(int type, int val)
    return new_node;
 
 }
-
+FILE* output = NULL;
 struct tnode *makeVariableNode(int type, char* varname)
 {
     struct tnode *new_node = (struct tnode *)malloc(sizeof(struct tnode));
@@ -45,51 +45,51 @@ void print_tree(struct tnode *node, int lvl, int isRight)
 
     for (int i = 0; i < lvl; i++) 
     {
-        printf("    ");
+        fprintf(output, "    ");
     }
 
     if (isRight)
     {
-        printf("R----");
+        fprintf(output, "R----");
     }
     else 
     {
-        printf("L----");
+        fprintf(output, "L----");
     }
 
     if(node->type==INT_NODE_CONST)
     {
-        printf("INT: %d\n", node->val);
+        fprintf(output, "INT: %d\n", node->val);
     }
     else if(node->type==ID_NODE_CONST)
     {
-        printf("ID: %s\n", node->varname);
+        fprintf(output, "ID: %s\n", node->varname);
     }
     else if(node->type==OP_NODE_CONST)
     {
-        printf("OP: %c\n", node->op);
+        fprintf(output, "OP: %c\n", node->op);
     }
     else if(node->type==READ_NODE_CONST)
     {
-        printf("READ: %s\n", node->varname);
+        fprintf(output, "READ: %s\n", node->varname);
     }
     else if(node->type==WRITE_NODE_CONST)
     {
-        printf("WRITE: %s\n", node->varname);
+        fprintf(output, "WRITE: %s\n", node->varname);
     }
     else if(node->type==STATEMENT_NODE_CONST)
     {
         //printf("STATEMENT\n");
-        printf("OP: %c\n", node->op);
+        fprintf(output, "OP: %c\n", node->op);
 
     }
     else if(node->type==ASSIGN_NODE_CONST)
     {
-        printf("ASSIGN\n");
+        fprintf(output, "ASSIGN\n");
     }
     else
     {
-        printf("unknown\n");
+        fprintf(output, "unknown\n");
     }
 
     print_tree(node->left, lvl + 1, 1);

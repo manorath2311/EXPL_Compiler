@@ -49,39 +49,41 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    PLUS_T = 258,
-    MINUS_T = 259,
-    MUL_T = 260,
-    DIV_T = 261,
-    BEGIN_T = 262,
-    END_T = 263,
-    READ_T = 264,
-    WRITE_T = 265,
-    ID_T = 266,
-    NUM_T = 267
+    NUM = 258,
+    ID = 259,
+    START = 260,
+    END = 261,
+    READ = 262,
+    WRITE = 263,
+    PLUS = 264,
+    MINUS = 265,
+    MUL = 266,
+    DIV = 267,
+    ASSGN = 268
   };
 #endif
 /* Tokens.  */
-#define PLUS_T 258
-#define MINUS_T 259
-#define MUL_T 260
-#define DIV_T 261
-#define BEGIN_T 262
-#define END_T 263
-#define READ_T 264
-#define WRITE_T 265
-#define ID_T 266
-#define NUM_T 267
+#define NUM 258
+#define ID 259
+#define START 260
+#define END 261
+#define READ 262
+#define WRITE 263
+#define PLUS 264
+#define MINUS 265
+#define MUL 266
+#define DIV 267
+#define ASSGN 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "task2.y"
+#line 15 "task2.y"
 
-	struct tnode *node;
+	struct tnode *nptr;
 
-#line 85 "y.tab.h"
+#line 87 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

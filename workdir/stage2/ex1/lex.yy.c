@@ -362,10 +362,10 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[34] =
     {   0,
-        0,    0,   16,   14,   13,   13,   12,    9,    7,    8,
-       10,    6,   11,    5,    5,    5,    5,    5,    6,    0,
-        0,    0,    0,    0,    2,    0,    0,    0,    3,    0,
-        1,    4,    0
+        0,    0,   16,   14,   12,   12,   13,    8,    6,    7,
+        9,    1,   10,   11,   11,   11,   11,   11,    1,    0,
+        0,    0,    0,    0,    3,    0,    0,    0,    4,    0,
+        2,    5,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -461,14 +461,13 @@ char *yytext;
 #line 2 "ex1.l"
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include<string.h>
 	#include "y.tab.h"
-	#include "ex1.h"
-	int yyerror(const char *s);
+	#include "task2.h"
+	#include <string.h>
 	int number;
-	char variable;
+        char *variable;
+#line 470 "lex.yy.c"
 #line 471 "lex.yy.c"
-#line 472 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -685,10 +684,10 @@ YY_DECL
 		}
 
 	{
-#line 12 "ex1.l"
+#line 11 "ex1.l"
 
 
-#line 692 "lex.yy.c"
+#line 691 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -747,84 +746,93 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 14 "ex1.l"
-{return BEGIN_T;}
+#line 13 "ex1.l"
+{
+                number = atoi(yytext);
+                yylval.nptr = createTree(0, number, NODE_NUM, NULL, NULL, NULL);
+                return NUM;
+            }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 15 "ex1.l"
-{return END_T;}
+#line 18 "ex1.l"
+{return START;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 16 "ex1.l"
-{return READ_T;}
+#line 19 "ex1.l"
+{return END;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "ex1.l"
-{return WRITE_T;}
+#line 20 "ex1.l"
+{return READ;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 18 "ex1.l"
-{variable = *yytext; yylval.node = makeVariableNode(ID_NODE_CONST ,yytext); return ID_T;}
+#line 21 "ex1.l"
+{return WRITE;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 19 "ex1.l"
-{number = atoi(yytext); yylval.node = makeConstantNode(INT_NODE_CONST,number); return NUM_T;}
+#line 22 "ex1.l"
+{return PLUS;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 20 "ex1.l"
-{return PLUS_T;}
+#line 23 "ex1.l"
+{return MINUS;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 21 "ex1.l"
-{return MINUS_T;}
+#line 24 "ex1.l"
+{return MUL;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 22 "ex1.l"
-{return MUL_T;}
+#line 25 "ex1.l"
+{return DIV;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 23 "ex1.l"
-{return DIV_T;}
+#line 26 "ex1.l"
+{return ASSGN;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 24 "ex1.l"
-{return *yytext;}
+#line 27 "ex1.l"
+{
+                variable = (char*)malloc(sizeof(yytext));
+                strcpy(variable, yytext);
+                yylval.nptr = createTree(1, 0, NODE_ID, variable, NULL, NULL);
+                return ID;
+            }
 	YY_BREAK
 case 12:
+/* rule 12 can match eol */
 YY_RULE_SETUP
-#line 25 "ex1.l"
-{ return *yytext; }
+#line 33 "ex1.l"
+{}
 	YY_BREAK
 case 13:
-/* rule 13 can match eol */
 YY_RULE_SETUP
-#line 26 "ex1.l"
-{}
+#line 34 "ex1.l"
+{return *yytext;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 27 "ex1.l"
+#line 35 "ex1.l"
 {
-    yyerror("unknown character\n");
-    exit(1);
-}
+                perror("unknown character\n");
+                exit(1);
+            }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "ex1.l"
+#line 40 "ex1.l"
 ECHO;
 	YY_BREAK
-#line 828 "lex.yy.c"
+#line 836 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1829,10 +1837,10 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 32 "ex1.l"
+#line 40 "ex1.l"
 
 
-int yywrap() 
+int yywrap(void) 
 {
 	return 1;
 }

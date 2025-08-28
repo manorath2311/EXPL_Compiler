@@ -1,0 +1,10 @@
+begin
+write(2+2);
+a=2;
+write(a);
+b=10;
+b=b+12;
+write(b);
+read(x);
+write(x);
+end;

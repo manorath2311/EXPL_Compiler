@@ -6,6 +6,7 @@
 	#include "task1.c"
 
 	int yylex(void);
+    int yyerror(const char*);
         extern FILE *yyin;
         FILE *fp;
         FILE *intermediate;
@@ -17,7 +18,8 @@
 	struct tnode *nptr;
 }
 
-%token START END READ WRITE PLUS MINUS MUL DIV ASSGN NUM ID
+%token START END READ WRITE PLUS MINUS MUL DIV ASSGN
+%token<nptr> ID NUM
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
 %token BREAK CONT
 %left PLUS MINUS
@@ -26,18 +28,18 @@
 %nonassoc LT GT LE GE
 %right EQ NEQ
 
-%type <nptr> NUM ID START END READ WRITE PLUS MINUS MUL DIV ASSGN
-%type <nptr> IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT BREAK CONT
+
 %type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr IfStmt WhileStmt
 %type <nptr> BrkStmt ContStmt 
 
 %%
 
 program: START Slist END ';'    {
-                                    $$ = $3;
-									print_dot_aux($2);
+                                    $$ = $2;
+									print_dot($$);
+                                    printf("DONE\n");
                                 }
-       | START END ';'          {$$ = $2;}
+       | START END ';'          {$$ = NULL;}
        ;
 
 Slist: Slist Stmt       {$$ = createTree(TYPE_VOID, 0, NODE_CONNECTOR, NULL, $1, $2, NULL);}
@@ -135,16 +137,24 @@ int yyerror(char const *s)
 	return 1;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[]) 
+{
+    stream=fopen("temp.txt", "w");
+    if (argc < 2) 
+    {
         printf("Please provide an input filename\n");
         exit(1);
-    } else {
+    }
+    else 
+    {
         fp = fopen(argv[1], "r");
-        if (!fp) {
+        if (!fp) 
+        {
             printf("Invalid input file specified\n");
             exit(1);
-        } else {
+        } 
+        else 
+        {
             yyin = fp;
         }
     }

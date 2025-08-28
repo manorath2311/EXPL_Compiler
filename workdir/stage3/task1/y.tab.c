@@ -75,12 +75,13 @@
 	#include "task1.c"
 
 	int yylex(void);
+    int yyerror(const char*);
         extern FILE *yyin;
         FILE *fp;
         FILE *intermediate;
         void print(int);
 
-#line 84 "y.tab.c"
+#line 85 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -137,8 +138,8 @@ extern int yydebug;
     MUL = 264,
     DIV = 265,
     ASSGN = 266,
-    NUM = 267,
-    ID = 268,
+    ID = 267,
+    NUM = 268,
     IF = 269,
     THEN = 270,
     ELSE = 271,
@@ -166,8 +167,8 @@ extern int yydebug;
 #define MUL 264
 #define DIV 265
 #define ASSGN 266
-#define NUM 267
-#define ID 268
+#define ID 267
+#define NUM 268
 #define IF 269
 #define THEN 270
 #define ELSE 271
@@ -188,11 +189,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "task1.y"
+#line 17 "task1.y"
 
 	struct tnode *nptr;
 
-#line 196 "y.tab.c"
+#line 197 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -511,7 +512,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  20
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   182
+#define YYLAST   213
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  32
@@ -568,12 +569,12 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    36,    36,    40,    43,    44,    47,    48,    49,    50,
-      51,    52,    53,    56,    60,    65,    69,    71,    73,    76,
-      79,    85,    89,    93,    97,   101,   105,   109,   113,   117,
-     121,   125,   126,   127
+       0,    37,    37,    42,    45,    46,    49,    50,    51,    52,
+      53,    54,    55,    58,    62,    67,    71,    73,    75,    78,
+      81,    87,    91,    95,    99,   103,   107,   111,   115,   119,
+     123,   127,   128,   129
 };
 #endif
 
@@ -583,7 +584,7 @@ static const yytype_int8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "START", "END", "READ", "WRITE", "PLUS",
-  "MINUS", "MUL", "DIV", "ASSGN", "NUM", "ID", "IF", "THEN", "ELSE",
+  "MINUS", "MUL", "DIV", "ASSGN", "ID", "NUM", "IF", "THEN", "ELSE",
   "ENDIF", "WHILE", "DO", "ENDWHILE", "EQ", "NEQ", "LE", "GE", "LT", "GT",
   "BREAK", "CONT", "';'", "'('", "')'", "$accept", "program", "Slist",
   "Stmt", "IfStmt", "WhileStmt", "BrkStmt", "ContStmt", "InputStmt",
@@ -617,14 +618,14 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       7,    82,    14,    11,    17,    18,    30,    33,    34,    37,
-      38,    98,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
-     -28,   -28,    55,    32,    32,    32,    32,   -28,   -28,    69,
-     -28,    66,   -28,   -28,    32,     8,   147,    28,    48,   -28,
-      72,    68,    32,    32,    32,    32,    32,    32,    32,    32,
-      32,    32,    76,   -28,    93,    94,   -28,   -28,   156,   156,
-     -17,   -17,    -9,    -9,    59,    59,    59,    59,   -28,   135,
-     135,   101,   117,   135,    91,    92,   133,   -28,   -28,    95,
+       7,    91,    14,    11,    17,    18,    30,    33,    34,    37,
+      38,    96,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
+     -28,   -28,    56,    32,    32,    32,    32,   -28,   -28,    57,
+     -28,    67,   -28,   -28,    32,     8,   178,    28,    48,   -28,
+      58,    68,    32,    32,    32,    32,    32,    32,    32,    32,
+      32,    32,    75,   -28,    73,    87,   -28,   -28,   187,   187,
+     -17,   -17,    -9,    -9,    59,    59,    59,    59,   -28,   166,
+     166,   115,   132,   166,    78,    82,   149,   -28,   -28,    83,
      -28
 };
 
@@ -636,7 +637,7 @@ static const yytype_int8 yydefact[] =
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     5,     9,    10,    11,    12,     6,     7,     8,
        1,     3,     0,     0,     0,     0,     0,    16,    17,     0,
-       4,     0,    32,    33,     0,     0,     0,     0,     0,     2,
+       4,     0,    33,    32,     0,     0,     0,     0,     0,     2,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,    20,     0,     0,    18,    31,    21,    22,
       23,    24,    30,    29,    27,    28,    25,    26,    19,     0,
@@ -671,17 +672,20 @@ static const yytype_int8 yytable[] =
       47,    48,    49,    50,    51,    42,    43,    44,    45,    54,
       30,    30,    34,    25,    26,    30,    27,    28,    31,    46,
       47,    48,    49,    50,    51,    42,    43,    44,    45,    55,
-      46,    47,    -1,    -1,    -1,    -1,     3,     4,     5,    46,
-      47,    48,    49,    50,    51,     6,     7,    40,    39,    57,
-       8,    56,    29,     4,     5,    68,     4,     5,    69,     9,
-      10,     6,     7,    70,     6,     7,     8,    73,    74,     8,
-      77,    78,     4,     5,    80,     9,    10,     0,     9,    10,
-       6,     7,     0,     0,     0,     8,     0,    75,     4,     5,
-       4,     5,     0,     0,     9,    10,     6,     7,     6,     7,
-      79,     8,     0,     8,    42,    43,    44,    45,     0,     0,
-       9,    10,     9,    10,     0,    44,    45,     0,    46,    47,
-      48,    49,    50,    51,     0,     0,    53,    46,    47,    48,
-      49,    50,    51
+      46,    47,    -1,    -1,    -1,    -1,    39,    56,    69,    46,
+      47,    48,    49,    50,    51,     3,     4,     5,    40,    57,
+      29,     4,     5,     6,    68,     7,    70,    77,     6,     8,
+       7,    78,    80,     0,     8,     0,     0,     0,     9,    10,
+       4,     5,     0,     9,    10,     0,     0,     6,     0,     7,
+       0,    73,    74,     8,     0,     0,     0,     4,     5,     0,
+       0,     0,     9,    10,     6,     0,     7,     0,     0,     0,
+       8,     0,    75,     0,     4,     5,     0,     0,     0,     9,
+      10,     6,     0,     7,     0,     0,    79,     8,     0,     0,
+       0,     4,     5,     0,     0,     0,     9,    10,     6,     0,
+       7,     0,     0,     0,     8,    42,    43,    44,    45,     0,
+       0,     0,     0,     9,    10,     0,    44,    45,     0,    46,
+      47,    48,    49,    50,    51,     0,     0,    53,    46,    47,
+      48,    49,    50,    51
 };
 
 static const yytype_int8 yycheck[] =
@@ -692,29 +696,32 @@ static const yytype_int8 yycheck[] =
       22,    23,    24,    25,    26,     7,     8,     9,    10,    31,
       29,    11,    69,    70,    12,    13,    73,    30,    30,    21,
       22,    23,    24,    25,    26,     7,     8,     9,    10,    31,
-      71,    72,    30,    30,    30,    76,    29,    29,    13,    21,
+      71,    72,    30,    30,    30,    76,    29,    29,    12,    21,
       22,    23,    24,    25,    26,     7,     8,     9,    10,    31,
-      21,    22,    23,    24,    25,    26,     4,     5,     6,    21,
-      22,    23,    24,    25,    26,    13,    14,    31,    29,    31,
-      18,    29,     4,     5,     6,    29,     5,     6,    15,    27,
-      28,    13,    14,    19,    13,    14,    18,    16,    17,    18,
-      29,    29,     5,     6,    29,    27,    28,    -1,    27,    28,
-      13,    14,    -1,    -1,    -1,    18,    -1,    20,     5,     6,
-       5,     6,    -1,    -1,    27,    28,    13,    14,    13,    14,
-      17,    18,    -1,    18,     7,     8,     9,    10,    -1,    -1,
-      27,    28,    27,    28,    -1,     9,    10,    -1,    21,    22,
-      23,    24,    25,    26,    -1,    -1,    29,    21,    22,    23,
-      24,    25,    26
+      21,    22,    23,    24,    25,    26,    29,    29,    15,    21,
+      22,    23,    24,    25,    26,     4,     5,     6,    31,    31,
+       4,     5,     6,    12,    29,    14,    19,    29,    12,    18,
+      14,    29,    29,    -1,    18,    -1,    -1,    -1,    27,    28,
+       5,     6,    -1,    27,    28,    -1,    -1,    12,    -1,    14,
+      -1,    16,    17,    18,    -1,    -1,    -1,     5,     6,    -1,
+      -1,    -1,    27,    28,    12,    -1,    14,    -1,    -1,    -1,
+      18,    -1,    20,    -1,     5,     6,    -1,    -1,    -1,    27,
+      28,    12,    -1,    14,    -1,    -1,    17,    18,    -1,    -1,
+      -1,     5,     6,    -1,    -1,    -1,    27,    28,    12,    -1,
+      14,    -1,    -1,    -1,    18,     7,     8,     9,    10,    -1,
+      -1,    -1,    -1,    27,    28,    -1,     9,    10,    -1,    21,
+      22,    23,    24,    25,    26,    -1,    -1,    29,    21,    22,
+      23,    24,    25,    26
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    33,     4,     5,     6,    13,    14,    18,    27,
+       0,     3,    33,     4,     5,     6,    12,    14,    18,    27,
       28,    34,    35,    36,    37,    38,    39,    40,    41,    42,
        0,    29,    30,    30,    11,    30,    30,    29,    29,     4,
-      35,    13,    12,    13,    30,    43,    43,    43,    43,    29,
+      35,    12,    12,    13,    30,    43,    43,    43,    43,    29,
       31,    43,     7,     8,     9,    10,    21,    22,    23,    24,
       25,    26,    31,    29,    31,    31,    29,    31,    43,    43,
       43,    43,    43,    43,    43,    43,    43,    43,    29,    15,
@@ -1433,244 +1440,245 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 36 "task1.y"
+#line 37 "task1.y"
                                 {
-                                    (yyval.nptr) = (yyvsp[-1].nptr);
-									print_dot_aux((yyvsp[-2].nptr));
+                                    (yyval.nptr) = (yyvsp[-2].nptr);
+									print_dot((yyval.nptr));
+                                    printf("DONE\n");
                                 }
-#line 1442 "y.tab.c"
+#line 1450 "y.tab.c"
     break;
 
   case 3:
-#line 40 "task1.y"
-                                {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1448 "y.tab.c"
+#line 42 "task1.y"
+                                {(yyval.nptr) = NULL;}
+#line 1456 "y.tab.c"
     break;
 
   case 4:
-#line 43 "task1.y"
+#line 45 "task1.y"
                         {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_CONNECTOR, NULL, (yyvsp[-1].nptr), (yyvsp[0].nptr), NULL);}
-#line 1454 "y.tab.c"
+#line 1462 "y.tab.c"
     break;
 
   case 5:
-#line 44 "task1.y"
+#line 46 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1460 "y.tab.c"
+#line 1468 "y.tab.c"
     break;
 
   case 6:
-#line 47 "task1.y"
+#line 49 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1466 "y.tab.c"
+#line 1474 "y.tab.c"
     break;
 
   case 7:
-#line 48 "task1.y"
+#line 50 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1472 "y.tab.c"
+#line 1480 "y.tab.c"
     break;
 
   case 8:
-#line 49 "task1.y"
+#line 51 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1478 "y.tab.c"
+#line 1486 "y.tab.c"
     break;
 
   case 9:
-#line 50 "task1.y"
+#line 52 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1484 "y.tab.c"
+#line 1492 "y.tab.c"
     break;
 
   case 10:
-#line 51 "task1.y"
+#line 53 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1490 "y.tab.c"
+#line 1498 "y.tab.c"
     break;
 
   case 11:
-#line 52 "task1.y"
+#line 54 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1496 "y.tab.c"
+#line 1504 "y.tab.c"
     break;
 
   case 12:
-#line 53 "task1.y"
+#line 55 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1502 "y.tab.c"
+#line 1510 "y.tab.c"
     break;
 
   case 13:
-#line 56 "task1.y"
+#line 58 "task1.y"
                                                             {
                                                                 typecheck((yyvsp[-7].nptr)->type, TYPE_BOOL, 'e');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_IF_ELSE, NULL, (yyvsp[-7].nptr), (yyvsp[-2].nptr), (yyvsp[-4].nptr));
                                                             }
-#line 1511 "y.tab.c"
+#line 1519 "y.tab.c"
     break;
 
   case 14:
-#line 60 "task1.y"
+#line 62 "task1.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'i');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_IF, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1520 "y.tab.c"
+#line 1528 "y.tab.c"
     break;
 
   case 15:
-#line 65 "task1.y"
+#line 67 "task1.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'w');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_WHILE, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1529 "y.tab.c"
+#line 1537 "y.tab.c"
     break;
 
   case 16:
-#line 69 "task1.y"
+#line 71 "task1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_BREAK, NULL, NULL, NULL, NULL);}
-#line 1535 "y.tab.c"
+#line 1543 "y.tab.c"
     break;
 
   case 17:
-#line 71 "task1.y"
+#line 73 "task1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_CONT, NULL, NULL, NULL, NULL);}
-#line 1541 "y.tab.c"
+#line 1549 "y.tab.c"
     break;
 
   case 18:
-#line 73 "task1.y"
+#line 75 "task1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_READ, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1547 "y.tab.c"
+#line 1555 "y.tab.c"
     break;
 
   case 19:
-#line 76 "task1.y"
+#line 78 "task1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_WRITE, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1553 "y.tab.c"
+#line 1561 "y.tab.c"
     break;
 
   case 20:
-#line 79 "task1.y"
+#line 81 "task1.y"
                                     {
                                         typecheck((yyvsp[-3].nptr)->type, (yyvsp[-1].nptr)->type, '=');
                                         (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_ASSGN, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr), NULL);
                                     }
-#line 1562 "y.tab.c"
+#line 1570 "y.tab.c"
     break;
 
   case 21:
-#line 85 "task1.y"
+#line 87 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_PLUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1571 "y.tab.c"
+#line 1579 "y.tab.c"
     break;
 
   case 22:
-#line 89 "task1.y"
+#line 91 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_MINUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1580 "y.tab.c"
+#line 1588 "y.tab.c"
     break;
 
   case 23:
-#line 93 "task1.y"
+#line 95 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_MUL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1589 "y.tab.c"
+#line 1597 "y.tab.c"
     break;
 
   case 24:
-#line 97 "task1.y"
+#line 99 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_DIV, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1598 "y.tab.c"
+#line 1606 "y.tab.c"
     break;
 
   case 25:
-#line 101 "task1.y"
+#line 103 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_LT, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1607 "y.tab.c"
+#line 1615 "y.tab.c"
     break;
 
   case 26:
-#line 105 "task1.y"
+#line 107 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_GT, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1616 "y.tab.c"
+#line 1624 "y.tab.c"
     break;
 
   case 27:
-#line 109 "task1.y"
+#line 111 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_LE, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1625 "y.tab.c"
+#line 1633 "y.tab.c"
     break;
 
   case 28:
-#line 113 "task1.y"
+#line 115 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_GE, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1634 "y.tab.c"
+#line 1642 "y.tab.c"
     break;
 
   case 29:
-#line 117 "task1.y"
+#line 119 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_NEQ, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1643 "y.tab.c"
+#line 1651 "y.tab.c"
     break;
 
   case 30:
-#line 121 "task1.y"
+#line 123 "task1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_EQ, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1652 "y.tab.c"
+#line 1660 "y.tab.c"
     break;
 
   case 31:
-#line 125 "task1.y"
+#line 127 "task1.y"
                         {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1658 "y.tab.c"
+#line 1666 "y.tab.c"
     break;
 
   case 32:
-#line 126 "task1.y"
+#line 128 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1664 "y.tab.c"
+#line 1672 "y.tab.c"
     break;
 
   case 33:
-#line 127 "task1.y"
+#line 129 "task1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1670 "y.tab.c"
+#line 1678 "y.tab.c"
     break;
 
 
-#line 1674 "y.tab.c"
+#line 1682 "y.tab.c"
 
       default: break;
     }
@@ -1902,7 +1910,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 130 "task1.y"
+#line 132 "task1.y"
 
 
 int yyerror(char const *s) 
@@ -1911,16 +1919,24 @@ int yyerror(char const *s)
 	return 1;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[]) 
+{
+    stream=fopen("temp.txt", "w");
+    if (argc < 2) 
+    {
         printf("Please provide an input filename\n");
         exit(1);
-    } else {
+    }
+    else 
+    {
         fp = fopen(argv[1], "r");
-        if (!fp) {
+        if (!fp) 
+        {
             printf("Invalid input file specified\n");
             exit(1);
-        } else {
+        } 
+        else 
+        {
             yyin = fp;
         }
     }

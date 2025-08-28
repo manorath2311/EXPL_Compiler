@@ -533,8 +533,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    24,    24,    33,    39,    40,    42,    43,    44,    46,
-      47,    48,    49,    50,    51,    52
+       0,    25,    25,    34,    40,    41,    43,    44,    45,    47,
+      48,    49,    50,    51,    52,    53
 };
 #endif
 
@@ -1340,7 +1340,7 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 24 "task1.y"
+#line 25 "task1.y"
                                       {
 								(yyval.node) = (yyvsp[-2].node);
 								printf("Parsing Successful\n");
@@ -1354,7 +1354,7 @@ yyreduce:
     break;
 
   case 3:
-#line 33 "task1.y"
+#line 34 "task1.y"
                                     {
 			printf("Empty Program\n");
 			printf("Parsing Successful\n");
@@ -1364,73 +1364,73 @@ yyreduce:
     break;
 
   case 4:
-#line 39 "task1.y"
+#line 40 "task1.y"
                               {(yyval.node) = makeStmtNode(STATEMENT_NODE_CONST, (yyvsp[-2].node), (yyvsp[-1].node));}
 #line 1370 "y.tab.c"
     break;
 
   case 5:
-#line 40 "task1.y"
+#line 41 "task1.y"
                    {(yyval.node) = (yyvsp[-1].node);}
 #line 1376 "y.tab.c"
     break;
 
   case 6:
-#line 42 "task1.y"
+#line 43 "task1.y"
                            { (yyval.node) = makeStmtNode(READ_NODE_CONST, (yyvsp[-1].node), (struct tnode *)NULL); }
 #line 1382 "y.tab.c"
     break;
 
   case 7:
-#line 43 "task1.y"
+#line 44 "task1.y"
                                { (yyval.node) = makeStmtNode(WRITE_NODE_CONST, (yyvsp[-1].node), (struct tnode *)NULL); }
 #line 1388 "y.tab.c"
     break;
 
   case 8:
-#line 44 "task1.y"
+#line 45 "task1.y"
                         { (yyval.node) = makeExprNode(ASSIGN_NODE_CONST, '=', (yyvsp[-2].node), (yyvsp[0].node)); }
 #line 1394 "y.tab.c"
     break;
 
   case 9:
-#line 46 "task1.y"
+#line 47 "task1.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '+',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed PLUS expression\n");}
 #line 1400 "y.tab.c"
     break;
 
   case 10:
-#line 47 "task1.y"
+#line 48 "task1.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '-',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed MINUS expression\n");}
 #line 1406 "y.tab.c"
     break;
 
   case 11:
-#line 48 "task1.y"
+#line 49 "task1.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '*',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed MUL expression\n");}
 #line 1412 "y.tab.c"
     break;
 
   case 12:
-#line 49 "task1.y"
+#line 50 "task1.y"
                                 {(yyval.node) = makeExprNode(STATEMENT_NODE_CONST, '/',(yyvsp[-2].node), (yyvsp[0].node));  printf("Parsed DIV expression\n");}
 #line 1418 "y.tab.c"
     break;
 
   case 13:
-#line 50 "task1.y"
+#line 51 "task1.y"
                         {(yyval.node) = (yyvsp[-1].node);}
 #line 1424 "y.tab.c"
     break;
 
   case 14:
-#line 51 "task1.y"
+#line 52 "task1.y"
                         {(yyval.node) = (yyvsp[0].node);}
 #line 1430 "y.tab.c"
     break;
 
   case 15:
-#line 52 "task1.y"
+#line 53 "task1.y"
                 {(yyval.node) = (yyvsp[0].node);}
 #line 1436 "y.tab.c"
     break;
@@ -1668,7 +1668,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 54 "task1.y"
+#line 55 "task1.y"
 
 
 void yyerror(char const *s)
@@ -1677,9 +1677,30 @@ void yyerror(char const *s)
 }
 
 
-int main(void) 
+FILE *fp;
+extern FILE *yyin;
+
+int main(int argc, char *argv[]) 
 {
+	output=fopen("output.txt","w");
+	if (argc < 2) 
+	{
+		printf("Please provide an input filename\n");
+		exit(1);
+	}
+	else 
+	{
+		fp = fopen(argv[1], "r");
+		if (!fp) 
+		{
+			printf("Invalid input file specified\n");
+			exit(1);
+		} 
+		else 
+		{
+			yyin = fp;
+		}
+	}
 	yyparse();
-	
 	return 0;
 }

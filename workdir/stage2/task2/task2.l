@@ -1,37 +1,45 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include<string.h>
 	#include "y.tab.h"
 	#include "task2.h"
-	int yyerror(const char *s);
+	#include <string.h>
 	int number;
-	char variable;
+        char *variable;
 %}
 
 %%
 
-"begin" {return BEGIN_T;}
-"end" {return END_T;}
-"read" {return READ_T;}
-"write" {return WRITE_T;}
-[a-z] {variable = *yytext; yylval.node = makeVariableNode(ID_NODE_CONST ,yytext); return ID_T;}
-[0-9]+	{number = atoi(yytext); yylval.node = makeConstantNode(INT_NODE_CONST,number); return NUM_T;}
-"+" {return PLUS_T;}
-"-" {return MINUS_T;}
-"*" {return MUL_T;}
-"/" {return DIV_T;}
-"=" {return *yytext;}
-[\(\);] { return *yytext; }
-[ \t\n]	{}
-. {
-    yyerror("unknown character\n");
-    exit(1);
-}
+[0-9]+	    {
+                number = atoi(yytext);
+                yylval.nptr = createTree(0, number, NODE_NUM, NULL, NULL, NULL);
+                return NUM;
+            }
+"begin"     {return START;}
+"end"       {return END;}
+"read"      {return READ;}
+"write"     {return WRITE;}
+"+"         {return PLUS;}
+"-"         {return MINUS;}
+"*"         {return MUL;}
+"/"         {return DIV;}
+"="         {return ASSGN;}
+[a-z]       {
+                variable = (char*)malloc(sizeof(yytext));
+                strcpy(variable, yytext);
+                yylval.nptr = createTree(1, 0, NODE_ID, variable, NULL, NULL);
+                return ID;
+            }
+[ \t\n]	    {}
+[();]       {return *yytext;}
+.	    {
+                perror("unknown character\n");
+                exit(1);
+            }
 
 %%
 
-int yywrap() 
+int yywrap(void) 
 {
 	return 1;
 }

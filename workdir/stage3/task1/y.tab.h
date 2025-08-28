@@ -58,8 +58,8 @@ extern int yydebug;
     MUL = 264,
     DIV = 265,
     ASSGN = 266,
-    NUM = 267,
-    ID = 268,
+    ID = 267,
+    NUM = 268,
     IF = 269,
     THEN = 270,
     ELSE = 271,
@@ -87,8 +87,8 @@ extern int yydebug;
 #define MUL 264
 #define DIV 265
 #define ASSGN 266
-#define NUM 267
-#define ID 268
+#define ID 267
+#define NUM 268
 #define IF 269
 #define THEN 270
 #define ELSE 271
@@ -109,7 +109,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "task1.y"
+#line 17 "task1.y"
 
 	struct tnode *nptr;
 
