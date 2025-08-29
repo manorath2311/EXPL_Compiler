@@ -36,7 +36,7 @@
 
 program: START Slist END ';'    {
                                     $$ = $2;
-									print_dot($$);
+									print_tree($$,0,0);
                                     printf("DONE\n");
                                 }
        | START END ';'          {$$ = NULL;}
@@ -131,7 +131,7 @@ expr : expr PLUS expr	{
 
 %%
 
-int yyerror(char const *s) 
+int yyerror(const char *s) 
 {
     printf("yyerror %s",s);
 	return 1;

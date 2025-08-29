@@ -2,7 +2,7 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include "y.tab.h"
-	#include "task2.h"
+	#include "ex1.h"
 	#include <string.h>
 	int number;
         char *variable;
@@ -24,7 +24,7 @@
 "*"         {return MUL;}
 "/"         {return DIV;}
 "="         {return ASSGN;}
-[a-z]       {
+[a-zA-Z]    {
                 variable = (char*)malloc(sizeof(yytext));
                 strcpy(variable, yytext);
                 yylval.nptr = createTree(1, 0, NODE_ID, variable, NULL, NULL);

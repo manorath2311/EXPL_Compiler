@@ -316,13 +316,15 @@
 int counter = -1, i, j;
 extern FILE *intermediate;
 
-int getReg() {
+int getReg() 
+{
     if(counter < 20)
         return ++counter;
     printf("Out of Registers");
     exit(1);
 }
-int freeReg() {
+int freeReg() 
+{
     if(counter >= 0)
         counter--;
 }
@@ -330,14 +332,18 @@ int codegen(struct tnode* t)
 {
     int r1, r2, r3, number, status=0;
 
-    if(t == NULL) {
+    if(t == NULL) 
+    {
         return -1;
-    } else if(t->nodetype == NODE_CONNECTOR) {
+    } 
+    else if(t->nodetype == NODE_CONNECTOR) 
+    {
         codegen(t->left);
         codegen(t->right);
     }
 
-    switch(t->nodetype) {
+    switch(t->nodetype) 
+    {
         case NODE_NUM:
             r1 = getReg();
             fprintf(intermediate, "MOV R%d, %d\n", r1, t->val);

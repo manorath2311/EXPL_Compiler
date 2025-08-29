@@ -1443,7 +1443,7 @@ yyreduce:
 #line 37 "task1.y"
                                 {
                                     (yyval.nptr) = (yyvsp[-2].nptr);
-									print_dot((yyval.nptr));
+									print_tree((yyval.nptr),0,0);
                                     printf("DONE\n");
                                 }
 #line 1450 "y.tab.c"
@@ -1913,7 +1913,7 @@ yyreturn:
 #line 132 "task1.y"
 
 
-int yyerror(char const *s) 
+int yyerror(const char *s) 
 {
     printf("yyerror %s",s);
 	return 1;

@@ -1,8 +1,8 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include "task2.h"
-	#include "task2.c"
+	#include "ex1.h"
+	#include "ex1.c"
 	#include <string.h>
 	int yylex(void);
         extern FILE *yyin;
@@ -27,9 +27,6 @@
 
 program: START Slist END ';'    {
                                     $$ = $2;
-                                    initialize();
-                                    //codegen($2); 
-                                    //close(intermediate);
                                     evaluate($2);
 
                                 }
@@ -65,22 +62,29 @@ expr : expr PLUS expr	{$$ = createTree(1, 0, NODE_PLUS, NULL, $1, $3);}
 
 %%
 
-int yyerror(char const *s) 
+int yyerror(const char *s) 
 {
     printf("yyerror %s",s);
 	return 0;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
         printf("Please provide an input filename\n");
         exit(1);
-    } else {
+    } 
+    else 
+    {
         fp = fopen(argv[1], "r");
-        if (!fp) {
+        if (!fp) 
+        {
             printf("Invalid input file specified\n");
             exit(1);
-        } else {
+        }
+         else 
+         {
             yyin = fp;
         }
     }

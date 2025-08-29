@@ -1,0 +1,18 @@
+0 M : _
+ 1 L : _
+  2 L : _
+   3 L : read
+    4 L : a
+   3 R : read
+    4 L : b
+  2 R : =
+   3 L : d
+   3 R : +
+    4 L : a
+    4 R : *
+     5 L : 2
+     5 R : b
+ 1 R : write
+  2 L : +
+   3 L : a
+   3 R : d

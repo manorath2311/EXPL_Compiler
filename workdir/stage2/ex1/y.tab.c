@@ -70,8 +70,8 @@
 
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include "task2.h"
-	#include "task2.c"
+	#include "ex1.h"
+	#include "ex1.c"
 	#include <string.h>
 	int yylex(void);
         extern FILE *yyin;
@@ -538,8 +538,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    28,    28,    36,    39,    40,    43,    44,    45,    48,
-      51,    54,    57,    58,    59,    60,    61,    62,    63
+       0,    28,    28,    33,    36,    37,    40,    41,    42,    45,
+      48,    51,    54,    55,    56,    57,    58,    59,    60
 };
 #endif
 
@@ -1352,113 +1352,110 @@ yyreduce:
 #line 28 "ex1.y"
                                 {
                                     (yyval.nptr) = (yyvsp[-2].nptr);
-                                    initialize();
-                                    //codegen($2); 
-                                    //close(intermediate);
                                     evaluate((yyvsp[-2].nptr));
 
                                 }
-#line 1362 "y.tab.c"
+#line 1359 "y.tab.c"
     break;
 
   case 3:
-#line 36 "ex1.y"
+#line 33 "ex1.y"
                                 {(yyval.nptr) = NULL;}
-#line 1368 "y.tab.c"
+#line 1365 "y.tab.c"
     break;
 
   case 4:
-#line 39 "ex1.y"
+#line 36 "ex1.y"
                         {(yyval.nptr) = createTree(1, 0, NODE_CONNECTOR, NULL, (yyvsp[-1].nptr), (yyvsp[0].nptr));}
-#line 1374 "y.tab.c"
+#line 1371 "y.tab.c"
     break;
 
   case 5:
-#line 40 "ex1.y"
+#line 37 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1380 "y.tab.c"
+#line 1377 "y.tab.c"
     break;
 
   case 6:
-#line 43 "ex1.y"
+#line 40 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1386 "y.tab.c"
+#line 1383 "y.tab.c"
     break;
 
   case 7:
-#line 44 "ex1.y"
+#line 41 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1392 "y.tab.c"
+#line 1389 "y.tab.c"
     break;
 
   case 8:
-#line 45 "ex1.y"
+#line 42 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1398 "y.tab.c"
+#line 1395 "y.tab.c"
     break;
 
   case 9:
-#line 48 "ex1.y"
+#line 45 "ex1.y"
                                 {(yyval.nptr) = createTree(1, 0, NODE_READ, NULL, (yyvsp[-2].nptr), NULL);}
-#line 1404 "y.tab.c"
+#line 1401 "y.tab.c"
     break;
 
   case 10:
-#line 51 "ex1.y"
+#line 48 "ex1.y"
                                    {(yyval.nptr) = createTree(1, 0, NODE_WRITE, NULL, (yyvsp[-2].nptr), NULL);}
-#line 1410 "y.tab.c"
+#line 1407 "y.tab.c"
     break;
 
   case 11:
-#line 54 "ex1.y"
+#line 51 "ex1.y"
                                 {(yyval.nptr) = createTree(1, 0, NODE_ASSGN, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr));}
-#line 1416 "y.tab.c"
+#line 1413 "y.tab.c"
     break;
 
   case 12:
-#line 57 "ex1.y"
+#line 54 "ex1.y"
                         {(yyval.nptr) = createTree(1, 0, NODE_PLUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr));}
-#line 1422 "y.tab.c"
+#line 1419 "y.tab.c"
     break;
 
   case 13:
-#line 58 "ex1.y"
+#line 55 "ex1.y"
                         {(yyval.nptr) = createTree(1, 0, NODE_MINUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr));}
-#line 1428 "y.tab.c"
+#line 1425 "y.tab.c"
     break;
 
   case 14:
-#line 59 "ex1.y"
+#line 56 "ex1.y"
                         {(yyval.nptr) = createTree(1, 0, NODE_MUL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr));}
-#line 1434 "y.tab.c"
+#line 1431 "y.tab.c"
     break;
 
   case 15:
-#line 60 "ex1.y"
+#line 57 "ex1.y"
                         {(yyval.nptr) = createTree(1, 0, NODE_DIV, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr));}
-#line 1440 "y.tab.c"
+#line 1437 "y.tab.c"
     break;
 
   case 16:
-#line 61 "ex1.y"
+#line 58 "ex1.y"
                         {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1446 "y.tab.c"
+#line 1443 "y.tab.c"
     break;
 
   case 17:
-#line 62 "ex1.y"
+#line 59 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1452 "y.tab.c"
+#line 1449 "y.tab.c"
     break;
 
   case 18:
-#line 63 "ex1.y"
+#line 60 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1458 "y.tab.c"
+#line 1455 "y.tab.c"
     break;
 
 
-#line 1462 "y.tab.c"
+#line 1459 "y.tab.c"
 
       default: break;
     }
@@ -1690,25 +1687,32 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 66 "ex1.y"
+#line 63 "ex1.y"
 
 
-int yyerror(char const *s) 
+int yyerror(const char *s) 
 {
     printf("yyerror %s",s);
 	return 0;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
         printf("Please provide an input filename\n");
         exit(1);
-    } else {
+    } 
+    else 
+    {
         fp = fopen(argv[1], "r");
-        if (!fp) {
+        if (!fp) 
+        {
             printf("Invalid input file specified\n");
             exit(1);
-        } else {
+        }
+         else 
+         {
             yyin = fp;
         }
     }

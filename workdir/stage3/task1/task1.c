@@ -1,16 +1,14 @@
 extern FILE *intermediate;
 
-void initialize() 
-{
-    intermediate = fopen("machinecode.xsm", "w");
-    fprintf(intermediate, "0\n2056\n0\n0\n0\n0\n0\n0\n");
-    fprintf(intermediate, "ADD SP, 26\n");
-    fprintf(intermediate, "CALL MAIN\n");
-    fprintf(intermediate, "MOV R0, 10\nPUSH R0\nINT 10\n");
-}
 FILE *stream;
 int count = 0;
 char* findKey(struct tnode*);
+char * convert_to_char(int n) 
+{
+    char *str = (char *)malloc(10);
+    sprintf(str, "%d", n);
+    return str;
+}
 void typecheck(int t1, int t2, char c) 
 {
     switch(c) {
@@ -47,73 +45,11 @@ void typecheck(int t1, int t2, char c)
     }
 
 }
-
-void print_dot_aux(struct tnode* node)
-{
-    static int node_id = 1;       // Unique id for each node
-    static int printed_nodes = 0; // Track printed nodes to avoid duplicate labels
-
-    if (node == NULL) {
-        // Print a NULL node for tree completeness
-        fprintf(stream, "    null%d [shape=point];\n", node_id);
-        node_id++;
-        return;
-    }
-
-    int curr_id = node_id++; // Unique id for this node
-
-    // Print this node with its label
-    fprintf(stream, "    node%d [label=\"%s\"];\n", curr_id, findKey(node));
-
-    // Print LEFT child and edge
-    if (node->left) {
-        int left_id = node_id; // The id that will be used for left child
-        print_dot_aux(node->left);
-        fprintf(stream, "    node%d -> node%d;\n", curr_id, left_id);
-    }
-
-    // Print MIDDLE child and edge (if present)
-    if (node->middle) {
-        int mid_id = node_id; // The id that will be used for middle child
-        print_dot_aux(node->middle);
-        fprintf(stream, "    node%d -> node%d;\n", curr_id, mid_id);
-    }
-
-    // Print RIGHT child and edge
-    if (node->right) {
-        int right_id = node_id; // The id that will be used for right child
-        print_dot_aux(node->right);
-        fprintf(stream, "    node%d -> node%d;\n", curr_id, right_id);
-    }
-}
-
-void print_dot(struct tnode* tree) 
-{
-    stream = fopen("temp.dot", "w");
-
-
-    if (!tree)
-        fprintf(stream, "\n");
-    else if (!tree->right && !tree->left)
-        fprintf(stream, "    %s;\n", findKey(tree));
-    else
-        print_dot_aux(tree);
-    fprintf(stream, "\n");
-
-    fclose(stream);
-}
-char* num_to_char(int num) 
-{
-    int length = snprintf(NULL, 0, "%d", num);
-    char *str = malloc(length + 1);
-    snprintf(str, length + 1, "%d", num);
-    return str;
-}
-
 char* findKey(struct tnode* head) 
 {
     char *key = malloc(10);
-    switch(head->nodetype) {
+    switch(head->nodetype) 
+    {
         case NODE_CONNECTOR:
             strcpy(key, "_");
             break;
@@ -133,7 +69,7 @@ char* findKey(struct tnode* head)
             strcpy(key, head->varname);
             break;
         case NODE_NUM:
-            key=num_to_char(head->val);
+            key = convert_to_char(head->val);
             break;
         case NODE_ASSGN:
             strcpy(key, "=");
@@ -174,7 +110,8 @@ char* findKey(struct tnode* head)
     }
     return key;        
 }
-struct tnode* createTree(int type, int val, int nodetype, char* name, struct tnode *l, struct tnode *r, struct tnode *mid) {
+struct tnode* createTree(int type, int val, int nodetype, char* name, struct tnode *l, struct tnode *r, struct tnode *mid) 
+{
     struct tnode *temp;
     temp = (struct tnode*)malloc(sizeof(struct tnode));
     temp->val = val;
@@ -188,4 +125,51 @@ struct tnode* createTree(int type, int val, int nodetype, char* name, struct tno
     temp->right = r;
     temp->middle = mid;
     return temp;
+}
+void print_tree(struct tnode *root,int lvl,int position)
+{
+    if(root==NULL)
+    {
+        return;
+    }
+    for(int i=0;i<lvl;i++)
+    {
+        fprintf(stream," ");
+    }
+    if(position==-1)
+    {
+        fprintf(stream,"%d ",lvl);
+        fprintf(stream,"L : ");
+    }
+    else if(position==0)
+    {
+        fprintf(stream,"%d ",lvl);
+        fprintf(stream,"M : ");
+    }
+    else
+    {
+        fprintf(stream,"%d ",lvl);
+        fprintf(stream,"R : ");
+    }
+  if(root->type==NODE_CONNECTOR)
+  {
+     print_tree(root->left,lvl+1,-1);
+     print_tree(root->right,lvl+1,1);
+     return;
+  }
+  if(root->type==NODE_IF_ELSE)
+  {
+    fprintf(stream," %s\n",findKey(root));
+    print_tree(root->left,lvl+1,-1);
+    print_tree(root->middle,lvl+1,0);
+    print_tree(root->right,lvl+1,1);
+    return;
+
+  }
+  fprintf(stream,"%s\n",findKey(root));
+  print_tree(root->left,lvl+1,-1);
+  print_tree(root->right,lvl+1,1);
+
+  return;
+
 }

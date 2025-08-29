@@ -46,3 +46,4 @@ struct tnode* createTree(int type, int val, int nodetype, char* name, struct tno
 //int evaluate(struct tnode *t);
 int codegen(struct tnode *t);
 void initialize();
+int iscapital(char *c);

@@ -20,21 +20,22 @@
 #define NODE_BREAK 19
 #define NODE_CONT 20
 
-#define TYPE_VOID 0
-#define TYPE_INT 1
-#define TYPE_BOOL 2
+#define TYPE_VOID 111
+#define TYPE_INT 222
+#define TYPE_BOOL 333
 
-struct tnode{
+typedef struct tnode
+{
     int val; //value of the expression tree
     int type; //type of variable
     char* varname; //Name of variable for ID names
     int nodetype; //Information of non-leaf nodes. Ex NODE_PLUS
     struct tnode *left, *middle, *right; //left and right branches, middle for NODE_IF_ELSE
-};
+}tnode;
 	
 /*Create a node tnode*/
-struct tnode* createTree(int type, int val, int nodetype, char* name, struct tnode *l, struct tnode *r, struct tnode *mid);
-	
+struct tnode* createTree(int type, int val, int nodetype, char* name, tnode *l, tnode *r, tnode *mid);
+
 /*To evaluate an expression tree*/
 //int evaluate(struct tnode *t);
 int codegen(struct tnode *t);
