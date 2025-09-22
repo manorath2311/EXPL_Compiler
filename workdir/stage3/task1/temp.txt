@@ -1,17 +1,47 @@
 0 M : _
  1 L : _
   2 L : _
-   3 L : read
-    4 L : a
-   3 R : read
-    4 L : b
-  2 R : =
-   3 L : d
-   3 R : +
-    4 L : a
-    4 R : *
-     5 L : 2
-     5 R : b
+   3 L : _
+    4 L : _
+     5 L : _
+      6 L : _
+       7 L : read
+        8 L : a
+       7 R : read
+        8 L : b
+      6 R : =
+       7 L : d
+       7 R : +
+        8 L : a
+        8 R : *
+         9 L : 2
+         9 R : b
+     5 R : if
+      6 L : ==
+       7 L : a
+       7 R : 2
+      6 R : =
+       7 L : p
+       7 R : 2
+    4 R : =
+     5 L : a
+     5 R : 4
+   3 R : while
+    4 L : <
+     5 L : a
+     5 R : 0
+    4 R : =
+     5 L : a
+     5 R : -
+      6 L : a
+      6 R : 2
+  2 R : if else
+   3 L : ==
+    4 L : x
+    4 R : 2
+   3 R : =
+    4 L : x
+    4 R : 1
  1 R : write
   2 L : +
    3 L : a

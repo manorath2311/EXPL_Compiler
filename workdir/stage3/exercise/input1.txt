@@ -1,0 +1,18 @@
+begin
+read(a);
+read(b);
+write(a+b);
+while(a>0) do 
+write(a);
+a=a-1;
+if(b==0) then
+break;
+endif;
+endwhile;
+write(a);
+b=b-1;
+if(b<2) then 
+b=b-1;
+endif;
+write(b);
+end;
