@@ -1,0 +1,21 @@
+decl 
+int a,b,d,p,x;
+enddecl;
+begin
+ read (a);
+ read (b);
+ d = a + 2 * b;
+ if(a==2) then
+ p=2;
+ endif;
+ a=4;
+ while(a<0) do
+ a=a-2;
+ endwhile;
+ if(x==2) then
+ x=3;
+ else
+ x=1;
+ endif;
+ write (a+d);
+end;

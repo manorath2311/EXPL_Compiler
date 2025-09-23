@@ -5,9 +5,12 @@
 	#include "y.tab.h"
 	#include "task1.h"
 
-	int number;
+	int number, i;
     char *variable;
 %}
+
+id [a-zA-Z_][0-9a-zA-Z_]*
+str \"(\\.|[^\\\"])*\"
 
 %%
 
@@ -29,6 +32,10 @@
 "endwhile"  {return ENDWHILE;}
 "break"     {return BREAK;}
 "continue"  {return CONT;}
+"decl"      {return DECL;}
+"enddecl"   {return ENDDECL;}
+"int"       {return INT;}
+"str"       {return STR;}
 "=="        {return EQ;}
 "!="        {return NEQ;}
 "<="        {return LE;}
@@ -39,15 +46,22 @@
 "-"         {return MINUS;}
 "*"         {return MUL;}
 "/"         {return DIV;}
+"%"         {return MOD;}
 "="         {return ASSGN;}
-[a-z]       {
+{id}        {
                 variable = (char*)malloc(sizeof(yytext));
                 strcpy(variable, yytext);
                 yylval.nptr = createTree(TYPE_INT, 0, NODE_ID, variable, NULL, NULL, NULL);
                 return ID;
             }
+{str}       {
+                variable = (char*)malloc(sizeof(yytext));
+                strcpy(variable, yytext);
+                yylval.nptr = createTree(TYPE_STR, 0, NODE_STRVAL, variable, NULL, NULL, NULL);
+                return STRVAL;
+            }
 [ \t\n]	    {}
-[();]       {return *yytext;}
+[()\[\];,]       {return *yytext;}
 .	    {
                 perror("unknown character\n");
                 exit(1);
@@ -55,7 +69,6 @@
 
 %%
 
-int yywrap(void) 
-{
+int yywrap(void) {
 	return 1;
 }
