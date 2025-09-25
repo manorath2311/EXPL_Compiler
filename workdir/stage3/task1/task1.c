@@ -3,12 +3,16 @@ extern FILE *intermediate;
 FILE *stream;
 int count = 0;
 char* findKey(struct tnode*);
+
+
 char * convert_to_char(int n) 
 {
     char *str = (char *)malloc(10);
     sprintf(str, "%d", n);
     return str;
 }
+
+
 void typecheck(int t1, int t2, char c) 
 {
     switch(c) {
@@ -45,6 +49,7 @@ void typecheck(int t1, int t2, char c)
     }
 
 }
+
 char* findKey(struct tnode* head) 
 {
     char *key = malloc(10);

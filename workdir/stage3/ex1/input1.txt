@@ -7,4 +7,9 @@ write(a);
 a=a-1;
 endwhile;
 write(a);
+if(b>=2) then
+write(b);
+else
+write(a);
+endif;
 end;

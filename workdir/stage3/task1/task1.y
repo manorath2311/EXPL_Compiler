@@ -7,10 +7,10 @@
 
 	int yylex(void);
     int yyerror(const char*);
-        extern FILE *yyin;
-        FILE *fp;
-        FILE *intermediate;
-        void print(int);
+    extern FILE *yyin;
+    FILE *fp;
+    FILE *intermediate;
+    void print(int);
 %}
 
 %union 

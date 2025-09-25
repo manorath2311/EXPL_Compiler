@@ -395,3 +395,119 @@ int codegen(struct tnode* t)
             break;
     }
 }
+
+int arr[52] = {0};
+int iscapital(char *c) 
+{
+    return (*c >= 'A' && *c <= 'Z');
+}
+
+int getAddr(char *c) 
+{
+    if(iscapital(c))
+    {
+        return *c - 'A' + 26;
+    }
+    
+    return *c - 'a';
+}
+int evaluate(struct tnode *t) 
+{
+    int addr, p, q;
+
+    if (t == NULL) 
+    {
+        return 0;
+    }
+
+    switch (t->nodetype) 
+    {
+
+        case NODE_NUM:
+            return t->val;
+
+        case NODE_ID:
+            addr = getAddr(t->varname);
+            return arr[addr];
+
+        case NODE_PLUS:
+            return evaluate(t->left) + evaluate(t->right);
+
+        case NODE_MINUS:
+            return evaluate(t->left) - evaluate(t->right);
+
+        case NODE_MUL:
+            return evaluate(t->left) * evaluate(t->right);
+
+        case NODE_DIV:
+            return evaluate(t->left) / evaluate(t->right);
+
+        case NODE_ASSGN:
+            if (t->left && t->left->nodetype == NODE_ID) 
+            {
+                addr = getAddr(t->left->varname);
+                arr[addr] = evaluate(t->right);
+            }
+            return -1;
+
+        case NODE_READ:
+            if (t->left && t->left->nodetype == NODE_ID) 
+            {
+                addr = getAddr(t->left->varname);
+                scanf("%d", &arr[addr]);
+            }
+            return -1;
+
+        case NODE_WRITE:
+            if (t->left) 
+            {
+                printf("%d\n", evaluate(t->left));
+            }
+            return -1;
+
+        case NODE_CONNECTOR:
+            evaluate(t->left);
+            evaluate(t->right);
+            return -1;
+        case NODE_LT:
+            return evaluate(t->left) < evaluate(t->right);
+        case NODE_GT:
+            return evaluate(t->left) > evaluate(t->right);
+        case NODE_LE:
+            return evaluate(t->left) <= evaluate(t->right);
+        case NODE_GE:
+            return evaluate(t->left) >= evaluate(t->right);
+        case NODE_EQ:
+            return evaluate(t->left) == evaluate(t->right);
+        case NODE_NEQ:
+            return evaluate(t->left) != evaluate(t->right);
+        case NODE_IF:
+            p = evaluate(t->left);
+            if (p) 
+            {
+                evaluate(t->right);
+            }
+            return -1;
+        case NODE_IF_ELSE:
+            p = evaluate(t->left);
+            if (p) 
+            {
+                evaluate(t->middle);
+            }
+            else
+            {
+                evaluate(t->right);
+            }
+            return -1;
+        case NODE_WHILE:
+            p = evaluate(t->left);
+            while (p) 
+            {
+                evaluate(t->right);
+                p = evaluate(t->left);
+            }
+            return -1;
+        default:
+            return 0;
+    }
+}

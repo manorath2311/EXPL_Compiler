@@ -571,10 +571,10 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    43,    46,    47,    50,    51,    52,    53,
-      54,    55,    56,    59,    63,    68,    72,    74,    76,    79,
-      82,    88,    92,    96,   100,   104,   108,   112,   116,   120,
-     124,   128,   129,   130
+       0,    37,    37,    44,    47,    48,    51,    52,    53,    54,
+      55,    56,    57,    60,    64,    69,    73,    75,    77,    80,
+      83,    89,    93,    97,   101,   105,   109,   113,   117,   121,
+     125,   129,   130,   131
 };
 #endif
 
@@ -1444,242 +1444,243 @@ yyreduce:
                                 {
                                     (yyval.nptr) = (yyvsp[-2].nptr);
 									//print_tree($$,0,0);
-                                    codegen((yyval.nptr));
+                                    //codegen($$);
+                                    evaluate((yyval.nptr));
                                     printf("DONE\n");
                                 }
-#line 1451 "y.tab.c"
+#line 1452 "y.tab.c"
     break;
 
   case 3:
-#line 43 "ex1.y"
+#line 44 "ex1.y"
                                 {(yyval.nptr) = NULL;}
-#line 1457 "y.tab.c"
+#line 1458 "y.tab.c"
     break;
 
   case 4:
-#line 46 "ex1.y"
+#line 47 "ex1.y"
                         {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_CONNECTOR, NULL, (yyvsp[-1].nptr), (yyvsp[0].nptr), NULL);}
-#line 1463 "y.tab.c"
+#line 1464 "y.tab.c"
     break;
 
   case 5:
-#line 47 "ex1.y"
+#line 48 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1469 "y.tab.c"
+#line 1470 "y.tab.c"
     break;
 
   case 6:
-#line 50 "ex1.y"
+#line 51 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1475 "y.tab.c"
+#line 1476 "y.tab.c"
     break;
 
   case 7:
-#line 51 "ex1.y"
+#line 52 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1481 "y.tab.c"
+#line 1482 "y.tab.c"
     break;
 
   case 8:
-#line 52 "ex1.y"
+#line 53 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1487 "y.tab.c"
+#line 1488 "y.tab.c"
     break;
 
   case 9:
-#line 53 "ex1.y"
+#line 54 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1493 "y.tab.c"
+#line 1494 "y.tab.c"
     break;
 
   case 10:
-#line 54 "ex1.y"
+#line 55 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1499 "y.tab.c"
+#line 1500 "y.tab.c"
     break;
 
   case 11:
-#line 55 "ex1.y"
+#line 56 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1505 "y.tab.c"
+#line 1506 "y.tab.c"
     break;
 
   case 12:
-#line 56 "ex1.y"
+#line 57 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1511 "y.tab.c"
+#line 1512 "y.tab.c"
     break;
 
   case 13:
-#line 59 "ex1.y"
+#line 60 "ex1.y"
                                                             {
                                                                 typecheck((yyvsp[-7].nptr)->type, TYPE_BOOL, 'e');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_IF_ELSE, NULL, (yyvsp[-7].nptr), (yyvsp[-2].nptr), (yyvsp[-4].nptr));
                                                             }
-#line 1520 "y.tab.c"
+#line 1521 "y.tab.c"
     break;
 
   case 14:
-#line 63 "ex1.y"
+#line 64 "ex1.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'i');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_IF, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1529 "y.tab.c"
+#line 1530 "y.tab.c"
     break;
 
   case 15:
-#line 68 "ex1.y"
+#line 69 "ex1.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'w');
                                                                 (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_WHILE, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1538 "y.tab.c"
+#line 1539 "y.tab.c"
     break;
 
   case 16:
-#line 72 "ex1.y"
+#line 73 "ex1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_BREAK, NULL, NULL, NULL, NULL);}
-#line 1544 "y.tab.c"
+#line 1545 "y.tab.c"
     break;
 
   case 17:
-#line 74 "ex1.y"
+#line 75 "ex1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_CONT, NULL, NULL, NULL, NULL);}
-#line 1550 "y.tab.c"
+#line 1551 "y.tab.c"
     break;
 
   case 18:
-#line 76 "ex1.y"
+#line 77 "ex1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_READ, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1556 "y.tab.c"
+#line 1557 "y.tab.c"
     break;
 
   case 19:
-#line 79 "ex1.y"
+#line 80 "ex1.y"
                                     {(yyval.nptr) = createTree(TYPE_VOID, 0, NODE_WRITE, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1562 "y.tab.c"
+#line 1563 "y.tab.c"
     break;
 
   case 20:
-#line 82 "ex1.y"
+#line 83 "ex1.y"
                                     {
                                         typecheck((yyvsp[-3].nptr)->type, (yyvsp[-1].nptr)->type, '=');
                                         (yyval.nptr) = createTree(TYPE_VOID, 0, NODE_ASSGN, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr), NULL);
                                     }
-#line 1571 "y.tab.c"
+#line 1572 "y.tab.c"
     break;
 
   case 21:
-#line 88 "ex1.y"
+#line 89 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_PLUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1580 "y.tab.c"
+#line 1581 "y.tab.c"
     break;
 
   case 22:
-#line 92 "ex1.y"
+#line 93 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_MINUS, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1589 "y.tab.c"
+#line 1590 "y.tab.c"
     break;
 
   case 23:
-#line 96 "ex1.y"
+#line 97 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_MUL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1598 "y.tab.c"
+#line 1599 "y.tab.c"
     break;
 
   case 24:
-#line 100 "ex1.y"
+#line 101 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = createTree(TYPE_INT, 0, NODE_DIV, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1607 "y.tab.c"
+#line 1608 "y.tab.c"
     break;
 
   case 25:
-#line 104 "ex1.y"
+#line 105 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_LT, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1616 "y.tab.c"
+#line 1617 "y.tab.c"
     break;
 
   case 26:
-#line 108 "ex1.y"
+#line 109 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_GT, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1625 "y.tab.c"
+#line 1626 "y.tab.c"
     break;
 
   case 27:
-#line 112 "ex1.y"
+#line 113 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_LE, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1634 "y.tab.c"
+#line 1635 "y.tab.c"
     break;
 
   case 28:
-#line 116 "ex1.y"
+#line 117 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_GE, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1643 "y.tab.c"
+#line 1644 "y.tab.c"
     break;
 
   case 29:
-#line 120 "ex1.y"
+#line 121 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_NEQ, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1652 "y.tab.c"
+#line 1653 "y.tab.c"
     break;
 
   case 30:
-#line 124 "ex1.y"
+#line 125 "ex1.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = createTree(TYPE_BOOL, 0, NODE_EQ, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1661 "y.tab.c"
+#line 1662 "y.tab.c"
     break;
 
   case 31:
-#line 128 "ex1.y"
+#line 129 "ex1.y"
                         {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1667 "y.tab.c"
+#line 1668 "y.tab.c"
     break;
 
   case 32:
-#line 129 "ex1.y"
+#line 130 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1673 "y.tab.c"
+#line 1674 "y.tab.c"
     break;
 
   case 33:
-#line 130 "ex1.y"
+#line 131 "ex1.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1679 "y.tab.c"
+#line 1680 "y.tab.c"
     break;
 
 
-#line 1683 "y.tab.c"
+#line 1684 "y.tab.c"
 
       default: break;
     }
@@ -1911,7 +1912,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 133 "ex1.y"
+#line 134 "ex1.y"
 
 
 int yyerror(const char *s) 

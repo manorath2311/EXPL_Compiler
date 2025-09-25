@@ -37,7 +37,8 @@
 program: START Slist END ';'    {
                                     $$ = $2;
 									//print_tree($$,0,0);
-                                    codegen($$);
+                                    //codegen($$);
+                                    evaluate($$);
                                     printf("DONE\n");
                                 }
        | START END ';'          {$$ = NULL;}

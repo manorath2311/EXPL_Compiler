@@ -48,7 +48,7 @@
             }
 [ \t\n]	    {}
 [();]       {return *yytext;}
-.	    {
+.	        {
                 perror("unknown character\n");
                 exit(1);
             }
