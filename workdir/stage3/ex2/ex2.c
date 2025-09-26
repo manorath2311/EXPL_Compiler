@@ -360,7 +360,7 @@ int codegen(struct tnode* t)
             // Change to new start and end labels
             whileStart = l1;
             whileEnd = l2;
-
+            fprintf(intermediate, "JMP L%d:\n", l1);
             fprintf(intermediate, "L%d:\n", l1);
             r1 = codegen(t->left);
             fprintf(intermediate, "JZ R%d,L%d\n", r1, l2);

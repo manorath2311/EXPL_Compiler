@@ -309,12 +309,12 @@ int codegen(struct tnode* t)
             status = counter;
 
             fprintf(intermediate, "MOV R0,\"Write\"\n");
-            fprintf(intermediate, "PUSH R0\n"); // function code "Write"
+            fprintf(intermediate, "PUSH R0\n"); 
             fprintf(intermediate, "MOV R0,-2\n");
-            fprintf(intermediate, "PUSH R0\n"); //Argument 1
+            fprintf(intermediate, "PUSH R0\n"); 
 
             r1 = codegen(t->left);
-            fprintf(intermediate, "PUSH R%d\n", r1); //Argument 2
+            fprintf(intermediate, "PUSH R%d\n", r1); 
             freeReg();
             fprintf(intermediate, "ADD SP,2\n");
             fprintf(intermediate, "CALL 0\n");

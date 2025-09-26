@@ -1,6 +1,7 @@
 int counter = -1, i, j, label=0;
 int whileStart = -1, whileEnd = -1;
 extern FILE *intermediate;
+extern FILE *intermediate2;
 
 FILE *stream;
 int count = 0;
@@ -354,13 +355,12 @@ int codegen(struct tnode* t)
             l1 = getlabel();
             l2 = getlabel();
 
-            // Store old while start and end
             prevWhileStart = whileStart;
             prevWhileEnd = whileEnd;
-            // Change to new start and end labels
+
             whileStart = l1;
             whileEnd = l2;
-
+                     // Store old while start and end
             fprintf(intermediate, "L%d:\n", l1);
             r1 = codegen(t->left);
             fprintf(intermediate, "JZ R%d,L%d\n", r1, l2);
@@ -369,7 +369,7 @@ int codegen(struct tnode* t)
             fprintf(intermediate, "JMP L%d\n", l1);
             fprintf(intermediate, "L%d:\n", l2);
 
-            // Restore while start and end labels
+
             whileStart = prevWhileStart;
             whileEnd = prevWhileEnd;
             break;
@@ -400,6 +400,58 @@ int codegen(struct tnode* t)
         case NODE_CONT:
             if(whileStart != -1)
                 fprintf(intermediate, "JMP L%d\n", whileStart);
+            break;
+        case NODE_DOWHILE:
+            r1 = codegen(t->right); 
+            l1 = getlabel();
+            l2 = getlabel();
+
+       
+            prevWhileStart = whileStart;
+            prevWhileEnd = whileEnd;
+     
+            whileStart = l1;
+            whileEnd = l2;
+
+            fprintf(intermediate, "L%d:\n", l1);
+            r1 = codegen(t->left);
+            fprintf(intermediate, "JZ R%d,L%d\n", r1, l2);
+            freeReg();
+            number = codegen(t->right);
+            fprintf(intermediate, "JMP L%d\n", l1);
+            fprintf(intermediate, "L%d:\n", l2);
+
+        
+            whileStart = prevWhileStart;
+            whileEnd = prevWhileEnd;
+            freeReg();
+            break;
+        case NODE_REPEATUNTIL:
+            r1 = codegen(t->right); 
+            l1 = getlabel();
+            l2 = getlabel();
+
+       
+            prevWhileStart = whileStart;
+            prevWhileEnd = whileEnd;
+     
+            whileStart = l1;
+            whileEnd = l2;
+
+            fprintf(intermediate, "L%d:\n", l1);
+            r1 = codegen(t->left);
+            fprintf(intermediate, "NOT R%d\n", r1);
+            fprintf(intermediate, "JZ R%d,L%d\n", r1, l2);
+            freeReg();
+            number = codegen(t->right);
+            fprintf(intermediate, "JMP L%d\n", l1);
+            fprintf(intermediate, "L%d:\n", l2);
+
+        
+            whileStart = prevWhileStart;
+            whileEnd = prevWhileEnd;
+            
+            freeReg();
             break;
     }
 }
@@ -513,8 +565,53 @@ int evaluate(struct tnode *t)
                 evaluate(t->right);
                 p = evaluate(t->left);
             }
+        
             return -1;
         default:
             return 0;
     }
+}
+
+int labels[100]={0};
+int labcount = 0;
+void changeLabels(FILE *fp) 
+{
+    char ch;
+    int line = 1;
+    
+    //rewind(fp); 
+    int cnt=0;
+    while(ch=fgetc(fp)!=EOF)
+    {
+        cnt++;
+    }
+    printf("%d",cnt);
+    // while ((ch = fgetc(fp)) != EOF) 
+    // {
+    //     if(ch=='L')
+    //     {
+    //         fprintf(intermediate2, "L");
+    //     }
+    //     if (ch == 'L') 
+    //     {
+    //         int label = 0;
+    //         ch = fgetc(fp);
+    //         while (isdigit(ch)) 
+    //         {
+    //             int num = ch - '0';
+    //             label = label * 10 + num;
+    //             ch = fgetc(fp);
+    //         }
+    //         if (ch == ':') 
+    //         {
+    //             labels[label] = 2 * (line - 1) + 2048;
+    //             fprintf(intermediate2, "L%d:\n", labels[label]);
+    //         }
+    //     }
+    //     if (ch == '\n')
+    //     {
+    //         line++;
+    //     }
+    // }
+    fprintf(intermediate2, "done\n");
 }

@@ -19,6 +19,8 @@
 #define NODE_NEQ 18
 #define NODE_BREAK 19
 #define NODE_CONT 20
+#define NODE_DOWHILE 21
+#define NODE_REPEATUNTIL 22
 
 #define TYPE_VOID 111
 #define TYPE_INT 222

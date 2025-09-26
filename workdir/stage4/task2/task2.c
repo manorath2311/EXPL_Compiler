@@ -204,17 +204,17 @@ int freeReg() {
         counter--;
 }
 
-int getMemoryAddress(struct tnode* t) {
+int getMemoryAddress(struct tnode* t) 
+{
     int r;
-    if(t->nodetype == NODE_ID) {
+    if(t->nodetype == NODE_ID) 
+    {
         r = getReg();
         fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
         return r;
-    } else if(t->nodetype == NODE_ARRAY) {
-        r = codegen(t->right);
-        fprintf(intermediate, "ADD R%d, %d\n", r, t->left->Gentry->binding);
-        return r;
-    } else {
+    } 
+    else
+    {
         return -1;
     }
 }

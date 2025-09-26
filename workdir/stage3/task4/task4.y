@@ -2,6 +2,7 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include <string.h>
+    #include<ctype.h>
 	#include "task4.h"
 	#include "task4.c"
 
@@ -9,7 +10,7 @@
     int yyerror(const char*);
         extern FILE *yyin;
         FILE *fp;
-        FILE *intermediate;
+        FILE *intermediate,*intermediate2,*t1;
         void print(int);
 %}
 
@@ -20,7 +21,7 @@
 
 %token START END READ WRITE PLUS MINUS MUL DIV ASSGN
 %token<nptr> ID NUM
-%token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
+%token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT ENDDOWHILE ENDREPEAT REPEATUNTIL 
 %token BREAK CONT
 %left PLUS MINUS
 %left MUL DIV
@@ -29,7 +30,7 @@
 %right EQ NEQ
 
 
-%type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr IfStmt WhileStmt
+%type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr IfStmt WhileStmt DoWhile RepeatUntil
 %type <nptr> BrkStmt ContStmt 
 
 %%
@@ -38,6 +39,7 @@ program: START Slist END ';'    {
                                     $$ = $2;
 									//print_tree($$,0,0);
                                     codegen($$);
+                                    //evaluate($$);
                                     printf("DONE\n");
                                 }
        | START END ';'          {$$ = NULL;}
@@ -52,6 +54,8 @@ Stmt: InputStmt         {$$ = $1;}
     | AsgStmt           {$$ = $1;}
     | IfStmt            {$$ = $1;}
     | WhileStmt         {$$ = $1;}
+    | DoWhile           {$$ = $1;}
+    | RepeatUntil       {$$ = $1;}
     | BrkStmt           {$$ = $1;}
     | ContStmt          {$$ = $1;}
     ;
@@ -70,6 +74,14 @@ WhileStmt: WHILE '(' expr ')' DO Slist ENDWHILE ';'         {
                                                                 //printf("WHILE\n");
                                                                 typecheck($3->type, TYPE_BOOL, 'w');
                                                                 $$ = createTree(TYPE_VOID, 0, NODE_WHILE, NULL, $3, $6, NULL);
+                                                            }
+DoWhile : DO WHILE '('expr')' Slist ENDDOWHILE ';'          {
+                                                                typecheck($4->type, TYPE_BOOL, 'd');
+                                                                $$ = createTree(TYPE_VOID, 0, NODE_DOWHILE, NULL, $4, $6, NULL);
+                                                            }     
+RepeatUntil: REPEATUNTIL '('expr')' Slist ENDREPEAT ';' {
+                                                                typecheck($3->type, TYPE_BOOL, 'r');
+                                                                $$ = createTree(TYPE_VOID, 0, NODE_REPEATUNTIL, NULL, $3, $5, NULL);
                                                             }
 BrkStmt: BREAK ';'                  {$$ = createTree(TYPE_VOID, 0, NODE_BREAK, NULL, NULL, NULL, NULL);}
 
@@ -162,5 +174,13 @@ int main(int argc, char *argv[])
         }
     }
     yyparse();
+    intermediate2=fopen("temp2.txt","w");
+     t1=fopen("temp.txt","r");
+    if (!t1) 
+    {
+        fprintf(stderr, "Failed to open temp.txt\n");
+    }
+    changeLabels(fp); 
+    
     return 0;
 }

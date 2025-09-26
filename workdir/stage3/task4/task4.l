@@ -2,11 +2,12 @@
 	#include <stdlib.h>
 	#include <stdio.h>
 	#include <string.h>
+    #include<ctype.h>
 	#include "y.tab.h"
 	#include "task4.h"
 
 	int number;
-        char *variable;
+    char *variable;
 %}
 
 %%
@@ -29,6 +30,9 @@
 "endwhile"  {return ENDWHILE;}
 "break"     {return BREAK;}
 "continue"  {return CONT;}
+"enddowhile"    {return ENDDOWHILE;}
+"repreatuntil" {return REPEATUNTIL;}
+"endrepeat"   {return ENDREPEAT;}
 "=="        {return EQ;}
 "!="        {return NEQ;}
 "<="        {return LE;}

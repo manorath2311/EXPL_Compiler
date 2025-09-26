@@ -73,8 +73,11 @@ extern int yydebug;
     GE = 279,
     LT = 280,
     GT = 281,
-    BREAK = 282,
-    CONT = 283
+    ENDDOWHILE = 282,
+    ENDREPEAT = 283,
+    REPEATUNTIL = 284,
+    BREAK = 285,
+    CONT = 286
   };
 #endif
 /* Tokens.  */
@@ -102,18 +105,21 @@ extern int yydebug;
 #define GE 279
 #define LT 280
 #define GT 281
-#define BREAK 282
-#define CONT 283
+#define ENDDOWHILE 282
+#define ENDREPEAT 283
+#define REPEATUNTIL 284
+#define BREAK 285
+#define CONT 286
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "task4.y"
+#line 18 "task4.y"
 
 	struct tnode *nptr;
 
-#line 117 "y.tab.h"
+#line 123 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
