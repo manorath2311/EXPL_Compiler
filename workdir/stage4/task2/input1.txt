@@ -1,5 +1,8 @@
 decl 
 int a,b,d,p,x;
+int c[10];
+str z;
+int z2;
 enddecl;
 begin
  read (a);
