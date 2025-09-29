@@ -114,6 +114,9 @@ void GInstall(char *name, int type, int size,int is2D, int arrleft_index, int ar
     temp->binding = totalCount;
     totalCount = totalCount + temp->size;
     temp->next = NULL;
+    temp->is2D = is2D;
+    temp->arrleft_index = arrleft_index;
+    temp->arrright_index = arrright_index;
 
     if (Ghead != NULL) 
     {
@@ -225,21 +228,21 @@ int getMemoryAddress(struct tnode* t)
         return r;
     }
 
-    // if(t->nodetype == NODE_2D_ARRAY) 
-    // {
-    //     r = getReg();
-    //     int rowReg = codegen(t->middle);
-    //     int colReg = codegen(t->right);
-    //     int numRows = t->Gentry->arrright_index;
-    //     int numCols = t->Gentry->arrleft_index ;
-    //     fprintf(intermediate, "MUL R%d, %d\n", rowReg, numCols);
-    //     fprintf(intermediate, "ADD R%d, R%d\n", rowReg, colReg);
-    //     fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
-    //     fprintf(intermediate, "ADD R%d, R%d\n", r, rowReg);
-    //     //freeReg();
-    //     //freeReg();
-    //     return r;
-    // }
+    if(t->nodetype == NODE_2D_ARRAY) 
+    {
+        r = getReg();
+        int rowReg = codegen(t->middle);
+        int colReg = codegen(t->right);
+        int numRows = t->Gentry->arrright_index;
+        int numCols = t->Gentry->arrleft_index ;
+        fprintf(intermediate, "MUL R%d, %d\n", rowReg, numCols);
+        fprintf(intermediate, "ADD R%d, R%d\n", rowReg, colReg);
+        fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
+        fprintf(intermediate, "ADD R%d, R%d\n", r, rowReg);
+        //freeReg();
+        //freeReg();
+        return r;
+    }
     else
     {
         return -1;
