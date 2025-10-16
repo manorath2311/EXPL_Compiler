@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_Y_TAB_H_INCLUDED
 # define YY_YY_Y_TAB_H_INCLUDED
@@ -44,46 +45,55 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    START = 258,
-    END = 259,
-    READ = 260,
-    WRITE = 261,
-    PLUS = 262,
-    MINUS = 263,
-    MUL = 264,
-    DIV = 265,
-    MOD = 266,
-    ASSGN = 267,
-    ID = 268,
-    NUM = 269,
-    STRVAL = 270,
-    IF = 271,
-    THEN = 272,
-    ELSE = 273,
-    ENDIF = 274,
-    WHILE = 275,
-    DO = 276,
-    ENDWHILE = 277,
-    EQ = 278,
-    NEQ = 279,
-    LE = 280,
-    GE = 281,
-    LT = 282,
-    GT = 283,
-    BREAK = 284,
-    CONT = 285,
-    DECL = 286,
-    ENDDECL = 287,
-    INT = 288,
-    STR = 289
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    START = 258,                   /* START  */
+    END = 259,                     /* END  */
+    READ = 260,                    /* READ  */
+    WRITE = 261,                   /* WRITE  */
+    PLUS = 262,                    /* PLUS  */
+    MINUS = 263,                   /* MINUS  */
+    MUL = 264,                     /* MUL  */
+    DIV = 265,                     /* DIV  */
+    MOD = 266,                     /* MOD  */
+    ASSGN = 267,                   /* ASSGN  */
+    ID = 268,                      /* ID  */
+    NUM = 269,                     /* NUM  */
+    STRVAL = 270,                  /* STRVAL  */
+    IF = 271,                      /* IF  */
+    THEN = 272,                    /* THEN  */
+    ELSE = 273,                    /* ELSE  */
+    ENDIF = 274,                   /* ENDIF  */
+    WHILE = 275,                   /* WHILE  */
+    DO = 276,                      /* DO  */
+    ENDWHILE = 277,                /* ENDWHILE  */
+    EQ = 278,                      /* EQ  */
+    NEQ = 279,                     /* NEQ  */
+    LE = 280,                      /* LE  */
+    GE = 281,                      /* GE  */
+    LT = 282,                      /* LT  */
+    GT = 283,                      /* GT  */
+    BREAK = 284,                   /* BREAK  */
+    CONT = 285,                    /* CONT  */
+    DECL = 286,                    /* DECL  */
+    ENDDECL = 287,                 /* ENDDECL  */
+    INT = 288,                     /* INT  */
+    STR = 289                      /* STR  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
 #define START 258
 #define END 259
 #define READ 260
@@ -121,11 +131,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "ex2.y"
+#line 16 "task1.y"
 
     struct tnode *nptr;
 
-#line 129 "y.tab.h"
+#line 139 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -136,6 +146,8 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
+
 int yyparse (void);
+
 
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */

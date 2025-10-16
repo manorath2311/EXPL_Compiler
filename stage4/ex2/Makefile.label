@@ -1,0 +1,103 @@
+# Makefile for label conversion tool
+# This converts labeled XSM assembly (temp.txt) to numbered assembly (out1.txt)
+
+# Compiler settings
+CC = gcc
+CFLAGS = -Wall -g
+LEX = lex
+
+# Source files
+LEX_SRC = label.l
+C_SRC = label.c
+HEADER = label.h
+
+# Generated files
+LEX_OUT = lex.yy.c
+TARGET = label_converter
+
+# Input and output files
+INPUT_FILE = temp.txt
+OUTPUT_FILE = out1.txt
+
+# Default target
+all: $(TARGET)
+
+# Build the label converter
+$(TARGET): $(LEX_OUT)
+	$(CC) $(CFLAGS) $(LEX_OUT) -o $(TARGET)
+
+# Generate lex analyzer
+$(LEX_OUT): $(LEX_SRC) $(C_SRC) $(HEADER)
+	$(LEX) $(LEX_SRC)
+
+# Convert labels from temp.txt to out1.txt
+convert: $(TARGET)
+	@if [ ! -f $(INPUT_FILE) ]; then \
+		echo "Error: $(INPUT_FILE) not found!"; \
+		echo "Run 'make -f Makefile' first to generate temp.txt"; \
+		exit 1; \
+	fi
+	./$(TARGET) $(INPUT_FILE) $(OUTPUT_FILE)
+	@echo "Labels converted: $(INPUT_FILE) -> $(OUTPUT_FILE)"
+
+# Quick conversion (builds and converts in one step)
+quick: all convert
+
+# Test the conversion
+test: convert
+	@echo "=== Label conversion test ==="
+	@echo "temp.txt (with labels) -> out1.txt (with line numbers)"
+	@echo ""
+	@echo "First few lines of temp.txt:"
+	@head -10 $(INPUT_FILE) 2>/dev/null || echo "$(INPUT_FILE) not found"
+	@echo ""
+	@echo "First few lines of out1.txt:"
+	@head -10 $(OUTPUT_FILE) 2>/dev/null || echo "$(OUTPUT_FILE) not found"
+	@echo ""
+	@echo "Check for labels converted:"
+	@echo "Lines with 'L' labels in temp.txt:"
+	@grep -n "L[0-9]" $(INPUT_FILE) 2>/dev/null || echo "No labels found"
+	@echo "Corresponding lines in out1.txt should have numbers instead of labels"
+
+# Clean generated files
+clean:
+	rm -f $(TARGET) $(LEX_OUT) $(OUTPUT_FILE)
+
+# Clean everything including backup files
+distclean: clean
+	rm -f *.o core a.out
+
+# Run the exact sequence you requested
+run-sequence: 
+	@echo "=== Running: lex label.l ==="
+	lex label.l
+	@echo "=== Running: gcc lex.yy.c ==="
+	gcc lex.yy.c
+	@echo "=== Running: ./a.out temp.txt out1.txt ==="
+	@if [ ! -f temp.txt ]; then \
+		echo "Error: temp.txt not found!"; \
+		echo "Run 'make -f Makefile' first to generate temp.txt"; \
+		exit 1; \
+	fi
+	./a.out temp.txt out1.txt
+	@echo "=== Label conversion completed ==="
+
+# Help
+help:
+	@echo "Available targets:"
+	@echo "  all          - Build the label converter"
+	@echo "  convert      - Convert temp.txt to out1.txt (builds if needed)"
+	@echo "  quick        - Build and convert in one step"
+	@echo "  test         - Convert and show before/after comparison"
+	@echo "  run-sequence - Run exact sequence: lex label.l && gcc lex.yy.c && ./a.out temp.txt out1.txt"
+	@echo "  clean        - Remove generated files"
+	@echo "  distclean    - Remove all generated files"
+	@echo "  help         - Show this help"
+	@echo ""
+	@echo "Usage examples:"
+	@echo "  make -f Makefile.label quick              # Build and convert"
+	@echo "  make -f Makefile.label run-sequence       # Run your exact sequence"
+	@echo "  make -f Makefile.label convert            # Just convert (if already built)"
+
+# Declare phony targets
+.PHONY: all convert quick test clean distclean run-sequence help

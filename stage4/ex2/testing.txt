@@ -1,0 +1,11 @@
+decl 
+int *a;
+int b;
+enddecl;
+begin
+b=2;
+a=&b;
+write(*a);
+*a=*a+1;
+write(*a);
+end;

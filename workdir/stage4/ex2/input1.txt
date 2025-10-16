@@ -1,7 +1,0 @@
-decl 
-int a[10];
-int x;
-enddecl;
-begin
-a[9]=2;
-end;

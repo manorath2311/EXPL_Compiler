@@ -3,7 +3,7 @@
 #define NODE_MINUS 2
 #define NODE_MUL 3
 #define NODE_DIV 4
-#define NODE_MOD 23
+#define NODE_MOD 100001
 #define NODE_ID 5
 #define NODE_NUM 6
 #define NODE_ASSGN 7
@@ -23,7 +23,7 @@
 #define NODE_STRVAL 21
 #define NODE_ARRAY 22
 #define NODE_2D_ARRAY 23
-#define NODE_ADDR 24
+#define NODE_ADDRESS 24
 #define NODE_INT_PTR 25
 
 #define TYPE_VOID 0
@@ -47,7 +47,7 @@ struct tnode* createTree(int type, int val, int nodetype, char* name, struct tno
 int codegen(struct tnode *t);
 void initialize();
 
-int declaration_type;
+extern int declaration_type;
 //int totalCount = 4096;
 
 struct Gsymbol
@@ -65,4 +65,3 @@ struct Gsymbol
 struct Gsymbol* GLookup(char * name);
 void GInstall(char *name, int type, int size,int is2D, int arrleft_index, int arrright_index);
 void printSymbolTable();
-struct Gsymbol *Ghead, *Gtail;

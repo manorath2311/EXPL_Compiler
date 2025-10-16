@@ -1,0 +1,8 @@
+decl 
+int a[5];
+int i;
+enddecl;
+begin
+read(a[2]);
+write(a[2]);
+end;

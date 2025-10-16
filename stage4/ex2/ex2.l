@@ -48,6 +48,7 @@ str \"(\\.|[^\\\"])*\"
 "/"         {return DIV;}
 "%"         {return MOD;}
 "="         {return ASSGN;}
+"&"         {return yytext[0];}
 {id}        {
                 variable = (char*)malloc(sizeof(yytext));
                 strcpy(variable, yytext);

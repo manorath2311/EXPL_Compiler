@@ -39,7 +39,9 @@ program: Declarations START Slist END ';'   {
                                                 $$ = $3;
                                                 //print_tree($$);
                                                 printSymbolTable();
+                                                print_header();
                                                 codegen($$);
+                                                print_footer();
                                             }
        | Declarations START END ';'         {$$ = $1;}
        ;
@@ -112,6 +114,7 @@ AsgStmt: id ASSGN expr ';'          {
                                         typecheck($1->type, $3->type, '=');
                                         $$ = createTree(TYPE_VOID, 0, NODE_ASSGN, NULL, $1, $3, NULL,NULL);
                                     }
+                    
        ;
 
 expr : expr PLUS expr	{
@@ -162,25 +165,7 @@ expr : expr PLUS expr	{
      | NUM		{$$ = $1;}
      | STRVAL           {$$ = $1;}
      | id		{$$ = $1;}
-     | MUL id		{
-                        if($2->Gentry == NULL) {
-                            printf("Variable '%s' not declared!", $2->varname);
-                            exit(1);
-                        } else if($2->Gentry->type != TYPE_INT_POINTER) {
-                            printf("Variable '%s' is not a pointer!", $2->varname);
-                            exit(1);
-                        }
-                        $2->type = TYPE_INT_POINTER;
-                         if ($2->Gentry->type == TYPE_INT_POINTER) 
-                        {
-                        $$ = createTree(TYPE_INT, 0, NODE_INT_PTR, NULL, $2, NULL, NULL,$2->Gentry);
-                        }
-                      else 
-                      {
-                            printf("Invalid dereference of non-integer pointer variable '%s'\n", $2->varname);
-                            exit(1);
-                        }
-            }; 
+             
      ;
 
 id: ID                  {
@@ -247,7 +232,7 @@ id: ID                  {
                             $1->type = $1->Gentry->type;
                             $$ = createTree($1->type, 0, NODE_2D_ARRAY, NULL, $1, $6, $3,$1->Gentry);
                         } 
-    | '*'ID               {
+    | MUL ID               {
                             $2->Gentry = GLookup($2->varname);
                             if($2->Gentry == NULL) {
                                 printf("Variable '%s' not declared!", $2->varname);
@@ -258,7 +243,16 @@ id: ID                  {
                             }
                             $2->type = TYPE_INT_POINTER;
                             $$ = createTree(TYPE_INT, 0, NODE_INT_PTR, NULL, $2, NULL, NULL,$2->Gentry);
-                        }                   
+                        }   
+    | '&' ID               {
+                            $2->Gentry = GLookup($2->varname);
+                            if($2->Gentry == NULL) {
+                                printf("Variable '%s' not declared!", $2->varname);
+                                exit(1);
+                            } 
+                            $2->type = $2->Gentry->type;
+                            $$ = createTree(TYPE_INT_POINTER, 0, NODE_ADDRESS, NULL, $2, NULL, NULL,$2->Gentry);
+                        }                                    
   ;
 
 %%
