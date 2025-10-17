@@ -37,9 +37,11 @@
 
 program: START Slist END ';'    {
                                     $$ = $2;
+                                    print_header();
 									//print_tree($$,0,0);
                                     codegen($$);
                                     //evaluate($$);
+                                    print_footer();
                                     printf("DONE\n");
                                 }
        | START END ';'          {$$ = NULL;}

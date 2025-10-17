@@ -31,7 +31,7 @@
 "break"     {return BREAK;}
 "continue"  {return CONT;}
 "enddowhile"    {return ENDDOWHILE;}
-"repreatuntil" {return REPEATUNTIL;}
+"repeatuntil" {return REPEATUNTIL;}
 "endrepeat"   {return ENDREPEAT;}
 "=="        {return EQ;}
 "!="        {return NEQ;}

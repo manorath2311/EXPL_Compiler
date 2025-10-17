@@ -440,17 +440,19 @@ int codegen(struct tnode* t)
 
             fprintf(intermediate, "L%d:\n", l1);
             r1 = codegen(t->left);
-            fprintf(intermediate, "NOT R%d\n", r1);
+            //fprintf(intermediate, "NOT R%d\n", r1);
             fprintf(intermediate, "JZ R%d,L%d\n", r1, l2);
             freeReg();
             number = codegen(t->right);
+            printf("hi\n");
+            //fprintf(intermediate, "NOT R%d\n", r1);
+            fprintf(intermediate,"JNZ R%d,L%d\n",r1,l2);
             fprintf(intermediate, "JMP L%d\n", l1);
             fprintf(intermediate, "L%d:\n", l2);
 
         
             whileStart = prevWhileStart;
             whileEnd = prevWhileEnd;
-            
             freeReg();
             break;
     }
@@ -614,4 +616,20 @@ void changeLabels(FILE *fp)
     //     }
     // }
     fprintf(intermediate2, "done\n");
+}
+
+void print_header() 
+{
+    fprintf(intermediate,"0");
+    fprintf(intermediate,"\n2056\n0\n0\n0\n0\n0\n0\n");
+    fprintf(intermediate,"ADD SP,200\n");
+  
+}
+void print_footer() 
+{
+
+    fprintf(intermediate, "MOV R0, \"Exit\"\nPUSH R0\n");
+    fprintf(intermediate, "PUSH R0\nPUSH R0\nPUSH R0\nPUSH R0\n");
+    fprintf(intermediate, "CALL 0\n");
+    fprintf(intermediate, "POP R0\nPOP R0\nPOP R0\nPOP R0\nPOP R0\n");
 }

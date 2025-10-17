@@ -1,0 +1,16 @@
+decl
+	int n,i,j;
+enddecl;
+begin
+	read(n);
+	while(n>3) do 
+      write(n);
+      if(n==5) then
+        write(n);
+        write("breaking");
+        break;
+      endif;
+      n=n-1;
+    endwhile;
+	
+end;

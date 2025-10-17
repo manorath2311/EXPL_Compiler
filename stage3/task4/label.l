@@ -1,71 +1,78 @@
 %{
-int line_count = 0;
-int arr[100];
-int size=0;
-char l[100];
-FILE *fp;
-FILE *fp2;
-int addr;
-int line=0;
+    #include <stdio.h>
+    #include <string.h>
+    #include "label.c"
+
+    
+    int step = 0;
+    int addr = 2040;
+    FILE* label_file = NULL;
+    FILE* output_file = NULL;
+
 %}
 
+label   L[0-9]+
+
 %%
-L[0-9]+:    { 
-                    int label_num = 0;
-                    char *p = yytext + 1; 
-                    while (*p != ':' && *p != '\0') 
+{label}:\n      {
+                    if(step == 0)
                     {
-                        label_num = label_num * 10 + (*p - '0');
-                        p++;
+                        int len = yyleng - 2;
+                        char* label = strndup(yytext, len);
+                        createLabel(label, addr);
                     }
-                    arr[label_num] = line_count; 
-                    addr=2056+2*(line_count);
-                    printf("Found label %d at line %d\n", label_num, line_count);
-                    fprintf(fp2,"%d:",addr);          
-           }
-L[0-9]+ {
-                int label_num = 0;
-                char *p = yytext + 1; 
-                while (*p != '\0') 
-                {
-                    label_num = label_num * 10 + (*p - '0');
-                    p++;
                 }
-                line=2056+2*(arr[label_num]);
-                fprintf(fp2,"%d",line);
-            }
-            
-\n              { line_count++; fprintf(fp2,"\n");}
-.|\t            {fprintf(fp2,"%s",yytext);}
+
+{label}         {
+                    if(step == 1)
+                    {
+                        int address = getLabelAddr(yytext);
+                        fprintf(output_file, "%d", address);
+                    }
+                }
+
+(.)             {
+                    if(step == 1)
+                    {
+                        fprintf(output_file, "%c", *yytext);
+                    }
+                }
+
+\n              {
+                    if(step == 0)
+                    {
+                        addr += 2;
+                    }
+                    else 
+                    {
+                        fprintf(output_file, "\n");
+                    }
+                }
 %%
 
 int yywrap()
 {
+    if(step == 0)
+    {
+        rewind(yyin);
+        step = 1;
+        return 0;
+    }
     return 1;
 }
-int main(int argc,char *argv[]) 
+
+int main(int argc, char* argv[])
 {
-    
-    if (argc < 2) 
+    label_file = fopen(argv[1], "r");
+    output_file = fopen(argv[2], "w");
+
+    if(label_file == NULL || output_file == NULL)
     {
-        printf("Please provide an input filename\n");
+        printf("Error opening file: label/output\n");
         exit(1);
     }
-    else 
-    {
-        fp = fopen(argv[1], "r");
-        fp2=fopen("out1.txt","w");
-        if (!fp) 
-        {
-            printf("Invalid input file specified\n");
-            exit(1);
-        } 
-        else 
-        {
-            yyin = fp;
-        }
-    }
+
+    yyin = label_file;
     yylex();
     return 0;
-
 }
