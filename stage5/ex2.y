@@ -2,8 +2,8 @@
 	#include <stdlib.h>
 	#include <stdio.h>
     #include <string.h>
-	#include "task1.h"
-    #include "task1.c"
+	#include "ex2.h"
+    #include "ex2.c"
 
 	int yylex(void);
         extern FILE *yyin;
@@ -13,19 +13,18 @@
         void print(int);
         struct Paramstruct *argList1, *argList2;
         int declCount = 0, defCount = 0; // Definition and Declaration count of functions
-
         int testing = 0; // can use to test ASTree
+       
 %}
 
 %union {
     struct ASTNode *nptr;
 }
 
-%token <nptr> NUM ID STRVAL VOID
+%token <nptr> NUM ID STRVAL
 %token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN 
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
 %token BREAK CONT DECL ENDDECL INT STR MAIN RETURN
-
 
 %nonassoc LT GT LE GE
 %right EQ NEQ
@@ -33,11 +32,12 @@
 %left MUL DIV MOD
 %right ASSGN
 
+
 %type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr id
 %type <nptr> BrkStmt ContStmt IfStmt WhileStmt Type GDeclBlock FDefBlock
 %type <nptr> MainBlock GDeclList GDecl GIdList GId ParamList FDef FType
-%type <nptr> LDeclBlock Body Param LDecList LDecl IdList RetStmt 
-%type <nptr> ExprList func
+%type <nptr> LDeclBlock Body Param LDecList LDecl IdList RetStmt
+%type <nptr> ExprList func 
 
 %%
 
@@ -100,7 +100,7 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
                                                             Gtemp = GLookup($2->name);
 
                                                             if(Gtemp == NULL) {
-                                                                yyerror("Function not declared");
+                                                                yyerror("Function is not declared");
                                                                 exit(1);
                                                             }
 
@@ -132,16 +132,20 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
                                                                 exit(1);
                                                             }
 
-                                                            if(testing) {
+                                                            if(testing) 
+                                                            {
                                                                 printLSymbolTable();
-                                                            
-                                                            } else {
+                                                                print_dot($8, $2->name);
+                                                            }
+                                                            else 
+                                                            {
                                                                 fprintf(intermediate, "F%d:\n",Gtemp->flabel);
                                                                 fprintf(intermediate, "PUSH BP\n");
                                                                 fprintf(intermediate, "MOV BP,SP\n");
 
                                                                 Ltemp = Lhead;
-                                                                while(Ltemp != NULL) {
+                                                                while(Ltemp != NULL) 
+                                                                {
                                                                     if(Ltemp->binding > 0)
                                                                         fprintf(intermediate, "PUSH R0\n");
                                                                     Ltemp = Ltemp->next;
@@ -159,7 +163,8 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
 
 ParamList: ParamList ',' Param
          | Param
-         | /* empty */  {$$ = NULL;}
+         | /* epsilon */    {$$ = NULL;}
+         
          ;
 
 Param: FType ID  {
@@ -182,7 +187,7 @@ MainBlock: Type MAIN '(' ')' '{' LDeclBlock Body '}'   {
                                                             if(testing) {
                                                                 printGSymbolTable();
                                                                 printLSymbolTable();
-                                                        
+                                                                print_dot($7, "main");
                                                             } else {
                                                                 fprintf(intermediate, "MAIN:\n");
                                                                 fprintf(intermediate, "PUSH BP\n");
@@ -215,11 +220,14 @@ LDecList: LDecList LDecl
 LDecl: FType IdList ';'
      ;
 
-IdList: IdList ',' IdList
-      | ID      {
-                    checkAvailability($1->name, 0);
-                    LInstall($1->name, FDeclarationType);
-                }
+IdList: IdList ',' ID   {
+                            checkAvailability($3->name, 0);
+                            LInstall($3->name, FDeclarationType);
+                        }
+      | ID              {
+                            checkAvailability($1->name, 0);
+                            LInstall($1->name, FDeclarationType);
+                        }
       ;
 
 Body: START Slist RetStmt END   {$$ = TreeCreate(TYPE_VOID, NODE_CONNECTOR, NULL, NULL, NULL, $2, $3, NULL);}
@@ -369,22 +377,29 @@ id: ID                  {
 
 %%
 
-int yyerror(char const *s) {
-    //printf("\033[0;31mERR:%d\033[0m : ", lineno);
-    printf("%s", s);
+int yyerror(char const *s) 
+{
+    printf("Error : %s",s);
     return 0;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
         yyerror("Please provide an input filename\n");
         exit(1);
-    } else {
+    }
+    else 
+    {
         fp = fopen(argv[1], "r");
-        if (!fp) {
+        if (!fp) 
+        {
             yyerror("Invalid input file specified\n");
             exit(1);
-        } else {
+        }
+        else 
+        {
             yyin = fp;
         }
     }

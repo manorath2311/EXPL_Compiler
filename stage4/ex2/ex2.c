@@ -531,7 +531,7 @@ void print_header()
 {
     fprintf(intermediate,"0");
     fprintf(intermediate,"\n2056\n0\n0\n0\n0\n0\n0\n");
-    fprintf(intermediate,"ADD SP,200\n");
+    fprintf(intermediate,"ADD SP,500\n");
   
 }
 void print_footer() 

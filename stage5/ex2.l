@@ -3,17 +3,18 @@
 	#include <stdio.h>
     #include <string.h>
 	#include "y.tab.h"
-	#include "task1.h"
-    
-	int number, i, lineno = 1;
-        char *variable;
+	#include "ex2.h"
 
+	int number, i, lineno = 1;
+    char *variable;
+    //int yyerror(const char *s);
 %}
 
 id [a-zA-Z_][0-9a-zA-Z_]*
 str \"(\\.|[^\\\"])*\"
 
 %%
+
 [0-9]+	    {
                 number = atoi(yytext);
                 union Constant *value = (union Constant*)malloc(sizeof(union Constant));
@@ -39,7 +40,6 @@ str \"(\\.|[^\\\"])*\"
 "decl"      {return DECL;}
 "enddecl"   {return ENDDECL;}
 "int"       {return INT;}
-"void"      {return VOID;}
 "str"       {return STR;}
 "=="        {return EQ;}
 "!="        {return NEQ;}
@@ -70,7 +70,7 @@ str \"(\\.|[^\\\"])*\"
 [ \t]	    {}
 \n          {lineno++;}
 [{}()\[\];,]  {return *yytext;}
-.	        {
+.	    {
                 yyerror("unknown character\n");
                 exit(1);
             }

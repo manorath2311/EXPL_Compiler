@@ -30,11 +30,13 @@
 #define TYPE_BOOL 2
 #define TYPE_STR 3
 
-
 union Constant{
     int intval;
     char* strval;
 };
+struct Gsymbol* Gtemp;
+struct Lsymbol* Ltemp;
+struct Paramstruct* Ptemp;
 
 struct ASTNode{
     int type;                         //pointer to the type table entry
@@ -44,7 +46,7 @@ struct ASTNode{
     struct ASTNode *arglist;          //pointer to the expression list given as arguments to a function call
     struct ASTNode *ptr1,*ptr2,*ptr3; //Subtrees of the node. (Maximum Subtrees for IF THEN ELSE)
     struct Gsymbol *Gentry;           //pointer to GST entry for global variables and functions
-    struct Lsymbol *Lentry;           //pointer to the function's LST for local variables and arguements
+    struct Lsymbol *Lentry;           //pointer to the function's LST for local variables and arguments
 };
 
 struct ASTNode* TreeCreate(
@@ -63,19 +65,11 @@ int codegen(struct ASTNode *t);
 void initialize();
 struct ASTNode* reverseList(struct ASTNode *t);
 
-extern struct Gsymbol* Gtemp;
-extern struct Lsymbol* Ltemp;
-extern struct Paramstruct* Ptemp;
-
-int checkAvailability(char *name, int global);
-void assignType(struct ASTNode* node, int func);
-void typecheck(int t1, int t2, char c);
-
-extern int declarationType;   // To pass variable type in yacc
-extern int FDeclarationType;  // To pass variable type to functions in yacc
-extern int totalCount;
-extern int localBindingStart;
-extern int fLabelCount;
+int declarationType;   // To pass variable type in yacc
+int FDeclarationType;  // To pass variable type to functions in yacc
+int totalCount = 4096;  // Memory address of next variable
+int localBindingStart = 1;
+int fLabelCount = 0;
 
 struct Paramstruct {
     char *name;
@@ -100,17 +94,20 @@ struct Lsymbol{
     struct Lsymbol *next;   //points to the next Local Symbol Table entry
 };
 
+ int yyerror(const char *s);
+int checkAvailability(char *name, int global);
+void assignType(struct ASTNode* node, int func);
+void typecheck(int t1, int t2, char c);
 struct Gsymbol* GLookup(char * name); // Returns a pointer to the symbol table entry for the variable, returns NULL otherwise.
 void GInstall(char *name, int type, int size, struct Paramstruct *paramlist); // Creates a symbol table entry.
-extern struct Gsymbol *Ghead, *Gtail;
+struct Gsymbol *Ghead, *Gtail;
 
-int yyerror(char const *s);
 struct Lsymbol* LLookup(char *name);
 void LInstall(char* name, int type);
-extern struct Lsymbol *Lhead, *Ltail;
+struct Lsymbol *Lhead, *Ltail;
 
 void PInstall(char* name, int type);
-extern struct Paramstruct *Phead, *Ptail;
+struct Paramstruct *Phead, *Ptail;
 
 void printLSymbolTable(); // FOR TESTING
 void printGSymbolTable(); // FOR TESTING

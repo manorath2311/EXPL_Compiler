@@ -57,38 +57,37 @@ extern int yydebug;
     NUM = 258,                     /* NUM  */
     ID = 259,                      /* ID  */
     STRVAL = 260,                  /* STRVAL  */
-    VOID = 261,                    /* VOID  */
-    START = 262,                   /* START  */
-    END = 263,                     /* END  */
-    READ = 264,                    /* READ  */
-    WRITE = 265,                   /* WRITE  */
-    PLUS = 266,                    /* PLUS  */
-    MINUS = 267,                   /* MINUS  */
-    MUL = 268,                     /* MUL  */
-    DIV = 269,                     /* DIV  */
-    MOD = 270,                     /* MOD  */
-    ASSGN = 271,                   /* ASSGN  */
-    IF = 272,                      /* IF  */
-    THEN = 273,                    /* THEN  */
-    ELSE = 274,                    /* ELSE  */
-    ENDIF = 275,                   /* ENDIF  */
-    WHILE = 276,                   /* WHILE  */
-    DO = 277,                      /* DO  */
-    ENDWHILE = 278,                /* ENDWHILE  */
-    EQ = 279,                      /* EQ  */
-    NEQ = 280,                     /* NEQ  */
-    LE = 281,                      /* LE  */
-    GE = 282,                      /* GE  */
-    LT = 283,                      /* LT  */
-    GT = 284,                      /* GT  */
-    BREAK = 285,                   /* BREAK  */
-    CONT = 286,                    /* CONT  */
-    DECL = 287,                    /* DECL  */
-    ENDDECL = 288,                 /* ENDDECL  */
-    INT = 289,                     /* INT  */
-    STR = 290,                     /* STR  */
-    MAIN = 291,                    /* MAIN  */
-    RETURN = 292                   /* RETURN  */
+    START = 261,                   /* START  */
+    END = 262,                     /* END  */
+    READ = 263,                    /* READ  */
+    WRITE = 264,                   /* WRITE  */
+    PLUS = 265,                    /* PLUS  */
+    MINUS = 266,                   /* MINUS  */
+    MUL = 267,                     /* MUL  */
+    DIV = 268,                     /* DIV  */
+    MOD = 269,                     /* MOD  */
+    ASSGN = 270,                   /* ASSGN  */
+    IF = 271,                      /* IF  */
+    THEN = 272,                    /* THEN  */
+    ELSE = 273,                    /* ELSE  */
+    ENDIF = 274,                   /* ENDIF  */
+    WHILE = 275,                   /* WHILE  */
+    DO = 276,                      /* DO  */
+    ENDWHILE = 277,                /* ENDWHILE  */
+    EQ = 278,                      /* EQ  */
+    NEQ = 279,                     /* NEQ  */
+    LE = 280,                      /* LE  */
+    GE = 281,                      /* GE  */
+    LT = 282,                      /* LT  */
+    GT = 283,                      /* GT  */
+    BREAK = 284,                   /* BREAK  */
+    CONT = 285,                    /* CONT  */
+    DECL = 286,                    /* DECL  */
+    ENDDECL = 287,                 /* ENDDECL  */
+    INT = 288,                     /* INT  */
+    STR = 289,                     /* STR  */
+    MAIN = 290,                    /* MAIN  */
+    RETURN = 291                   /* RETURN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -100,48 +99,47 @@ extern int yydebug;
 #define NUM 258
 #define ID 259
 #define STRVAL 260
-#define VOID 261
-#define START 262
-#define END 263
-#define READ 264
-#define WRITE 265
-#define PLUS 266
-#define MINUS 267
-#define MUL 268
-#define DIV 269
-#define MOD 270
-#define ASSGN 271
-#define IF 272
-#define THEN 273
-#define ELSE 274
-#define ENDIF 275
-#define WHILE 276
-#define DO 277
-#define ENDWHILE 278
-#define EQ 279
-#define NEQ 280
-#define LE 281
-#define GE 282
-#define LT 283
-#define GT 284
-#define BREAK 285
-#define CONT 286
-#define DECL 287
-#define ENDDECL 288
-#define INT 289
-#define STR 290
-#define MAIN 291
-#define RETURN 292
+#define START 261
+#define END 262
+#define READ 263
+#define WRITE 264
+#define PLUS 265
+#define MINUS 266
+#define MUL 267
+#define DIV 268
+#define MOD 269
+#define ASSGN 270
+#define IF 271
+#define THEN 272
+#define ELSE 273
+#define ENDIF 274
+#define WHILE 275
+#define DO 276
+#define ENDWHILE 277
+#define EQ 278
+#define NEQ 279
+#define LE 280
+#define GE 281
+#define LT 282
+#define GT 283
+#define BREAK 284
+#define CONT 285
+#define DECL 286
+#define ENDDECL 287
+#define INT 288
+#define STR 289
+#define MAIN 290
+#define RETURN 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "task1.y"
+#line 20 "ex2.y"
 
     struct ASTNode *nptr;
 
-#line 145 "y.tab.h"
+#line 143 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

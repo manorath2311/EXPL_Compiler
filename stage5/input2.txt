@@ -1,0 +1,7 @@
+decl 
+str a;
+enddecl;
+begin
+a="bye";
+write(a);
+end;

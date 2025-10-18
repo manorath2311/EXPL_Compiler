@@ -1,23 +1,13 @@
 decl
-    int m, n, p;
-    int m1;
-    int i, j, k;
+    int n;
     int A[10][10], B[10][10], C[10][10];
+    int i, j, k;
 enddecl;
+
 begin
-
-    read(m);
-    read (m1);
     read(n);
- 
-    read(p);
-    if(m1 != n) then
-    write("Error");
-    endif;
-
- 
     i = 0;
-    while (i < m) do
+    while (i < n) do
         j = 0;
         while (j < n) do
             read(A[i][j]);
@@ -26,11 +16,10 @@ begin
         i = i + 1;
     endwhile;
 
- 
     i = 0;
     while (i < n) do
         j = 0;
-        while (j < p) do
+        while (j < n) do
             read(B[i][j]);
             j = j + 1;
         endwhile;
@@ -38,10 +27,19 @@ begin
     endwhile;
 
     i = 0;
-    while (i < m) do
+    while (i < n) do
         j = 0;
-        while (j < p) do
+        while (j < n) do
             C[i][j] = 0;
+            j = j + 1;
+        endwhile;
+        i = i + 1;
+    endwhile;
+
+    i = 0;
+    while (i < n) do
+        j = 0;
+        while (j < n) do
             k = 0;
             while (k < n) do
                 C[i][j] = C[i][j] + (A[i][k] * B[k][j]);
@@ -51,12 +49,11 @@ begin
         endwhile;
         i = i + 1;
     endwhile;
-
-   
+    
     i = 0;
-    while (i < m) do
+    while (i < n) do
         j = 0;
-        while (j < p) do
+        while (j < n) do
             write(C[i][j]);
             j = j + 1;
         endwhile;

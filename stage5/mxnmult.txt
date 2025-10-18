@@ -1,19 +1,15 @@
 decl
     int m, n, p;
-    int m1;
     int i, j, k;
     int A[10][10], B[10][10], C[10][10];
 enddecl;
 begin
 
     read(m);
-    read (m1);
+
     read(n);
  
     read(p);
-    if(m1 != n) then
-    write("Error");
-    endif;
 
  
     i = 0;

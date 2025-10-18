@@ -3,9 +3,9 @@ int *a;
 int b;
 enddecl;
 begin
-b=4;
+b=2;
 a=&b;
 write(*a);
-*a=*a+3;
+*a=*a+1;
 write(*a);
 end;

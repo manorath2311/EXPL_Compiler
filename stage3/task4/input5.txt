@@ -2,7 +2,7 @@ begin
 read(a);
 read(b);
 write(a+b);
-repeatuntil (a>=5) 
+repeatuntil (a>=3) 
 a=a-1;
 endrepeat;
 write(a);
