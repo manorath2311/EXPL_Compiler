@@ -277,16 +277,19 @@ void InstallParamsInLocal() {
     struct Paramstruct *temp = Phead;
     int count = 0;
 
+    // Count parameters
     while(temp != NULL) {
         count++;
         temp = temp->next;
     }
 
-    // Parameters are at positive offsets: BP+3, BP+4, ...
-    localBindingStart = 3;
+    // Parameters are at negative offsets below BP
+    // First param is at BP - (3 + count - 1), last is at BP - 3
     temp = Phead;
     while(temp != NULL) {
+        localBindingStart = -(3 + count - 1);
         LInstall(temp->name, temp->type);
+        count--;
         temp = temp->next;
     }
 
@@ -473,20 +476,28 @@ int popArguments(struct ASTNode *t) {
 
 int getMemoryAddress(struct ASTNode* t) {
     int r;
-    if(t->nodetype == NODE_ID && t->Gentry != NULL) {
+    if(t->nodetype == NODE_ID && t->Gentry != NULL) 
+    {
         r = getReg();
         fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
         return r;
-    } else if(t->nodetype == NODE_ID) {
+    }
+    else if(t->nodetype == NODE_ID) 
+    {
         r = getReg();
         fprintf(intermediate, "MOV R%d,BP\n", r);
         fprintf(intermediate, "ADD R%d,%d\n", r, t->Lentry->binding);
         return r;
-    } else if(t->nodetype == NODE_ARRAY) {
+    }
+    else if(t->nodetype == NODE_ARRAY) 
+    {
         r = codegen(t->ptr2);
-        if(t->Gentry != NULL) {
+        if(t->Gentry != NULL) 
+        {
             fprintf(intermediate, "ADD R%d, %d\n", r, t->Gentry->binding);
-        } else {
+        }
+        else 
+        {
             int r2 = getReg();
             fprintf(intermediate, "MOV R%d, BP\n", r2);
             fprintf(intermediate, "ADD R%d, %d\n", r2, t->Lentry->binding);
@@ -494,7 +505,9 @@ int getMemoryAddress(struct ASTNode* t) {
             freeReg();
         }
         return r;
-    } else {
+    }
+    else 
+    {
         printf("Cannot find memory address of nodetype %d", t->nodetype);
         exit(1);
     }

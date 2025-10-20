@@ -1,0 +1,26 @@
+decl
+  int test(int a, int b);
+enddecl
+
+int test(int a, int b)
+{
+  decl
+  enddecl
+  begin
+    write(a);
+    write(b);
+    return a + b;
+  end
+}
+
+int main()
+{
+  decl
+    int r;
+  enddecl
+  begin
+    r = test(5, 7);
+    write(r);
+    return 0;
+  end
+}
