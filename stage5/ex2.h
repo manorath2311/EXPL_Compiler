@@ -81,7 +81,8 @@ struct Paramstruct {
     struct Paramstruct *next;
 };
 
-struct Gsymbol{
+struct Gsymbol
+{
     char *name;     //name of the variable or function
     int type;       //type of the variable:(Integer / String)
     int size;       //size of an array
@@ -91,7 +92,8 @@ struct Gsymbol{
     struct Gsymbol *next;   //points to the next Global Symbol Table entry
 };
 
-struct Lsymbol{
+struct Lsymbol
+{
     char *name;     //name of the variable
     int type;       //type of the variable:(Integer / String)
     int binding;    //local binding of the variable

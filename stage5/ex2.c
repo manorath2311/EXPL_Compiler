@@ -59,57 +59,41 @@ void initialize()
     fprintf(intermediate, "MOV R0, 10\nPUSH R0\nINT 10\n");
 }
 
-void print_dot_aux(struct ASTNode* node) 
+// void print_tree(struct ASTNode* node) 
+// {
+//     static int nullcount = 0;
+//     count += 1;
+//     int temp = count;
+
+//     if (node->ptr1) 
+//     {
+//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr1));
+//         print_tree(node->ptr1);
+//     }
+
+//     if (node->ptr2) 
+//     {
+//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr2));
+//         print_tree(node->ptr2);
+//     }
+
+//     if (node->ptr3) 
+//     {
+//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr3));
+//         print_tree(node->ptr3);
+//     }
+
+//     if (node->arglist) 
+//     {
+//         fprintf(stream, "    \"%d.%s\":e -> \"%d.%s\":w;\n", temp, findKey(node), count + 1, findKey(node->arglist));
+//         print_tree(node->arglist);
+//    }
+// }
+
+
+
+char* findKey(struct ASTNode* head) 
 {
-    static int nullcount = 0;
-    count += 1;
-    int temp = count;
-
-    if (node->ptr1) 
-    {
-        fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr1));
-        print_dot_aux(node->ptr1);
-    }
-
-    if (node->ptr2) 
-    {
-        fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr2));
-        print_dot_aux(node->ptr2);
-    }
-
-    if (node->ptr3) 
-    {
-        fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr3));
-        print_dot_aux(node->ptr3);
-    }
-
-    if (node->arglist) 
-    {
-        fprintf(stream, "    \"%d.%s\":e -> \"%d.%s\":w;\n", temp, findKey(node), count + 1, findKey(node->arglist));
-        print_dot_aux(node->arglist);
-    }
-}
-
-void print_dot(struct ASTNode* tree, char* name) 
-{
-    char filename[200];
-    sprintf(filename, "./TreeVisualizations/%s.gv", name);
-    stream = fopen(filename, "w");
-    fprintf(stream, "digraph BST {\n");
-    fprintf(stream, "    node [fontname=\"Arial\"];\n");
-
-    if (!tree)
-        fprintf(stream, "\n");
-    else if (!tree->ptr2 && !tree->ptr1)
-        fprintf(stream, "    %s;\n", findKey(tree));
-    else
-        print_dot_aux(tree);
-    fprintf(stream, "}\n");
-
-    fclose(stream);
-}
-
-char* findKey(struct ASTNode* head) {
     char *key = malloc(20);
     switch(head->nodetype) {
         case NODE_CONNECTOR:
@@ -192,7 +176,20 @@ char* findKey(struct ASTNode* head) {
     return key;        
 }
 
-struct Gsymbol* GLookup(char *name) {
+void print_tree(struct ASTNode* node,int level)
+{
+    if(node == NULL)
+        return;
+    for(int i=0; i<level; i++)
+        printf("--");
+    printf("%s\n", findKey(node));
+    print_tree(node->ptr1, level + 1);
+    print_tree(node->ptr2, level + 1);
+    print_tree(node->ptr3, level + 1);
+}
+
+struct Gsymbol* GLookup(char *name) 
+{
     struct Gsymbol *temp = Ghead;
 
     while (temp != NULL && (strcmp(temp->name, name) != 0)) {
@@ -202,27 +199,32 @@ struct Gsymbol* GLookup(char *name) {
     return temp;
 }
 
-struct Lsymbol* LLookup(char *name) {
+struct Lsymbol* LLookup(char *name) 
+{
     struct Lsymbol *temp = Lhead;
 
-    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
+    while (temp != NULL && (strcmp(temp->name, name) != 0)) 
+    {
         temp = temp->next;
     }
 
     return temp;
 }
 
-struct Paramstruct* PLookup(char *name) {
+struct Paramstruct* PLookup(char *name) 
+{
     struct Paramstruct *temp = Phead;
 
-    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
+    while (temp != NULL && (strcmp(temp->name, name) != 0)) 
+    {
         temp = temp->next;
     }
 
     return temp;
 }
 
-void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) {
+void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) 
+{
     struct Gsymbol* temp;
     temp = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
     temp->name = (char*)malloc(sizeof(name));
@@ -234,18 +236,24 @@ void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) {
     if(paramlist != NULL)
         temp->paramlist = paramlist;
 
-    if(size != -1) {
+    if(size != -1) 
+    {
         temp->binding = totalCount;
         totalCount = totalCount + temp->size;
-    } else {
+    }
+    else 
+    {
         temp->flabel = fLabelCount;
         fLabelCount++;
     }
 
-    if (Ghead != NULL) {
+    if (Ghead != NULL) 
+    {
         Gtail->next = temp;
         Gtail = temp;
-    } else {
+    }
+    else 
+    {
         Ghead = temp;
         Gtail = temp;
     }
@@ -253,7 +261,8 @@ void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) {
     return;
 }
 
-void LInstall(char *name, int type) {
+void LInstall(char *name, int type) 
+{
     struct Lsymbol *temp;
     temp = (struct Lsymbol *)malloc(sizeof(struct Lsymbol));
     temp->name = (char*)malloc(sizeof(name));
@@ -262,10 +271,13 @@ void LInstall(char *name, int type) {
     temp->binding = localBindingStart;
     localBindingStart++;
 
-    if (Lhead != NULL) {
+    if (Lhead != NULL) 
+    {
         Ltail->next = temp;
         Ltail = temp;
-    } else {
+    }
+    else 
+    {
         Lhead = temp;
         Ltail = temp;
     }
@@ -273,12 +285,14 @@ void LInstall(char *name, int type) {
     return;
 }
 
-void InstallParamsInLocal() {
+void InstallParamsInLocal() 
+{
     struct Paramstruct *temp = Phead;
     int count = 0;
 
     // Count parameters
-    while(temp != NULL) {
+    while(temp != NULL) 
+    {
         count++;
         temp = temp->next;
     }
@@ -286,7 +300,8 @@ void InstallParamsInLocal() {
     // Parameters are at negative offsets below BP
     // First param is at BP - (3 + count - 1), last is at BP - 3
     temp = Phead;
-    while(temp != NULL) {
+    while(temp != NULL) 
+    {
         localBindingStart = -(3 + count - 1);
         LInstall(temp->name, temp->type);
         count--;
@@ -298,17 +313,21 @@ void InstallParamsInLocal() {
     return;
 }
 
-void PInstall(char *name, int type) {
+void PInstall(char *name, int type) 
+{
     struct Paramstruct *temp;
     temp = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
     temp->name = (char*)malloc(sizeof(name));
     strcpy(temp->name, name);
     temp->type = type;
 
-    if (Phead != NULL) {
+    if (Phead != NULL) 
+    {
         Ptail->next = temp;
         Ptail = temp;
-    } else {
+    }
+    else 
+    {
         Phead = temp;
         Ptail = temp;
     }
@@ -316,35 +335,54 @@ void PInstall(char *name, int type) {
     return;
 }
 
-void printGSymbolTable() {
+void printGSymbolTable() 
+{
     struct Gsymbol* temp = Ghead;
     printf("\nGlobal Variables:\n");
-    while (temp != NULL) {
+    if(temp==NULL)
+    {
+        printf("NO Global variables\n");
+    }
+    while (temp != NULL) 
+    {
         printf("%s --- %d --- %d\n", temp->name, temp->type, temp->binding);
         temp = temp->next;
     }
 }
 
-void printLSymbolTable() {
+void printLSymbolTable() 
+{
     struct Lsymbol* temp = Lhead;
     printf("\nLocal Variables:\n");
-    while (temp != NULL) {
+    if(temp == NULL) 
+    {
+        printf("No local variables.\n");
+        return;
+    }
+    while (temp != NULL) 
+    {
         printf("%s --- %d --- %d\n", temp->name, temp->type, temp->binding);
         temp = temp->next;
     }
 }
 
-int checkAvailability(char *name, int global) {
-    if(global) {
+int checkAvailability(char *name, int global) 
+{
+    if(global) 
+    {
         Gtemp = GLookup(name);
-        if(Gtemp != NULL) {
+        if(Gtemp != NULL) 
+        {
             yyerror_impl("Re-initialization of variable/function:", name);
             exit(1);
         }
-    } else {
+    }
+    else 
+    {
         Ltemp = LLookup(name);
         Ptemp = PLookup(name);
-        if(Ptemp != NULL || Ltemp != NULL) {
+        if(Ptemp != NULL || Ltemp != NULL) 
+        {
             yyerror_impl("Re-initialization of variable:", name);
             exit(1);
         }

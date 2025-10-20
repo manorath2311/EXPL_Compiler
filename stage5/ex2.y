@@ -53,8 +53,8 @@ program: GDeclBlock FDefBlock MainBlock {fclose(intermediate);}
        | MainBlock                      {fclose(intermediate);}
        ;
 
-GDeclBlock: DECL GDeclList ENDDECL      {initialize();}
-          | DECL ENDDECL                {initialize();}
+GDeclBlock: DECL GDeclList ENDDECL      { printGSymbolTable() ;initialize();}
+          | DECL ENDDECL                { printGSymbolTable() ;initialize();}
           ;
 
 GDeclList: GDeclList GDecl
@@ -102,7 +102,8 @@ FDefBlock: FDefBlock FDef
          | FDef
          ;
 
-FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
+FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' 
+                                                        {
                                                             defCount++;
                                                             Gtemp = GLookup($2->name);
 
@@ -139,10 +140,15 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
                                                                 exit(1);
                                                             }
 
+                                                             printLSymbolTable();
+                                                             printf("print_tree for function %s:\n", $2->name);
+                                                             print_tree($8,0);
+                                                             printf("Done\n");
+
+                                                             
                                                             if(testing) 
                                                             {
-                                                                printLSymbolTable();
-                                                                print_dot($8, $2->name);
+                                                                // print_dot($8, $2->name);
                                                             }
                                                             else 
                                                             {
@@ -181,21 +187,30 @@ Param: FType ID  {
      ;
 
 MainBlock: Type MAIN '(' ')' '{' LDeclBlock Body '}'   {
-                                                            if(defCount != declCount) {
+                                                            if(defCount != declCount) 
+                                                            {
                                                                 yyerror_impl("All functions declared need to be defined", NULL);
                                                                 exit(1);
                                                             }
 
-                                                            if(declarationType != TYPE_INT) {
+                                                            if(declarationType != TYPE_INT) 
+                                                            {
                                                                 yyerror_impl("Main return type should be of integer type", NULL);
                                                                 exit(1);
                                                             }
 
-                                                            if(testing) {
-                                                                printGSymbolTable();
-                                                                printLSymbolTable();
-                                                                print_dot($7, "main");
-                                                            } else {
+                                                            //printGSymbolTable();
+                                                            printLSymbolTable();
+                                                            printf("print_tree for main:\n");
+                                                            print_tree($7,0);
+                                                            printf("Done\n");
+                                                            if(testing) 
+                                                            {
+                                                                
+                                                                //print_dot($7, "main");
+                                                            }
+                                                            else 
+                                                            {
                                                                 fprintf(intermediate, "MAIN:\n");
                                                                 fprintf(intermediate, "PUSH BP\n");
                                                                 fprintf(intermediate, "MOV BP,SP\n");

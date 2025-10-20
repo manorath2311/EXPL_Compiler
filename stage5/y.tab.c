@@ -716,13 +716,13 @@ static const yytype_int16 yyrline[] =
 {
        0,    51,    51,    52,    53,    56,    57,    60,    61,    64,
       67,    68,    71,    72,    76,    77,    80,    87,    91,   101,
-     102,   105,   171,   172,   173,   177,   183,   218,   219,   220,
-     223,   224,   227,   230,   234,   240,   241,   244,   254,   255,
-     258,   259,   260,   261,   262,   263,   264,   265,   268,   272,
-     278,   283,   286,   289,   292,   295,   301,   305,   306,   309,
-     313,   317,   321,   325,   329,   333,   337,   341,   345,   349,
-     353,   357,   361,   362,   363,   367,   368,   369,   372,   379,
-     383
+     102,   105,   177,   178,   179,   183,   189,   233,   234,   235,
+     238,   239,   242,   245,   249,   255,   256,   259,   269,   270,
+     273,   274,   275,   276,   277,   278,   279,   280,   283,   287,
+     293,   298,   301,   304,   307,   310,   316,   320,   321,   324,
+     328,   332,   336,   340,   344,   348,   352,   356,   360,   364,
+     368,   372,   376,   377,   378,   382,   383,   384,   387,   394,
+     398
 };
 #endif
 
@@ -1448,13 +1448,13 @@ yyreduce:
 
   case 5: /* GDeclBlock: DECL GDeclList ENDDECL  */
 #line 56 "ex2.y"
-                                        {initialize();}
+                                        { printGSymbolTable() ;initialize();}
 #line 1453 "y.tab.c"
     break;
 
   case 6: /* GDeclBlock: DECL ENDDECL  */
 #line 57 "ex2.y"
-                                        {initialize();}
+                                        { printGSymbolTable() ;initialize();}
 #line 1459 "y.tab.c"
     break;
 
@@ -1517,7 +1517,7 @@ yyreduce:
     break;
 
   case 21: /* FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}'  */
-#line 105 "ex2.y"
+#line 106 "ex2.y"
                                                         {
                                                             defCount++;
                                                             Gtemp = GLookup((yyvsp[-7].nptr)->name);
@@ -1555,10 +1555,15 @@ yyreduce:
                                                                 exit(1);
                                                             }
 
+                                                             printLSymbolTable();
+                                                             printf("print_tree for function %s:\n", (yyvsp[-7].nptr)->name);
+                                                             print_tree((yyvsp[-1].nptr),0);
+                                                             printf("Done\n");
+
+                                                             
                                                             if(testing) 
                                                             {
-                                                                printLSymbolTable();
-                                                                print_dot((yyvsp[-1].nptr), (yyvsp[-7].nptr)->name);
+                                                                // print_dot($8, $2->name);
                                                             }
                                                             else 
                                                             {
@@ -1582,42 +1587,51 @@ yyreduce:
                                                             Lhead = NULL;
                                                             Ltail = NULL;
                                                         }
-#line 1586 "y.tab.c"
+#line 1591 "y.tab.c"
     break;
 
   case 24: /* ParamList: %empty  */
-#line 173 "ex2.y"
+#line 179 "ex2.y"
                             {(yyval.nptr) = NULL;}
-#line 1592 "y.tab.c"
+#line 1597 "y.tab.c"
     break;
 
   case 25: /* Param: FType ID  */
-#line 177 "ex2.y"
+#line 183 "ex2.y"
                  {
                     checkAvailability((yyvsp[0].nptr)->name, 0);
                     PInstall((yyvsp[0].nptr)->name, FDeclarationType);
                 }
-#line 1601 "y.tab.c"
+#line 1606 "y.tab.c"
     break;
 
   case 26: /* MainBlock: Type MAIN '(' ')' '{' LDeclBlock Body '}'  */
-#line 183 "ex2.y"
+#line 189 "ex2.y"
                                                        {
-                                                            if(defCount != declCount) {
+                                                            if(defCount != declCount) 
+                                                            {
                                                                 yyerror_impl("All functions declared need to be defined", NULL);
                                                                 exit(1);
                                                             }
 
-                                                            if(declarationType != TYPE_INT) {
+                                                            if(declarationType != TYPE_INT) 
+                                                            {
                                                                 yyerror_impl("Main return type should be of integer type", NULL);
                                                                 exit(1);
                                                             }
 
-                                                            if(testing) {
-                                                                printGSymbolTable();
-                                                                printLSymbolTable();
-                                                                print_dot((yyvsp[-1].nptr), "main");
-                                                            } else {
+                                                            //printGSymbolTable();
+                                                            printLSymbolTable();
+                                                            printf("print_tree for main:\n");
+                                                            print_tree((yyvsp[-1].nptr),0);
+                                                            printf("Done\n");
+                                                            if(testing) 
+                                                            {
+                                                                
+                                                                //print_dot($7, "main");
+                                                            }
+                                                            else 
+                                                            {
                                                                 fprintf(intermediate, "MAIN:\n");
                                                                 fprintf(intermediate, "PUSH BP\n");
                                                                 fprintf(intermediate, "MOV BP,SP\n");
@@ -1635,59 +1649,59 @@ yyreduce:
                                                             Lhead = NULL;
                                                             Ltail = NULL;
                                                         }
-#line 1639 "y.tab.c"
+#line 1653 "y.tab.c"
     break;
 
   case 27: /* LDeclBlock: DECL LDecList ENDDECL  */
-#line 218 "ex2.y"
+#line 233 "ex2.y"
                                     {InstallParamsInLocal();}
-#line 1645 "y.tab.c"
+#line 1659 "y.tab.c"
     break;
 
   case 28: /* LDeclBlock: DECL ENDDECL  */
-#line 219 "ex2.y"
+#line 234 "ex2.y"
                                     {InstallParamsInLocal();}
-#line 1651 "y.tab.c"
+#line 1665 "y.tab.c"
     break;
 
   case 29: /* LDeclBlock: %empty  */
-#line 220 "ex2.y"
+#line 235 "ex2.y"
                                     {InstallParamsInLocal();}
-#line 1657 "y.tab.c"
+#line 1671 "y.tab.c"
     break;
 
   case 33: /* IdList: IdList ',' ID  */
-#line 230 "ex2.y"
+#line 245 "ex2.y"
                         {
                             checkAvailability((yyvsp[0].nptr)->name, 0);
                             LInstall((yyvsp[0].nptr)->name, FDeclarationType);
                         }
-#line 1666 "y.tab.c"
+#line 1680 "y.tab.c"
     break;
 
   case 34: /* IdList: ID  */
-#line 234 "ex2.y"
+#line 249 "ex2.y"
                         {
                             checkAvailability((yyvsp[0].nptr)->name, 0);
                             LInstall((yyvsp[0].nptr)->name, FDeclarationType);
                         }
-#line 1675 "y.tab.c"
+#line 1689 "y.tab.c"
     break;
 
   case 35: /* Body: START Slist RetStmt END  */
-#line 240 "ex2.y"
+#line 255 "ex2.y"
                                 {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_CONNECTOR, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[-1].nptr), NULL);}
-#line 1681 "y.tab.c"
+#line 1695 "y.tab.c"
     break;
 
   case 36: /* Body: START RetStmt END  */
-#line 241 "ex2.y"
+#line 256 "ex2.y"
                                 {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1687 "y.tab.c"
+#line 1701 "y.tab.c"
     break;
 
   case 37: /* RetStmt: RETURN expr ';'  */
-#line 244 "ex2.y"
+#line 259 "ex2.y"
                             {
                                 if(declarationType == (yyvsp[-1].nptr)->type) {
                                     (yyval.nptr) = TreeCreate(TYPE_VOID, NODE_RET, NULL, NULL, NULL, (yyvsp[-1].nptr), NULL, NULL);
@@ -1696,339 +1710,339 @@ yyreduce:
                                     exit(1);
                                 }
                             }
-#line 1700 "y.tab.c"
+#line 1714 "y.tab.c"
     break;
 
   case 38: /* Slist: Slist Stmt  */
-#line 254 "ex2.y"
+#line 269 "ex2.y"
                         {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_CONNECTOR, NULL, NULL, NULL, (yyvsp[-1].nptr), (yyvsp[0].nptr), NULL);}
-#line 1706 "y.tab.c"
+#line 1720 "y.tab.c"
     break;
 
   case 39: /* Slist: Stmt  */
-#line 255 "ex2.y"
+#line 270 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1712 "y.tab.c"
+#line 1726 "y.tab.c"
     break;
 
   case 40: /* Stmt: InputStmt  */
-#line 258 "ex2.y"
+#line 273 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1718 "y.tab.c"
+#line 1732 "y.tab.c"
     break;
 
   case 41: /* Stmt: OutputStmt  */
-#line 259 "ex2.y"
+#line 274 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1724 "y.tab.c"
+#line 1738 "y.tab.c"
     break;
 
   case 42: /* Stmt: AsgStmt  */
-#line 260 "ex2.y"
+#line 275 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1730 "y.tab.c"
+#line 1744 "y.tab.c"
     break;
 
   case 43: /* Stmt: IfStmt  */
-#line 261 "ex2.y"
+#line 276 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1736 "y.tab.c"
+#line 1750 "y.tab.c"
     break;
 
   case 44: /* Stmt: WhileStmt  */
-#line 262 "ex2.y"
+#line 277 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1742 "y.tab.c"
+#line 1756 "y.tab.c"
     break;
 
   case 45: /* Stmt: BrkStmt  */
-#line 263 "ex2.y"
+#line 278 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1748 "y.tab.c"
+#line 1762 "y.tab.c"
     break;
 
   case 46: /* Stmt: ContStmt  */
-#line 264 "ex2.y"
+#line 279 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1754 "y.tab.c"
+#line 1768 "y.tab.c"
     break;
 
   case 47: /* Stmt: func ';'  */
-#line 265 "ex2.y"
+#line 280 "ex2.y"
                         {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1760 "y.tab.c"
+#line 1774 "y.tab.c"
     break;
 
   case 48: /* IfStmt: IF '(' expr ')' THEN Slist ELSE Slist ENDIF ';'  */
-#line 268 "ex2.y"
+#line 283 "ex2.y"
                                                             {
                                                                 typecheck((yyvsp[-7].nptr)->type, TYPE_BOOL, 'e');
                                                                 (yyval.nptr) = TreeCreate(TYPE_VOID, NODE_IF_ELSE, NULL, NULL, NULL, (yyvsp[-7].nptr), (yyvsp[-2].nptr), (yyvsp[-4].nptr));
                                                             }
-#line 1769 "y.tab.c"
+#line 1783 "y.tab.c"
     break;
 
   case 49: /* IfStmt: IF '(' expr ')' THEN Slist ENDIF ';'  */
-#line 272 "ex2.y"
+#line 287 "ex2.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'i');
                                                                 (yyval.nptr) = TreeCreate(TYPE_VOID, NODE_IF, NULL, NULL, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1778 "y.tab.c"
+#line 1792 "y.tab.c"
     break;
 
   case 50: /* WhileStmt: WHILE '(' expr ')' DO Slist ENDWHILE ';'  */
-#line 278 "ex2.y"
+#line 293 "ex2.y"
                                                             {
                                                                 typecheck((yyvsp[-5].nptr)->type, TYPE_BOOL, 'w');
                                                                 (yyval.nptr) = TreeCreate(TYPE_VOID, NODE_WHILE, NULL, NULL, NULL, (yyvsp[-5].nptr), (yyvsp[-2].nptr), NULL);
                                                             }
-#line 1787 "y.tab.c"
+#line 1801 "y.tab.c"
     break;
 
   case 51: /* BrkStmt: BREAK ';'  */
-#line 283 "ex2.y"
+#line 298 "ex2.y"
                                     {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_BREAK, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1793 "y.tab.c"
+#line 1807 "y.tab.c"
     break;
 
   case 52: /* ContStmt: CONT ';'  */
-#line 286 "ex2.y"
+#line 301 "ex2.y"
                                     {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_CONT, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1799 "y.tab.c"
+#line 1813 "y.tab.c"
     break;
 
   case 53: /* InputStmt: READ '(' id ')' ';'  */
-#line 289 "ex2.y"
+#line 304 "ex2.y"
                                     {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_READ, NULL, NULL, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1805 "y.tab.c"
+#line 1819 "y.tab.c"
     break;
 
   case 54: /* OutputStmt: WRITE '(' expr ')' ';'  */
-#line 292 "ex2.y"
+#line 307 "ex2.y"
                                     {(yyval.nptr) = TreeCreate(TYPE_VOID, NODE_WRITE, NULL, NULL, NULL, (yyvsp[-2].nptr), NULL, NULL);}
-#line 1811 "y.tab.c"
+#line 1825 "y.tab.c"
     break;
 
   case 55: /* AsgStmt: id ASSGN expr ';'  */
-#line 295 "ex2.y"
+#line 310 "ex2.y"
                                     {
                                         typecheck((yyvsp[-3].nptr)->type, (yyvsp[-1].nptr)->type, '=');
                                         (yyval.nptr) = TreeCreate(TYPE_VOID, NODE_ASSGN, NULL, NULL, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr), NULL);
                                     }
-#line 1820 "y.tab.c"
+#line 1834 "y.tab.c"
     break;
 
   case 56: /* ExprList: ExprList ',' expr  */
-#line 301 "ex2.y"
+#line 316 "ex2.y"
                             {
                                 (yyvsp[0].nptr)->arglist = (yyvsp[-2].nptr);
                                 (yyval.nptr) = (yyvsp[0].nptr);
                             }
-#line 1829 "y.tab.c"
+#line 1843 "y.tab.c"
     break;
 
   case 57: /* ExprList: expr  */
-#line 305 "ex2.y"
+#line 320 "ex2.y"
                             {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1835 "y.tab.c"
+#line 1849 "y.tab.c"
     break;
 
   case 58: /* ExprList: %empty  */
-#line 306 "ex2.y"
+#line 321 "ex2.y"
                             {(yyval.nptr) = NULL;}
-#line 1841 "y.tab.c"
+#line 1855 "y.tab.c"
     break;
 
   case 59: /* expr: expr PLUS expr  */
-#line 309 "ex2.y"
+#line 324 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = TreeCreate(TYPE_INT, NODE_PLUS, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1850 "y.tab.c"
+#line 1864 "y.tab.c"
     break;
 
   case 60: /* expr: expr MINUS expr  */
-#line 313 "ex2.y"
+#line 328 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = TreeCreate(TYPE_INT, NODE_MINUS, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1859 "y.tab.c"
+#line 1873 "y.tab.c"
     break;
 
   case 61: /* expr: expr MUL expr  */
-#line 317 "ex2.y"
+#line 332 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = TreeCreate(TYPE_INT, NODE_MUL, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1868 "y.tab.c"
+#line 1882 "y.tab.c"
     break;
 
   case 62: /* expr: expr DIV expr  */
-#line 321 "ex2.y"
+#line 336 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = TreeCreate(TYPE_INT, NODE_DIV, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1877 "y.tab.c"
+#line 1891 "y.tab.c"
     break;
 
   case 63: /* expr: expr MOD expr  */
-#line 325 "ex2.y"
+#line 340 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'a');
                             (yyval.nptr) = TreeCreate(TYPE_INT, NODE_MOD, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1886 "y.tab.c"
+#line 1900 "y.tab.c"
     break;
 
   case 64: /* expr: expr LT expr  */
-#line 329 "ex2.y"
+#line 344 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_LT, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1895 "y.tab.c"
+#line 1909 "y.tab.c"
     break;
 
   case 65: /* expr: expr GT expr  */
-#line 333 "ex2.y"
+#line 348 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_GT, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1904 "y.tab.c"
+#line 1918 "y.tab.c"
     break;
 
   case 66: /* expr: expr LE expr  */
-#line 337 "ex2.y"
+#line 352 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_LE, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1913 "y.tab.c"
+#line 1927 "y.tab.c"
     break;
 
   case 67: /* expr: expr GE expr  */
-#line 341 "ex2.y"
+#line 356 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_GE, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1922 "y.tab.c"
+#line 1936 "y.tab.c"
     break;
 
   case 68: /* expr: expr NEQ expr  */
-#line 345 "ex2.y"
+#line 360 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_NEQ, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1931 "y.tab.c"
+#line 1945 "y.tab.c"
     break;
 
   case 69: /* expr: expr EQ expr  */
-#line 349 "ex2.y"
+#line 364 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'b');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_EQ, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1940 "y.tab.c"
+#line 1954 "y.tab.c"
     break;
 
   case 70: /* expr: expr AND expr  */
-#line 353 "ex2.y"
+#line 368 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'l');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_AND, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1949 "y.tab.c"
+#line 1963 "y.tab.c"
     break;
 
   case 71: /* expr: expr OR expr  */
-#line 357 "ex2.y"
+#line 372 "ex2.y"
                         {
                             typecheck((yyvsp[-2].nptr)->type, (yyvsp[0].nptr)->type, 'l');
                             (yyval.nptr) = TreeCreate(TYPE_BOOL, NODE_OR, NULL, NULL, NULL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL);
                         }
-#line 1958 "y.tab.c"
+#line 1972 "y.tab.c"
     break;
 
   case 72: /* expr: '(' expr ')'  */
-#line 361 "ex2.y"
+#line 376 "ex2.y"
                         {(yyval.nptr) = (yyvsp[-1].nptr);}
-#line 1964 "y.tab.c"
+#line 1978 "y.tab.c"
     break;
 
   case 73: /* expr: NUM  */
-#line 362 "ex2.y"
+#line 377 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1970 "y.tab.c"
+#line 1984 "y.tab.c"
     break;
 
   case 74: /* expr: MINUS NUM  */
-#line 363 "ex2.y"
+#line 378 "ex2.y"
                         {
                             (yyvsp[0].nptr)->value.intval = -1*((yyvsp[0].nptr)->value.intval);
                             (yyval.nptr) = (yyvsp[0].nptr);
                         }
-#line 1979 "y.tab.c"
+#line 1993 "y.tab.c"
     break;
 
   case 75: /* expr: STRVAL  */
-#line 367 "ex2.y"
+#line 382 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1985 "y.tab.c"
+#line 1999 "y.tab.c"
     break;
 
   case 76: /* expr: id  */
-#line 368 "ex2.y"
+#line 383 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1991 "y.tab.c"
+#line 2005 "y.tab.c"
     break;
 
   case 77: /* expr: func  */
-#line 369 "ex2.y"
+#line 384 "ex2.y"
                         {(yyval.nptr) = (yyvsp[0].nptr);}
-#line 1997 "y.tab.c"
+#line 2011 "y.tab.c"
     break;
 
   case 78: /* func: ID '(' ExprList ')'  */
-#line 372 "ex2.y"
+#line 387 "ex2.y"
                             {
                                 assignType((yyvsp[-3].nptr), 1);
                                 (yyvsp[-3].nptr)->nodetype = NODE_FUNC;
                                 (yyvsp[-3].nptr)->ptr1 = reverseList((yyvsp[-1].nptr));
                                 (yyval.nptr) = (yyvsp[-3].nptr);
                             }
-#line 2008 "y.tab.c"
+#line 2022 "y.tab.c"
     break;
 
   case 79: /* id: ID  */
-#line 379 "ex2.y"
+#line 394 "ex2.y"
                         {
                             assignType((yyvsp[0].nptr), 0);
                             (yyval.nptr) = (yyvsp[0].nptr);
                         }
-#line 2017 "y.tab.c"
+#line 2031 "y.tab.c"
     break;
 
   case 80: /* id: ID '[' expr ']'  */
-#line 383 "ex2.y"
+#line 398 "ex2.y"
                         {
                             assignType((yyvsp[-3].nptr), 2);
                             (yyval.nptr) = TreeCreate((yyvsp[-3].nptr)->type, NODE_ARRAY, NULL, NULL, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr), NULL);
                             (yyval.nptr)->Gentry = (yyvsp[-3].nptr)->Gentry;
                             (yyval.nptr)->Lentry = (yyvsp[-3].nptr)->Lentry;
                         }
-#line 2028 "y.tab.c"
+#line 2042 "y.tab.c"
     break;
 
 
-#line 2032 "y.tab.c"
+#line 2046 "y.tab.c"
 
       default: break;
     }
@@ -2221,7 +2235,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 392 "ex2.y"
+#line 407 "ex2.y"
 
 
 int yyerror_impl(char const *s, const char *var) 
