@@ -11,8 +11,16 @@ typedef struct lnode {
     struct lnode* next;
 } lnode;
 
+typedef struct fnode {
+    char* label;
+    int address;
+    struct fnode* next;
+} fnode;
+
 lnode* createLabel(char* label, int addr);
+fnode* createLabel_func(char *label,int addr);
 
 int getLabelAddr(char* label);
+int getLabelAddr_func(char* label);
 
 #endif

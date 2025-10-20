@@ -5,7 +5,7 @@
 	#include "y.tab.h"
 	#include "ex2.h"
 
-	int number, i, lineno = 1;
+	static int number, i, lineno = 1;
     char *variable;
     //int yyerror(const char *s);
 %}
@@ -39,6 +39,10 @@ str \"(\\.|[^\\\"])*\"
 "continue"  {return CONT;}
 "decl"      {return DECL;}
 "enddecl"   {return ENDDECL;}
+"and"       {return AND;}
+"AND"       {return AND;}
+"or"        {return OR;}
+"OR"        {return OR;}
 "int"       {return INT;}
 "str"       {return STR;}
 "=="        {return EQ;}
@@ -71,7 +75,9 @@ str \"(\\.|[^\\\"])*\"
 \n          {lineno++;}
 [{}()\[\];,]  {return *yytext;}
 .	    {
-                yyerror("unknown character\n");
+                char msg[50];
+                snprintf(msg, sizeof(msg), "unknown character: '%c'", yytext[0]);
+                yyerror_impl(msg, NULL);
                 exit(1);
             }
 

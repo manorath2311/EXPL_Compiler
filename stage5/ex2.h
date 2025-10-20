@@ -24,19 +24,28 @@
 #define NODE_ARRAY 22
 #define NODE_RET 24
 #define NODE_FUNC 25
+#define NODE_AND 26
+#define NODE_OR 27
 
 #define TYPE_VOID 0
 #define TYPE_INT 1
 #define TYPE_BOOL 2
 #define TYPE_STR 3
 
-union Constant{
+union Constant
+{
     int intval;
     char* strval;
 };
-struct Gsymbol* Gtemp;
-struct Lsymbol* Ltemp;
-struct Paramstruct* Ptemp;
+
+extern int declarationType;   // To pass variable type in yacc
+extern int FDeclarationType;  // To pass variable type to functions in yacc
+extern int totalCount;  // Memory address of next variable
+extern int localBindingStart;
+extern int fLabelCount;
+extern struct Gsymbol* Gtemp;
+extern struct Lsymbol* Ltemp;
+extern struct Paramstruct* Ptemp;
 
 struct ASTNode{
     int type;                         //pointer to the type table entry
@@ -65,11 +74,6 @@ int codegen(struct ASTNode *t);
 void initialize();
 struct ASTNode* reverseList(struct ASTNode *t);
 
-int declarationType;   // To pass variable type in yacc
-int FDeclarationType;  // To pass variable type to functions in yacc
-int totalCount = 4096;  // Memory address of next variable
-int localBindingStart = 1;
-int fLabelCount = 0;
 
 struct Paramstruct {
     char *name;
@@ -94,20 +98,22 @@ struct Lsymbol{
     struct Lsymbol *next;   //points to the next Local Symbol Table entry
 };
 
- int yyerror(const char *s);
+ int yyerror_impl(const char *s, const char *var);
 int checkAvailability(char *name, int global);
 void assignType(struct ASTNode* node, int func);
 void typecheck(int t1, int t2, char c);
 struct Gsymbol* GLookup(char * name); // Returns a pointer to the symbol table entry for the variable, returns NULL otherwise.
 void GInstall(char *name, int type, int size, struct Paramstruct *paramlist); // Creates a symbol table entry.
-struct Gsymbol *Ghead, *Gtail;
+extern struct Gsymbol *Ghead, *Gtail;
 
 struct Lsymbol* LLookup(char *name);
 void LInstall(char* name, int type);
-struct Lsymbol *Lhead, *Ltail;
+extern struct Lsymbol *Lhead, *Ltail;
 
 void PInstall(char* name, int type);
-struct Paramstruct *Phead, *Ptail;
+extern struct Paramstruct *Phead, *Ptail;
 
 void printLSymbolTable(); // FOR TESTING
 void printGSymbolTable(); // FOR TESTING
+
+char* findKey(struct ASTNode*);

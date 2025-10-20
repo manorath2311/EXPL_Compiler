@@ -1,0 +1,10 @@
+decl 
+int x;
+int x;
+enddecl
+int main() {
+begin
+    x = 10;
+    write(x);
+end
+}

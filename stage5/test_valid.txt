@@ -1,0 +1,14 @@
+decl 
+int x, y, z;
+enddecl
+
+int main() 
+{
+begin
+    read(x);
+    read(y);
+    z = x + y;
+    write(z);
+    return 0;
+end
+}

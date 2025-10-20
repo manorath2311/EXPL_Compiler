@@ -14,6 +14,12 @@
         struct Paramstruct *argList1, *argList2;
         int declCount = 0, defCount = 0; // Definition and Declaration count of functions
         int testing = 0; // can use to test ASTree
+        
+        // Internal yyerror implementation for two arguments
+        int yyerror_impl(const char *s, const char *var);
+        
+        // Wrapper for Bison's single-argument calls
+        #define yyerror(msg) yyerror_impl(msg, NULL)
        
 %}
 
@@ -22,10 +28,11 @@
 }
 
 %token <nptr> NUM ID STRVAL
-%token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN 
+%token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN AND OR
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
 %token BREAK CONT DECL ENDDECL INT STR MAIN RETURN
 
+%left AND OR
 %nonassoc LT GT LE GE
 %right EQ NEQ
 %left PLUS MINUS
@@ -84,7 +91,7 @@ GId: ID '(' ParamList ')'   {
    | ID '[' NUM ']'         {
                                 checkAvailability($1->name, 1);
                                 if($3->value.intval < 1) {
-                                    yyerror("Invalid array size");
+                                    yyerror_impl("Invalid array size for", $1->name);
                                     exit(1);
                                 }
                                 GInstall($1->name, declarationType, $3->value.intval, NULL);
@@ -100,12 +107,12 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
                                                             Gtemp = GLookup($2->name);
 
                                                             if(Gtemp == NULL) {
-                                                                yyerror("Function is not declared");
+                                                                yyerror_impl("Function is not declared:", $2->name);
                                                                 exit(1);
                                                             }
 
                                                             if(Gtemp->type != declarationType) {
-                                                               yyerror("Function type does not match declaration");
+                                                               yyerror_impl("Function type does not match declaration:", $2->name);
                                                                exit(1);
                                                             }
 
@@ -114,12 +121,12 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
 
                                                             while(argList1 != NULL && argList2 != NULL) {
                                                                 if(argList1->type != argList2->type) {
-                                                                    yyerror("Conflict in argument types");
+                                                                    yyerror_impl("Conflict in argument types for function:", $2->name);
                                                                     exit(1);
                                                                 }
 
                                                                 if(strcmp(argList1->name, argList2->name)) {
-                                                                    yyerror("Conflict in argument names");
+                                                                    yyerror_impl("Conflict in argument names for function:", $2->name);
                                                                     exit(1);
                                                                 }
 
@@ -128,7 +135,7 @@ FDef: Type ID '(' ParamList ')' '{' LDeclBlock Body '}' {
                                                             }
 
                                                             if ((argList1 != NULL) || (argList2 != NULL)) {
-                                                                yyerror("Not enough arguments");
+                                                                yyerror_impl("Not enough arguments for function:", $2->name);
                                                                 exit(1);
                                                             }
 
@@ -175,12 +182,12 @@ Param: FType ID  {
 
 MainBlock: Type MAIN '(' ')' '{' LDeclBlock Body '}'   {
                                                             if(defCount != declCount) {
-                                                                yyerror("All functions declared need to be defined\n");
+                                                                yyerror_impl("All functions declared need to be defined", NULL);
                                                                 exit(1);
                                                             }
 
                                                             if(declarationType != TYPE_INT) {
-                                                                yyerror("Main return type should be of integer type\n");
+                                                                yyerror_impl("Main return type should be of integer type", NULL);
                                                                 exit(1);
                                                             }
 
@@ -238,7 +245,7 @@ RetStmt: RETURN expr ';'    {
                                 if(declarationType == $2->type) {
                                     $$ = TreeCreate(TYPE_VOID, NODE_RET, NULL, NULL, NULL, $2, NULL, NULL);
                                 } else {
-                                    yyerror("Return type mismatch");
+                                    yyerror_impl("Return type mismatch", NULL);
                                     exit(1);
                                 }
                             }
@@ -343,6 +350,14 @@ expr : expr PLUS expr	{
                             typecheck($1->type, $3->type, 'b');
                             $$ = TreeCreate(TYPE_BOOL, NODE_EQ, NULL, NULL, NULL, $1, $3, NULL);
                         }
+     | expr AND expr    {
+                            typecheck($1->type, $3->type, 'l');
+                            $$ = TreeCreate(TYPE_BOOL, NODE_AND, NULL, NULL, NULL, $1, $3, NULL);
+                        }
+     | expr OR expr     {
+                            typecheck($1->type, $3->type, 'l');
+                            $$ = TreeCreate(TYPE_BOOL, NODE_OR, NULL, NULL, NULL, $1, $3, NULL);
+                        }
      | '(' expr ')'	{$$ = $2;}
      | NUM		{$$ = $1;}
      | MINUS NUM        {
@@ -365,29 +380,35 @@ id: ID                  {
                             assignType($1, 0);
                             $$ = $1;
                         }
-  | ID '[' NUM ']'      {
+  | ID '[' expr ']'     {
                             assignType($1, 2);
                             $$ = TreeCreate($1->type, NODE_ARRAY, NULL, NULL, NULL, $1, $3, NULL);
-                        }
-  | ID '[' id ']'       {
-                            assignType($1, 2);
-                            $$ = TreeCreate($1->type, NODE_ARRAY, NULL, NULL, NULL, $1, $3, NULL);
+                            $$->Gentry = $1->Gentry;
+                            $$->Lentry = $1->Lentry;
                         }
   ;
 
+
 %%
 
-int yyerror(char const *s) 
+int yyerror_impl(char const *s, const char *var) 
 {
     printf("Error : %s",s);
+    if(var != NULL) {
+        printf(" '%s'", var);
+    }
+    printf("\n");
     return 0;
 }
+
+// Undefine the macro for the actual implementation
+#undef yyerror
 
 int main(int argc, char *argv[]) 
 {
     if (argc < 2) 
     {
-        yyerror("Please provide an input filename\n");
+        yyerror_impl("Please provide an input filename", NULL);
         exit(1);
     }
     else 
@@ -395,7 +416,7 @@ int main(int argc, char *argv[])
         fp = fopen(argv[1], "r");
         if (!fp) 
         {
-            yyerror("Invalid input file specified\n");
+            yyerror_impl("Invalid input file specified:", argv[1]);
             exit(1);
         }
         else 

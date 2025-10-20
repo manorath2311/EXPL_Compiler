@@ -12,8 +12,22 @@
 %}
 
 label   L[0-9]+
-
+Func F[0-9]+
+Main  MAIN
 %%
+{Main}:\n          {
+                    if(step == 0)
+                    {
+                        createLabel("MAIN", addr);
+                    }
+                }
+{Main}         {
+                    if(step == 1)
+                    {
+                        int address = getLabelAddr("MAIN");
+                        fprintf(output_file, "%d", address);
+                    }
+                }
 {label}:\n      {
                     if(step == 0)
                     {
@@ -21,6 +35,23 @@ label   L[0-9]+
                         char* label = strndup(yytext, len);
                         createLabel(label, addr);
                     }
+                }
+{Func}:\n       {
+                    if(step == 0)
+                    {
+                        int len = yyleng - 2;
+                        char* label = strndup(yytext, len);
+                        createLabel_func(label, addr);
+                    }
+
+                }
+{Func}          {
+                    if(step == 1)
+                    {
+                        int address = getLabelAddr_func(yytext);
+                        fprintf(output_file, "%d", address);
+                    }
+
                 }
 
 {label}         {

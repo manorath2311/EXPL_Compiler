@@ -1,8 +1,53 @@
+
+// Global variable definitions
+int declarationType = 0;
+int FDeclarationType = 0;
+int totalCount = 4096;
+int localBindingStart = 1;
+int fLabelCount = 0;
+struct Gsymbol* Gtemp = NULL;
+struct Lsymbol* Ltemp = NULL;
+struct Paramstruct* Ptemp = NULL;
+struct Gsymbol *Ghead = NULL, *Gtail = NULL;
+struct Lsymbol *Lhead = NULL, *Ltail = NULL;
+struct Paramstruct *Phead = NULL, *Ptail = NULL;
+
 FILE *stream;
 int count = 0;
-char* findKey(struct ASTNode*);
+
 
 extern FILE *intermediate;
+struct ASTNode* TreeCreate(int type,int nodetype,char *name,union Constant *value,struct ASTNode *arglist,struct ASTNode *ptr1,struct ASTNode *ptr2,struct ASTNode *ptr3) 
+{
+    struct ASTNode* temp;
+    temp = (struct ASTNode*)malloc(sizeof(struct ASTNode));
+
+    if(value != NULL) 
+        temp->value = *value;
+
+    temp->type = type;
+    temp->nodetype = nodetype;
+    temp->name = name;
+    temp->ptr1 = ptr1;
+    temp->ptr2 = ptr2;
+    temp->ptr3 = ptr3;
+    temp->arglist = arglist;
+    return temp;
+}
+
+struct ASTNode* reverseList(struct ASTNode* head) 
+{
+    struct ASTNode *prev = NULL, *current;
+
+    while(head != NULL) {
+        current = head->arglist;
+        head->arglist = prev;
+        prev = head;
+        head = current;
+    }
+
+    return prev;
+}
 
 void initialize() 
 {
@@ -237,13 +282,15 @@ void InstallParamsInLocal() {
         temp = temp->next;
     }
 
-    localBindingStart = -1*count - 2;
+    // Parameters are at positive offsets: BP+3, BP+4, ...
+    localBindingStart = 3;
     temp = Phead;
     while(temp != NULL) {
         LInstall(temp->name, temp->type);
         temp = temp->next;
     }
 
+    // Local variables start at BP+1
     localBindingStart = 1;
     return;
 }
@@ -288,14 +335,14 @@ int checkAvailability(char *name, int global) {
     if(global) {
         Gtemp = GLookup(name);
         if(Gtemp != NULL) {
-            yyerror("Re-initialization of variable/function \n");
+            yyerror_impl("Re-initialization of variable/function:", name);
             exit(1);
         }
     } else {
         Ltemp = LLookup(name);
         Ptemp = PLookup(name);
         if(Ptemp != NULL || Ltemp != NULL) {
-            yyerror("Re-initialization of variable \n");
+            yyerror_impl("Re-initialization of variable:", name);
             exit(1);
         }
     }
@@ -324,17 +371,16 @@ void assignType(struct ASTNode* node, int code)
 
             if(code == 1 && Gtemp->size != -1) 
             {
-                yyerror("conflict in ID NodeType : Expected Function \n");
-                printf("%s\n", node->name);
+                yyerror_impl("conflict in ID NodeType : Expected Function:", node->name);
                 exit(1);
             }
         }
         else 
         {
             if(code == 1)
-                yyerror("Function not declared!");
+                yyerror_impl("Function not declared:", node->name);
             else
-                yyerror("Variable not declared!");
+                yyerror_impl("Variable not declared:", node->name);
             exit(1);
         }
     }
@@ -346,39 +392,44 @@ void typecheck(int t1, int t2, char c)
 {
     switch(c) {
         case 'w': if(t1 != t2) {
-                      yyerror("Expected Boolean in WHILE check\n");
+                      yyerror_impl("Expected Boolean in WHILE check", NULL);
                       exit(1);
                   }
                   break;
         case 'e': if(t1 != t2) {
-                      yyerror("Expected Boolean in IF ELSE check\n");
+                      yyerror_impl("Expected Boolean in IF ELSE check", NULL);
                       exit(1);
                   }
                   break;
         case 'i': if(t1 != t2) {
-                      yyerror("Expected Boolean in IF check\n");
+                      yyerror_impl("Expected Boolean in IF check", NULL);
                       exit(1);
                   }
                   break;
         case 'a': if(t1 != TYPE_INT || t2 != TYPE_INT) {
-                      yyerror("Invalid type for arithmetic operation\n");
+                      yyerror_impl("Invalid type for arithmetic operation", NULL);
                       exit(1);
                   }
                   break;
         case 'b': if(t1 != TYPE_INT || t2 != TYPE_INT) {
-                      yyerror("Invalid type for comparing (<, >, <=..) operation\n");
+                      yyerror_impl("Invalid type for comparing (<, >, <=..) operation", NULL);
+                      exit(1);
+                  }
+                  break;
+        case 'l': if(t1 != TYPE_BOOL || t2 != TYPE_BOOL) {
+                      yyerror_impl("Invalid type for logical AND/OR operation", NULL);
                       exit(1);
                   }
                   break;
         case '=': if(t1 != t2) {
-                      yyerror("Invalid type for assignment operation\n");
+                      yyerror_impl("Invalid type for assignment operation", NULL);
                       exit(1);
                   }
                   break;
     }
 }
 
-int counter = -1, i, j, label=0;
+static int counter = -1, i, j, label=0;
 int whileStart = -1, whileEnd = -1;
 extern FILE *intermediate;
 
@@ -388,7 +439,7 @@ int getlabel() {
 int getReg() {
     if(counter < 20)
         return ++counter;
-    yyerror("Out of Registers");
+    yyerror_impl("Out of Registers", NULL);
     exit(1);
 }
 int freeReg() {
@@ -399,9 +450,11 @@ int freeAllReg() {
     counter = -1;
 }
 
-int pushArguments(struct ASTNode *t) {
+int pushArguments(struct ASTNode *t) 
+{
     int r;
-    while(t != NULL) {
+    while(t != NULL) 
+    {
         r = codegen(t);
         fprintf(intermediate, "PUSH R%d\n", r);
         freeReg();
@@ -431,7 +484,15 @@ int getMemoryAddress(struct ASTNode* t) {
         return r;
     } else if(t->nodetype == NODE_ARRAY) {
         r = codegen(t->ptr2);
-        fprintf(intermediate, "ADD R%d, %d\n", r, t->ptr1->Gentry->binding);
+        if(t->Gentry != NULL) {
+            fprintf(intermediate, "ADD R%d, %d\n", r, t->Gentry->binding);
+        } else {
+            int r2 = getReg();
+            fprintf(intermediate, "MOV R%d, BP\n", r2);
+            fprintf(intermediate, "ADD R%d, %d\n", r2, t->Lentry->binding);
+            fprintf(intermediate, "ADD R%d, R%d\n", r, r2);
+            freeReg();
+        }
         return r;
     } else {
         printf("Cannot find memory address of nodetype %d", t->nodetype);
@@ -597,6 +658,40 @@ int codegen(struct ASTNode* t)
             number = codegen(t->ptr2);
             fprintf(intermediate, "L%d:\n", l1);
             freeReg();
+            break;
+        case NODE_AND:
+            l1 = getlabel();
+            r1 = codegen(t->ptr1);
+            fprintf(intermediate, "JZ R%d,L%d\n", r1, l1);
+            freeReg();
+            r2 = codegen(t->ptr2);
+            fprintf(intermediate, "JZ R%d,L%d\n", r2, l1);
+            freeReg();
+            r3 = getReg();
+            fprintf(intermediate, "MOV R%d, 1\n", r3);
+            l2 = getlabel();
+            fprintf(intermediate, "JMP L%d\n", l2);
+            fprintf(intermediate, "L%d:\n", l1);
+            fprintf(intermediate, "MOV R%d, 0\n", r3);
+            fprintf(intermediate, "L%d:\n", l2);
+            return r3;
+            break;
+        case NODE_OR:
+            l1 = getlabel();
+            r1 = codegen(t->ptr1);
+            fprintf(intermediate, "JNZ R%d,L%d\n", r1, l1);
+            freeReg();
+            r2 = codegen(t->ptr2);
+            fprintf(intermediate, "JNZ R%d,L%d\n", r2, l1);
+            freeReg();
+            r3 = getReg();
+            fprintf(intermediate, "MOV R%d, 0\n", r3);
+            l2 = getlabel();
+            fprintf(intermediate, "JMP L%d\n", l2);
+            fprintf(intermediate, "L%d:\n", l1);
+            fprintf(intermediate, "MOV R%d, 1\n", r3);
+            fprintf(intermediate, "L%d:\n", l2);
+            return r3;
             break;
         case NODE_IF_ELSE:
             r1 = codegen(t->ptr1);
