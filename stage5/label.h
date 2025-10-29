@@ -23,4 +23,6 @@ fnode* createLabel_func(char *label,int addr);
 int getLabelAddr(char* label);
 int getLabelAddr_func(char* label);
 
+void printLabels();
+
 #endif

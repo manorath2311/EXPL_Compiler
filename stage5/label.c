@@ -3,7 +3,8 @@
 lnode* head = NULL;
 fnode* head2 = NULL;
 
-lnode* createLabel(char* label, int addr){
+lnode* createLabel(char* label, int addr)
+{
     lnode* node = (lnode*)malloc(sizeof(lnode));
 
     node->label = label;
@@ -52,4 +53,22 @@ int getLabelAddr_func(char *label)
         temp = temp->next;
     }
     return -1;
+}
+void printLabels()
+{
+    lnode* temp = head;
+    printf("Labels:\n");
+    while(temp != NULL)
+    {
+        printf("Label: %s, Address: %d\n", temp->label, temp->address);
+        temp = temp->next;
+    }
+
+    fnode* temp2 = head2;
+    printf("Function Labels:\n");
+    while(temp2 != NULL)
+    {
+        printf("Label: %s, Address: %d\n", temp2->label, temp2->address);
+        temp2 = temp2->next;
+    }
 }

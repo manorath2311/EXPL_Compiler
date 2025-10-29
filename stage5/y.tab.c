@@ -721,8 +721,8 @@ static const yytype_int16 yyrline[] =
      273,   274,   275,   276,   277,   278,   279,   280,   283,   287,
      293,   298,   301,   304,   307,   310,   316,   320,   321,   324,
      328,   332,   336,   340,   344,   348,   352,   356,   360,   364,
-     368,   372,   376,   377,   378,   382,   383,   384,   387,   394,
-     398
+     368,   372,   376,   377,   378,   382,   383,   384,   387,   437,
+     441
 };
 #endif
 
@@ -1430,31 +1430,31 @@ yyreduce:
     {
   case 2: /* program: GDeclBlock FDefBlock MainBlock  */
 #line 51 "ex2.y"
-                                        {fclose(intermediate);}
+                                        {}
 #line 1435 "y.tab.c"
     break;
 
   case 3: /* program: GDeclBlock MainBlock  */
 #line 52 "ex2.y"
-                                        {fclose(intermediate);}
+                                        {}
 #line 1441 "y.tab.c"
     break;
 
   case 4: /* program: MainBlock  */
 #line 53 "ex2.y"
-                                        {fclose(intermediate);}
+                                        {}
 #line 1447 "y.tab.c"
     break;
 
   case 5: /* GDeclBlock: DECL GDeclList ENDDECL  */
 #line 56 "ex2.y"
-                                        { printGSymbolTable() ;initialize();}
+                                        { printGSymbolTable() ;print_header();}
 #line 1453 "y.tab.c"
     break;
 
   case 6: /* GDeclBlock: DECL ENDDECL  */
 #line 57 "ex2.y"
-                                        { printGSymbolTable() ;initialize();}
+                                        { printGSymbolTable() ;print_header();}
 #line 1459 "y.tab.c"
     break;
 
@@ -2013,36 +2013,79 @@ yyreduce:
   case 78: /* func: ID '(' ExprList ')'  */
 #line 387 "ex2.y"
                             {
-                                assignType((yyvsp[-3].nptr), 1);
+                                 assignType((yyvsp[-3].nptr),1);
+                                //checkParamType($1,$3);
                                 (yyvsp[-3].nptr)->nodetype = NODE_FUNC;
                                 (yyvsp[-3].nptr)->ptr1 = reverseList((yyvsp[-1].nptr));
-                                (yyval.nptr) = (yyvsp[-3].nptr);
+                                    if((yyvsp[-3].nptr)==NULL || (yyvsp[-1].nptr)==NULL)
+                                    {
+                                        printf("Error at 394");
+                                        exit(1);
+                                    }
+                                    struct Gsymbol* temp=GLookup((yyvsp[-3].nptr)->name);
+                                    printf("func is :%s\n",temp->name);
+                                    struct Paramstruct* temp2=temp->paramlist;
+                                    struct ASTNode* right=(yyvsp[-3].nptr)->ptr1;
+
+                                    while(right!=NULL && temp2!=NULL)
+                                    {
+                                        if(right->type==temp2->type)
+                                        {
+                                            // printf("hi bro %s %s\n",right->name,temp2->name);
+                                            // printf("%d==%d\n",right->type,temp2->type);
+                                            right=right->arglist;
+                                            temp2=temp2->next;
+                                        }
+                                        else
+                                        {
+                                            // printf("hi bro %s %s\n",right->name,temp2->name);
+                                            // printf("%d==%d\n",right->type,temp2->type);
+                                            printf("mismatch bro in function arguments\n");
+                                            exit(1);
+                                        }
+                                        
+                                    }
+                                    if(right!=NULL || temp2!=NULL)
+                                    {
+                                        printf("Error at 422");
+                                        if(right==NULL)
+                                        {
+                                            printf("right is NULL\n");
+                                        }
+                                        if(temp2==NULL)
+                                        {
+                                            printf("temp2 is NULL\n");
+                                        }
+                                        exit(1);
+                                    }
+                                    (yyval.nptr) = (yyvsp[-3].nptr);
+                                    codegen((yyval.nptr));
                             }
-#line 2022 "y.tab.c"
+#line 2065 "y.tab.c"
     break;
 
   case 79: /* id: ID  */
-#line 394 "ex2.y"
+#line 437 "ex2.y"
                         {
                             assignType((yyvsp[0].nptr), 0);
                             (yyval.nptr) = (yyvsp[0].nptr);
                         }
-#line 2031 "y.tab.c"
+#line 2074 "y.tab.c"
     break;
 
   case 80: /* id: ID '[' expr ']'  */
-#line 398 "ex2.y"
+#line 441 "ex2.y"
                         {
                             assignType((yyvsp[-3].nptr), 2);
                             (yyval.nptr) = TreeCreate((yyvsp[-3].nptr)->type, NODE_ARRAY, NULL, NULL, NULL, (yyvsp[-3].nptr), (yyvsp[-1].nptr), NULL);
                             (yyval.nptr)->Gentry = (yyvsp[-3].nptr)->Gentry;
                             (yyval.nptr)->Lentry = (yyvsp[-3].nptr)->Lentry;
                         }
-#line 2042 "y.tab.c"
+#line 2085 "y.tab.c"
     break;
 
 
-#line 2046 "y.tab.c"
+#line 2089 "y.tab.c"
 
       default: break;
     }
@@ -2235,7 +2278,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 407 "ex2.y"
+#line 450 "ex2.y"
 
 
 int yyerror_impl(char const *s, const char *var) 

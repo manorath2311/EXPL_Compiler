@@ -19,6 +19,7 @@ Main  MAIN
                     if(step == 0)
                     {
                         createLabel("MAIN", addr);
+                        printf("Created MAIN at address %d\n", addr);
                     }
                 }
 {Main}         {
@@ -26,6 +27,7 @@ Main  MAIN
                     {
                         int address = getLabelAddr("MAIN");
                         fprintf(output_file, "%d", address);
+                        printf("Found MAIN at address %d\n", address);
                     }
                 }
 {label}:\n      {
@@ -42,6 +44,7 @@ Main  MAIN
                         int len = yyleng - 2;
                         char* label = strndup(yytext, len);
                         createLabel_func(label, addr);
+                        printf("Created function %s at address %d\n", label, addr);
                     }
 
                 }
@@ -50,6 +53,7 @@ Main  MAIN
                     {
                         int address = getLabelAddr_func(yytext);
                         fprintf(output_file, "%d", address);
+                        printf("Found function %s at address %d\n", yytext, address);
                     }
 
                 }
@@ -97,6 +101,7 @@ int main(int argc, char* argv[])
     label_file = fopen(argv[1], "r");
     output_file = fopen(argv[2], "w");
 
+
     if(label_file == NULL || output_file == NULL)
     {
         printf("Error opening file: label/output\n");
@@ -105,5 +110,6 @@ int main(int argc, char* argv[])
 
     yyin = label_file;
     yylex();
+    printLabels();
     return 0;
 }

@@ -48,13 +48,13 @@
 
 %%
 
-program: GDeclBlock FDefBlock MainBlock {fclose(intermediate);}
-       | GDeclBlock MainBlock           {fclose(intermediate);}
-       | MainBlock                      {fclose(intermediate);}
+program: GDeclBlock FDefBlock MainBlock {}
+       | GDeclBlock MainBlock           {}
+       | MainBlock                      {}
        ;
 
-GDeclBlock: DECL GDeclList ENDDECL      { printGSymbolTable() ;initialize();}
-          | DECL ENDDECL                { printGSymbolTable() ;initialize();}
+GDeclBlock: DECL GDeclList ENDDECL      { printGSymbolTable() ;print_header();}
+          | DECL ENDDECL                { printGSymbolTable() ;print_header();}
           ;
 
 GDeclList: GDeclList GDecl
@@ -385,10 +385,53 @@ expr : expr PLUS expr	{
      ;
 
 func: ID '(' ExprList ')'   {
-                                assignType($1, 1);
+                                 assignType($1,1);
+                                //checkParamType($1,$3);
                                 $1->nodetype = NODE_FUNC;
                                 $1->ptr1 = reverseList($3);
-                                $$ = $1;
+                                    if($1==NULL || $3==NULL)
+                                    {
+                                        printf("Error at 394");
+                                        exit(1);
+                                    }
+                                    struct Gsymbol* temp=GLookup($1->name);
+                                    printf("func is :%s\n",temp->name);
+                                    struct Paramstruct* temp2=temp->paramlist;
+                                    struct ASTNode* right=$1->ptr1;
+
+                                    while(right!=NULL && temp2!=NULL)
+                                    {
+                                        if(right->type==temp2->type)
+                                        {
+                                            // printf("hi bro %s %s\n",right->name,temp2->name);
+                                            // printf("%d==%d\n",right->type,temp2->type);
+                                            right=right->arglist;
+                                            temp2=temp2->next;
+                                        }
+                                        else
+                                        {
+                                            // printf("hi bro %s %s\n",right->name,temp2->name);
+                                            // printf("%d==%d\n",right->type,temp2->type);
+                                            printf("mismatch bro in function arguments\n");
+                                            exit(1);
+                                        }
+                                        
+                                    }
+                                    if(right!=NULL || temp2!=NULL)
+                                    {
+                                        printf("Error at 422");
+                                        if(right==NULL)
+                                        {
+                                            printf("right is NULL\n");
+                                        }
+                                        if(temp2==NULL)
+                                        {
+                                            printf("temp2 is NULL\n");
+                                        }
+                                        exit(1);
+                                    }
+                                    $$ = $1;
+                                    codegen($$);
                             }
 
 id: ID                  {

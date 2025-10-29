@@ -47,7 +47,8 @@ extern struct Gsymbol* Gtemp;
 extern struct Lsymbol* Ltemp;
 extern struct Paramstruct* Ptemp;
 
-struct ASTNode{
+struct ASTNode
+{
     int type;                         //pointer to the type table entry
     int nodetype;                     //node type information,eg : NODETYPE_WHILE,NODETYPE_PLUS,NODETYPE_STMT etc
     char *name;                       //stores the variable/function name in case of variable/function nodes
@@ -58,7 +59,8 @@ struct ASTNode{
     struct Lsymbol *Lentry;           //pointer to the function's LST for local variables and arguments
 };
 
-struct ASTNode* TreeCreate(
+struct ASTNode* TreeCreate
+(
     int type,
     int nodetype,
     char *name,
@@ -75,7 +77,8 @@ void initialize();
 struct ASTNode* reverseList(struct ASTNode *t);
 
 
-struct Paramstruct {
+struct Paramstruct 
+{
     char *name;
     int type;
     struct Paramstruct *next;
@@ -119,3 +122,10 @@ void printLSymbolTable(); // FOR TESTING
 void printGSymbolTable(); // FOR TESTING
 
 char* findKey(struct ASTNode*);
+
+int pushArguments(struct ASTNode *t);
+int popArguments(struct ASTNode *t);
+int codegen(struct ASTNode* t);
+
+void print_header();
+
