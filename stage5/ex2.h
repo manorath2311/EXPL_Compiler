@@ -26,11 +26,17 @@
 #define NODE_FUNC 25
 #define NODE_AND 26
 #define NODE_OR 27
+#define NODE_2D_ARRAY 28
+#define NODE_ADDR 29
+#define NODE_INT_PTR 30
+
 
 #define TYPE_VOID 0
 #define TYPE_INT 1
-#define TYPE_BOOL 2
-#define TYPE_STR 3
+#define TYPE_STR 2
+#define TYPE_BOOL 3
+#define TYPE_INT_PTR 4
+#define TYPE_ADDR 5
 
 union Constant
 {

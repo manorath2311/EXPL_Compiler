@@ -89,7 +89,8 @@ extern int yydebug;
     INT = 290,                     /* INT  */
     STR = 291,                     /* STR  */
     MAIN = 292,                    /* MAIN  */
-    RETURN = 293                   /* RETURN  */
+    RETURN = 293,                  /* RETURN  */
+    ADDR = 294                     /* ADDR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -134,6 +135,7 @@ extern int yydebug;
 #define STR 291
 #define MAIN 292
 #define RETURN 293
+#define ADDR 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -143,7 +145,7 @@ union YYSTYPE
 
     struct ASTNode *nptr;
 
-#line 147 "y.tab.h"
+#line 149 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

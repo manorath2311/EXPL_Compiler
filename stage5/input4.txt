@@ -1,0 +1,25 @@
+decl
+    int result,n;
+    int print(int *p,int *x,int r);
+enddecl
+
+int print(int *p,int *x,int r)
+{
+    begin
+     write(*p);
+     write(*x+1);
+     write(r);
+     *x=*p+1;
+     write(*x);
+      return n;
+    end
+}
+int main()
+{
+    begin
+    read(n); 
+    read(result);
+    print(&n,&result,3); 
+    return 0;
+    end
+}

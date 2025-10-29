@@ -30,7 +30,7 @@
 %token <nptr> NUM ID STRVAL
 %token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN AND OR
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
-%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN
+%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN ADDR
 
 %left AND OR
 %nonassoc LT GT LE GE
@@ -90,11 +90,16 @@ GId: ID '(' ParamList ')'   {
                             }
    | ID '[' NUM ']'         {
                                 checkAvailability($1->name, 1);
-                                if($3->value.intval < 1) {
+                                if($3->value.intval < 1) 
+                                {
                                     yyerror_impl("Invalid array size for", $1->name);
                                     exit(1);
                                 }
                                 GInstall($1->name, declarationType, $3->value.intval, NULL);
+                            }
+    | MUL ID                {
+                                checkAvailability($2->name, 1);
+                                GInstall($2->name, TYPE_INT_PTR, 1, NULL); 
                             }
    ;
 
@@ -180,9 +185,14 @@ ParamList: ParamList ',' Param
          
          ;
 
-Param: FType ID  {
+Param: FType ID {
                     checkAvailability($2->name, 0);
                     PInstall($2->name, FDeclarationType);
+                }
+        | FType MUL ID  
+                {
+                    checkAvailability($3->name, 0);
+                    PInstall($3->name, TYPE_INT_PTR);
                 }
      ;
 
@@ -380,8 +390,17 @@ expr : expr PLUS expr	{
                             $$ = $2;
                         }
      | STRVAL           {$$ = $1;}
-     | id		{$$ = $1;}
+     | id		        {$$ = $1;}
      | func             {$$ = $1;}
+     | ADDR id         {
+                            if($2->type == TYPE_INT_PTR) 
+                            {
+                                yyerror_impl("Cannot take address of pointer variable", $2->name);
+                                exit(1);
+                            }
+                            $$ = TreeCreate(TYPE_INT_PTR, NODE_ADDR, NULL, NULL, NULL, $2, NULL, NULL);
+                        }
+ 
      ;
 
 func: ID '(' ExprList ')'   {
@@ -443,6 +462,12 @@ id: ID                  {
                             $$ = TreeCreate($1->type, NODE_ARRAY, NULL, NULL, NULL, $1, $3, NULL);
                             $$->Gentry = $1->Gentry;
                             $$->Lentry = $1->Lentry;
+                        }
+    | MUL ID            {
+                            assignType($2, 0);
+                            $$ = TreeCreate($2->type, NODE_INT_PTR, $2->name, NULL, NULL, NULL, NULL, NULL);
+                            $$->Gentry = $2->Gentry;
+                            $$->Lentry = $2->Lentry;
                         }
   ;
 

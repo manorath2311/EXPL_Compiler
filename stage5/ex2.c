@@ -1,4 +1,3 @@
-
 // Global variable definitions
 int declarationType = 0;
 int FDeclarationType = 0;
@@ -171,6 +170,9 @@ char* findKey(struct ASTNode* head)
             break;
         case NODE_RET:
             strcpy(key, "return");
+            break;
+        case NODE_INT_PTR:
+            sprintf(key, "*%s", head->name);
             break;
     }
     return key;        
@@ -402,13 +404,27 @@ void assignType(struct ASTNode* node, int code)
     {
         node->Lentry = Ltemp;
         node->type = Ltemp->type;
+        
+        // If this is a pointer dereference, the type should be the base type
+        if(node->nodetype == NODE_INT_PTR) 
+        {
+            node->type = TYPE_INT;
+        }
     }
     else 
     {
         Gtemp = GLookup(node->name);
-        if(Gtemp != NULL) {
+        
+        if(Gtemp != NULL) 
+        {
             node->Gentry = Gtemp;
             node->type = Gtemp->type;
+            
+            // If this is a pointer dereference, the type should be the base type
+            if(node->nodetype == NODE_INT_PTR) 
+            {
+                node->type = TYPE_INT;
+            }
 
             if(code == 1 && Gtemp->size != -1) 
             {
@@ -447,7 +463,14 @@ void typecheck(int t1, int t2, char c)
                       exit(1);
                   }
                   break;
-        case 'a': if(t1 != TYPE_INT || t2 != TYPE_INT) {
+        case 'a': 
+                    if(t1 == TYPE_INT_PTR && t2 == TYPE_INT) {
+                        break;
+                    }
+                    if(t1 == TYPE_INT && t2 == TYPE_INT_PTR) {
+                        break;
+                    }
+                    if(t1 != TYPE_INT || t2 != TYPE_INT) {
                       yyerror_impl("Invalid type for arithmetic operation", NULL);
                       exit(1);
                   }
@@ -462,10 +485,18 @@ void typecheck(int t1, int t2, char c)
                       exit(1);
                   }
                   break;
-        case '=': if(t1 != t2) {
+        case '=': 
+                    // Allow assignment if types match, no special handling needed
+                    // Dereferencing is handled in codegen
+                    if(t1==TYPE_INT_PTR && t2==TYPE_INT)
+                    {
+                        break;
+                    }
+                    if(t1 != t2) 
+                    {
                       yyerror_impl("Invalid type for assignment operation", NULL);
                       exit(1);
-                  }
+                    }
                   break;
     }
 }
@@ -512,7 +543,8 @@ int popArguments(struct ASTNode *t) {
     freeReg();
 }
 
-int getMemoryAddress(struct ASTNode* t) {
+int getMemoryAddress(struct ASTNode* t) 
+{
     int r;
     if(t->nodetype == NODE_ID && t->Gentry != NULL) 
     {
@@ -542,6 +574,36 @@ int getMemoryAddress(struct ASTNode* t) {
             fprintf(intermediate, "ADD R%d, R%d\n", r, r2);
             freeReg();
         }
+        return r;
+    }
+    else if(t->nodetype == NODE_INT_PTR) 
+    {
+        // Get the address stored in the pointer variable
+        r = getReg();
+        if(t->Gentry != NULL)
+        {
+            fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
+            
+            printf("Pointer variable found in Global symbol table: %s\n", t->name);
+        }
+        else if(t->Lentry != NULL)
+        {
+            fprintf(intermediate, "MOV R%d, BP\n", r);
+            fprintf(intermediate, "ADD R%d, %d\n", r, t->Lentry->binding);
+    
+            printf("Pointer variable found in local symbol table: %s\n", t->name);
+        }
+        else
+        {
+            printf("Error: Pointer variable not found in symbol table: %s\n", t->name);
+            exit(1);
+        }
+        return r;
+    }
+    else if(t->nodetype == NODE_ADDR) 
+    {
+        // Get the address of the variable
+        r = getMemoryAddress(t->ptr1);
         return r;
     }
     else 
@@ -830,6 +892,16 @@ int codegen(struct ASTNode* t)
                 fprintf(intermediate, "POP R%d\n", i);
             counter = status;
             r1 = getReg();
+            return r1;
+            break;
+        case NODE_INT_PTR:
+            r1 = getMemoryAddress(t);
+            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
+            return r1;
+            break;
+        case NODE_ADDR:
+            r1 = getMemoryAddress(t->ptr1);
+            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
             return r1;
             break;
         default:
