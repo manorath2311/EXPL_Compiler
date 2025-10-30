@@ -29,6 +29,8 @@
 #define NODE_2D_ARRAY 28
 #define NODE_ADDR 29
 #define NODE_INT_PTR 30
+#define NODE_TUPLE 31
+#define NODE_TUPLE_VAR 32
 
 
 #define TYPE_VOID 0
@@ -37,6 +39,8 @@
 #define TYPE_BOOL 3
 #define TYPE_INT_PTR 4
 #define TYPE_ADDR 5
+#define TYPE_TUPLE 6
+#define TYPE_TUPLE_VAR 7
 
 union Constant
 {

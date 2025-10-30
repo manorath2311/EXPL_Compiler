@@ -20,17 +20,19 @@
         
         // Wrapper for Bison's single-argument calls
         #define yyerror(msg) yyerror_impl(msg, NULL)
+        int size=0;
        
 %}
 
 %union {
     struct ASTNode *nptr;
+    struct Paramstruct *pptr;
 }
 
 %token <nptr> NUM ID STRVAL
 %token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN AND OR
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
-%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN ADDR
+%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN ADDR TUPLE
 
 %left AND OR
 %nonassoc LT GT LE GE
@@ -44,7 +46,8 @@
 %type <nptr> BrkStmt ContStmt IfStmt WhileStmt Type GDeclBlock FDefBlock
 %type <nptr> MainBlock GDeclList GDecl GIdList GId ParamList FDef FType
 %type <nptr> LDeclBlock Body Param LDecList LDecl IdList RetStmt
-%type <nptr> ExprList func 
+%type <nptr> ExprList func
+%type <pptr> ARGS TD
 
 %%
 
@@ -62,8 +65,85 @@ GDeclList: GDeclList GDecl
          ;
 
 GDecl: Type GIdList ';'
+    | TUPLE ID '('ARGS ')' ';'  {
+                                checkAvailability($2->name, 1);
+                                
+                                int count=  0;
+                                struct Paramstruct* temp=$4;
+                                while(temp!=NULL)
+                                {
+                                    count++;
+                                 
+                                    temp = temp->next;
+                                }
+                                printf("Tuple %s with %d elements\n", $2->name, count);
+                                GInstall($2->name, TYPE_TUPLE, count, $4);
+                 
+                            }
+
+    |ID TD ';'              {
+                                struct Gsymbol* temp=GLookup($1->name);
+                                if(temp==NULL)
+                                {
+                                    printf("Tuple %s not defined\n", $1->name);
+                                    exit(1);
+                                }
+                                size=temp->size;
+                                struct Paramstruct* t=$2;
+                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+                                tempParamList = GLookup($1->name)->paramlist;
+                                while(t)
+                                {
+                                    struct Gsymbol* temp2=GLookup(t->name);
+                                    if(temp2!=NULL)
+                                    {
+                                        printf("Tuple element %s already defined\n", t->name);
+                                        exit(1);
+                                    }
+                                    
+                                    GInstall(t->name, TYPE_TUPLE_VAR, size, tempParamList);
+                                    t = t->next;
+                                }
+
+                            }
      ;
 
+TD : TD ',' ID      {
+
+                                struct Gsymbol* temp=GLookup($3->name);
+                                if(temp!=NULL)
+                                {
+                                    printf("Tuple element %s already defined\n", $3->name);
+                                    exit(1);
+                                }
+                                
+                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+                                tempParamList->name = $3->name;
+                                tempParamList->type = TYPE_TUPLE_VAR;
+                                tempParamList->next = NULL;
+                                struct Paramstruct* temp2 = $1;
+                                while(temp2->next != NULL)
+                                {
+                                    temp2 = temp2->next;
+                                }
+                                temp2->next = tempParamList;
+                                $$ = $1;
+                            }
+    | ID                     {
+                                struct Gsymbol* temp=GLookup($1->name);
+                                if(temp!=NULL)
+                                {
+                                    printf("Tuple element %s already defined\n", $1->name);
+                                    exit(1);
+                                }
+                                
+                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+                                tempParamList->name = $1->name;
+                                tempParamList->type = TYPE_TUPLE_VAR;
+                                tempParamList->next = NULL;
+                                $$ = tempParamList;
+                            }
+    ;
 Type: INT   {declarationType = TYPE_INT;}
     | STR   {declarationType = TYPE_STR;}
     ;
@@ -76,6 +156,7 @@ FType: INT   {FDeclarationType = TYPE_INT;}
 GIdList: GIdList ',' GId
        | GId
        ;
+
 
 GId: ID '(' ParamList ')'   {
                                 declCount++;
@@ -101,7 +182,32 @@ GId: ID '(' ParamList ')'   {
                                 checkAvailability($2->name, 1);
                                 GInstall($2->name, TYPE_INT_PTR, 1, NULL); 
                             }
+
    ;
+ARGS : Type ID {
+                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+                                tempParamList->name = $2->name;
+                                tempParamList->type = declarationType;
+                                tempParamList->next = NULL;
+                                $$ = tempParamList;
+                            }
+
+     | ARGS ',' Type ID {
+                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+                                tempParamList->name = $4->name;
+                                tempParamList->type = declarationType;
+                                tempParamList->next = NULL;
+
+                                struct Paramstruct* temp = $1;
+                                while(temp->next != NULL) 
+                                {
+                                    temp = temp->next;
+                                }
+                                temp->next = tempParamList;
+                                $$ = $1;
+                            }
+  
+     ;
 
 FDefBlock: FDefBlock FDef
          | FDef
@@ -267,9 +373,13 @@ Body: START Slist RetStmt END   {$$ = TreeCreate(TYPE_VOID, NODE_CONNECTOR, NULL
     ;
 
 RetStmt: RETURN expr ';'    {
-                                if(declarationType == $2->type) {
+                                if(declarationType == $2->type) 
+                                {
                                     $$ = TreeCreate(TYPE_VOID, NODE_RET, NULL, NULL, NULL, $2, NULL, NULL);
-                                } else {
+                                
+                                } 
+                                else 
+                                {
                                     yyerror_impl("Return type mismatch", NULL);
                                     exit(1);
                                 }
@@ -469,6 +579,35 @@ id: ID                  {
                             $$->Gentry = $2->Gentry;
                             $$->Lentry = $2->Lentry;
                         }
+    | ID '.' ID         {
+                            struct Gsymbol * temp=GLookup($1->name);
+                            if(temp->type!=TYPE_TUPLE_VAR)
+                            {
+                                printf("Variable %s is not of tuple type\n", $1->name);
+                                exit(1);
+                            }
+                            struct Paramstruct* tempParam=temp->paramlist;
+                            int found=0;
+                            while(tempParam!=NULL)
+                            {
+                                if(strcmp(tempParam->name,$3->name)==0)
+                                {
+                                    found=1;
+                                    break;
+
+                                }
+                                tempParam=tempParam->next;
+                            }
+                            if(found==0)
+                            {
+                                printf("Tuple %s does not have element %s\n", $1->name, $3->name);
+                                exit(1);
+                            }
+                            $$ = TreeCreate(tempParam->type, NODE_TUPLE, NULL, NULL, NULL, $1, $3, NULL);
+                            $$->Gentry=temp;
+
+                        }       
+
   ;
 
 

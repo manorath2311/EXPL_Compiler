@@ -45,6 +45,7 @@ str \"(\\.|[^\\\"])*\"
 "OR"        {return OR;}
 "int"       {return INT;}
 "str"       {return STR;}
+"tuple"     {return TUPLE;}
 "=="        {return EQ;}
 "!="        {return NEQ;}
 "<="        {return LE;}
@@ -74,8 +75,8 @@ str \"(\\.|[^\\\"])*\"
             }
 [ \t]	    {}
 \n          {lineno++;}
-[{}()\[\];,]  {return *yytext;}
-.	    {
+[{}()\[\];,.]  {return *yytext;}
+.	        {
                 char msg[50];
                 snprintf(msg, sizeof(msg), "unknown character: '%c'", yytext[0]);
                 yyerror_impl(msg, NULL);

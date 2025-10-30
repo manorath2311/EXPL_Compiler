@@ -16,7 +16,7 @@ int print(int *p,int *x,int r)
 }
 int main()
 {
-    begin
+    begin 
     read(n); 
     read(result);
     print(&n,&result,3); 

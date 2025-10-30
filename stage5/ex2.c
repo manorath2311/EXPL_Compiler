@@ -174,6 +174,9 @@ char* findKey(struct ASTNode* head)
         case NODE_INT_PTR:
             sprintf(key, "*%s", head->name);
             break;
+        case NODE_TUPLE :
+            sprintf(key,"<%s>", head->name);
+
     }
     return key;        
 }
@@ -606,6 +609,60 @@ int getMemoryAddress(struct ASTNode* t)
         r = getMemoryAddress(t->ptr1);
         return r;
     }
+    else if(t->nodetype == NODE_TUPLE)
+    {
+        r=getReg();
+        if(t->ptr1==NULL)
+        {
+            printf("ptr1 is null \n");
+            exit(1);
+        }
+        else
+        {
+            printf("ptr1 is not null\n");
+        }
+        if(t->Gentry==NULL)
+        {
+            printf("TUPLE Gentry is NULL\n");
+            exit(1);
+        }
+        else
+        {
+            printf("TUPLE Gentry is NOT NULL\n");
+
+        }
+        int baseAddress=t->Gentry->binding;
+        printf("Base Address of TUPLE %s is %d\n",t->name,baseAddress);
+        struct Paramstruct* tempParamList=t->Gentry->paramlist;
+        int offset=0;
+        if(tempParamList==NULL)
+        {
+            printf("tempParamList is NULL\n");
+        }
+        else
+        {
+            printf("tempParamList is not NULL\n");
+        }
+        while(tempParamList)
+        {
+            if(strcmp(tempParamList->name,t->ptr2->name)==0)
+            {
+                printf("found %s %s\n",tempParamList->name,t->ptr2->name);
+                break;
+            }
+            offset++;
+            tempParamList=tempParamList->next;
+        }
+        
+        printf("Offset of TUPLE %s is %d\n",t->name,offset);
+        // offset=0;
+        
+        int addr=baseAddress+offset;
+        fprintf(intermediate, "MOV R%d, %d\n", r,addr);
+        //fprintf(intermediate, "MOV R%d, %d\n", r,addr);
+        return r;
+
+    }
     else 
     {
         printf("Cannot find memory address of nodetype %d", t->nodetype);
@@ -904,6 +961,11 @@ int codegen(struct ASTNode* t)
             fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
             return r1;
             break;
+        case NODE_TUPLE:
+            r1 = getMemoryAddress(t);
+            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
+            return r1;
+
         default:
             printf("%d: This shouldn't have happened", t->nodetype);
             exit(1);
