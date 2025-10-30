@@ -1,26 +1,16 @@
+
+
 decl
-int fun(int x,int y),a;
-int fun2(int x,int y);
- int pp;
- int pp2;
+ int fun(int x),a;
 enddecl
 
-int fun2(int x,int y)
-{
-    begin
-    
-    return pp2;
-  
-    end
-
-}
-int fun(int x,int y)
+int fun(int x)
 {
  begin
   if(x >= 91) then
    a = 91;
   else
-   a = fun(fun2(x,y),99);
+   a = fun(fun(x+11));
   endif;
 
   return a;
@@ -35,10 +25,10 @@ int main()
 
  begin
   read(b);
-  c = fun(b,99);
+  c = fun(b);
   write(c);
-
 
   return 0;
  end
 }
+
