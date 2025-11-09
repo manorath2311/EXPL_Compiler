@@ -1,0 +1,22 @@
+decl 
+  int n, foo();
+enddecl
+
+int foo()
+{
+  begin
+    return 1;
+  end
+}
+
+int main()
+{
+  decl
+    int r;
+  enddecl
+  begin
+    r = foo();
+    write(r);
+    return 0;
+  end
+}

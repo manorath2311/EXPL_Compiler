@@ -21,18 +21,25 @@
         // Wrapper for Bison's single-argument calls
         #define yyerror(msg) yyerror_impl(msg, NULL)
         int size=0;
+        int tbv=0;
+        char nameType[20];
+        char declaredType[20];
        
 %}
 
 %union {
     struct ASTNode *nptr;
     struct Paramstruct *pptr;
+    struct Fieldstruct *fptr;
+    struct TypeDef *tptr;
 }
+
 
 %token <nptr> NUM ID STRVAL
 %token START END READ WRITE PLUS MINUS MUL DIV MOD ASSGN AND OR
 %token IF THEN ELSE ENDIF WHILE DO ENDWHILE EQ NEQ LE GE LT GT
-%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN ADDR TUPLE
+%token BREAK CONT DECL ENDDECL INT STR MAIN RETURN ADDR
+%token TYPE ENDTYPE
 
 %left AND OR
 %nonassoc LT GT LE GE
@@ -43,18 +50,261 @@
 
 
 %type <nptr> program Slist Stmt InputStmt OutputStmt AsgStmt expr id
-%type <nptr> BrkStmt ContStmt IfStmt WhileStmt Type GDeclBlock FDefBlock
+%type <nptr> BrkStmt ContStmt IfStmt WhileStmt Type GDeclBlock FDefBlock TDeclBlock
+%type <nptr> TypeList TypeDef Field
 %type <nptr> MainBlock GDeclList GDecl GIdList GId ParamList FDef FType
 %type <nptr> LDeclBlock Body Param LDecList LDecl IdList RetStmt
-%type <nptr> ExprList func
-%type <pptr> ARGS TD
+%type <nptr> ExprList func 
+%type <fptr> TypeFieldList TypeField
+
+
 
 %%
 
-program: GDeclBlock FDefBlock MainBlock {}
+program: TDeclBlock GDeclBlock FDefBlock MainBlock {}
        | GDeclBlock MainBlock           {}
        | MainBlock                      {}
        ;
+
+TDeclBlock : TYPE TypeList ENDTYPE      {
+                                            
+                                            printTypeTable();
+                                        }
+            |TYPE ENDTYPE              {}
+            ;
+TypeList : TypeDef TypeList
+         | TypeDef
+         ;
+TypeDef : ID '{' TypeFieldList '}' ';'   {
+                                            checkAvailability($1->name, 2);
+                                            int count=0;
+                                            struct Fieldstruct* temp=$3;
+                                            while(temp!=NULL)
+                                            {
+                                                count++;
+                                                temp = temp->next;
+                                            }
+                                            printf("Type %s with %d fields\n", $1->name, count);
+                                            //TInstall($1->name,$3, count);
+                                            
+                                            struct TypeDef* tempTypeDef = (struct TypeDef*)malloc(sizeof(struct TypeDef));
+                                            tempTypeDef->name = $1->name;
+                                            tempTypeDef->fields = $3;
+                                            tempTypeDef->size = count;
+                                            tempTypeDef->next = NULL;
+                                            struct Fieldstruct* temp1=Fhead;
+                                            while(temp1!=NULL)
+                                            {
+                                                if(temp1->tbv)
+                                                {
+                                                    printf("verification in progress for %s %s\n",$1->name,temp1->typeName);
+                                                    if(strcmp(temp1->typeName,$1->name)==0)
+                                                    {
+                                                        temp1->tbv=0;
+                                                    }
+                                                    else
+                                                    {
+                                                        printf("Error in type fields of user defined %s in field %s\n", $1->name, temp1->typeName);
+                                                        exit(1);
+                                                    }
+                                                }
+                                                temp1=temp1->next;
+                                            }
+                                            if(Thead == NULL) 
+                                            {
+                                                Thead = tempTypeDef;
+                                                Ttail = tempTypeDef;
+                                            } 
+                                            else 
+                                            {
+                                                Ttail->next = tempTypeDef;
+                                                Ttail = tempTypeDef;
+                                            }
+                                            Fhead = NULL;
+                                            Ftail = NULL;
+
+                                        }
+         ;
+TypeFieldList : TypeFieldList TypeField {
+                                            struct Fieldstruct* tempFieldList = (struct Fieldstruct*)malloc(sizeof(struct Fieldstruct));
+                                            tempFieldList = $2;
+                                            struct Fieldstruct* temp = $1;
+                                            Fhead = $1;
+                                            tempFieldList->next = NULL;
+                                            int cnt=1;
+                                            while(temp->next != NULL) 
+                                            {
+                                                temp = temp->next;
+                                                if(temp->type==TYPE_USER_DEC)
+                                                {
+                                                    struct TypeDef* tempTypeDef = TLookup(temp->typeName);
+                                                    if(tempTypeDef==NULL)
+                                                    {
+                                                        printf("Error in type fields of user defined %s in field %s\n", nameType, temp->typeName);
+                                                        exit(1);
+                                                    }
+                                                    else
+                                                    {
+                                                        cnt=cnt+tempTypeDef->size;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    cnt++;
+                                                }
+                                                
+                                            }
+                                            tempFieldList->fieldIndex=cnt;
+                                            tempFieldList->tbv=tbv;
+                                            tempFieldList->typeName=nameType;
+                                            temp->next = tempFieldList;
+                                            Ftail = tempFieldList;
+                                            $$ = $1;
+                        }
+              | TypeField {
+                                        struct Fieldstruct* tempFieldList = (struct Fieldstruct*)malloc(sizeof(struct Fieldstruct));
+                                        tempFieldList = $1;
+                                        tempFieldList->next = NULL;
+                                        tempFieldList->fieldIndex=0;
+                                        tempFieldList->tbv=tbv;
+                                        tempFieldList->typeName=nameType;
+                                        $$ = tempFieldList;
+                                        Fhead = tempFieldList;
+                                        Ftail = tempFieldList;
+                        }
+              ;
+TypeField : FIType ID ';'   {
+                                    struct Fieldstruct* tempFieldList = (struct Fieldstruct*)malloc(sizeof(struct Fieldstruct));
+                                    tempFieldList->name = $2->name;
+                                    tempFieldList->type = declarationType;
+                                    tempFieldList->tbv=tbv;
+                                    tempFieldList->typeName=nameType;
+                                    tempFieldList->next = NULL;
+
+                                    $$ = tempFieldList;
+                        }
+          ;
+
+FIType    : INT { declarationType = TYPE_INT; tbv=0;strcpy(nameType,"Integer");}
+          | STR { declarationType = TYPE_STR; tbv=0;strcpy(nameType,"String");}
+          | ID  { 
+                    declarationType = TYPE_USER_DEC;
+                    struct TypeDef* temp=Thead;
+
+                    while(temp!=NULL)
+                    {
+                        if(strcmp(temp->name,$1->name)==0)
+                        {
+                            printf("User-defined type %s found\n", $1->name);
+                            tbv=0;
+                            strcpy(nameType,$1->name);
+                            break;
+                        }
+                        temp = temp->next;
+                    }
+                    if(temp==NULL)
+                    { 
+                        tbv=1;
+                        strcpy(nameType,$1->name);
+                    }
+                }
+          ;
+
+
+Field : Field '.' ID 
+                    {
+                        // Field is already validated, now validate next level==-
+                        struct TypeDef* parentType = $1->userType;
+                        if(parentType == NULL) 
+                        {
+                            printf("Error: Previous field is not a user-defined type\n");
+                            exit(1);
+                        }
+                        
+                        // Search for $3 (ID) in parentType's fields
+                        struct Fieldstruct* field = parentType->fields;
+                        int found = 0;
+                        struct TypeDef* currentType = NULL;
+                        
+                        while(field != NULL) 
+                        {
+                            if(strcmp(field->name, $3->name) == 0) 
+                            {
+                                found = 1;
+                                // If this field is also user-defined, get its type
+                                if(field->type == TYPE_USER_DEC) 
+                                {
+                                    currentType = TLookup(field->typeName);
+                                }
+                                break;
+                            }
+                            field = field->next;
+                        }
+                        
+                        if(!found) {
+                            printf("Error: Field %s not found in type %s\n", $3->name, parentType->name);
+                            exit(1);
+                        }
+                        
+                        $$ = TreeCreate(field->type, NODE_FIELD, $3->name, NULL, NULL, $1, NULL, NULL);
+                        $$->userType = currentType;
+                    }
+                    
+      | ID '.' ID   {
+                        // Look up ID in global symbol table
+                        struct Gsymbol* var = GLookup($1->name);
+                        if(var == NULL) 
+                        {
+                            printf("Error: Variable %s not declared\n", $1->name);
+                            exit(1);
+                        }
+                        
+                        // Check if it's a user-defined type
+                        if(var->type != TYPE_USER_DEC) 
+                        {
+                            printf("Error: Variable %s is not of user-defined type\n", $1->name);
+                            exit(1);
+                        }
+                        
+                        // Get the type definition from type table
+                        struct TypeDef* userType = var->userType;
+                        if(userType == NULL) 
+                        {
+                            printf("Error: Type definition not found for %s\n", var->userType->name);
+                            exit(1);
+                        }
+                        
+                        // Search for field ID in the type's field list
+                        struct Fieldstruct* field = userType->fields;
+                        int found = 0;
+                        struct TypeDef* fieldType = NULL;
+                        
+                        while(field != NULL) 
+                        {
+                            if(strcmp(field->name, $3->name) == 0) 
+                            {
+                                found = 1;
+                                // If field is also user-defined, get its type for further chaining
+                                if(field->type == TYPE_USER_DEC) 
+                                {
+                                    fieldType = TLookup(field->typeName);
+                                }
+                                break;
+                            }
+                            field = field->next;
+                        }
+                        
+                        if(!found) 
+                        {
+                            printf("Error: Field %s not found in type %s\n", $3->name, userType->name);
+                            exit(1);
+                        }
+                        
+                        $$ = TreeCreate(field->type, NODE_FIELD, $3->name, NULL, NULL, $1, NULL, NULL);
+                        $$->Gentry = var;
+                        $$->userType = fieldType;  // Store for further chaining
+                    }
+
 
 GDeclBlock: DECL GDeclList ENDDECL      { printGSymbolTable() ;print_header();}
           | DECL ENDDECL                { printGSymbolTable() ;print_header();}
@@ -80,72 +330,65 @@ GDecl: Type GIdList ';'
                                 GInstall($2->name, TYPE_TUPLE, count, $4);
                  
                             } */
-
-    |ID TD ';'              {
-                                struct Gsymbol* temp=GLookup($1->name);
-                                if(temp==NULL)
+        /* | ID TD ';'    {
+                                checkAvailability($1->name, 1);
+                                
+                                struct TypeDef* tempTypeDef = TLookup($1->name);
+                                if(tempTypeDef == NULL)
                                 {
-                                    printf("Tuple %s not defined\n", $1->name);
+                                    printf("User-defined type %s not defined\n", $1->name);
                                     exit(1);
                                 }
-                                size=temp->size;
-                                struct Paramstruct* t=$2;
-                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
-                                tempParamList = GLookup($1->name)->paramlist;
-                                while(t)
+                                int count=0;
+                                struct TypeDef* temp=$2;
+                                while(temp!=NULL)
                                 {
-                                    struct Gsymbol* temp2=GLookup(t->name);
-                                    if(temp2!=NULL)
-                                    {
-                                        printf("Tuple element %s already defined\n", t->name);
-                                        exit(1);
-                                    }
-                                    
-                                    GInstall(t->name, TYPE_TUPLE_VAR, size, tempParamList);
-                                    t = t->next;
+                                    count++;
+                                    temp = temp->next;
                                 }
+                                printf("Variable of user-defined type %s with %d instances\n", $1->name, count);
+                                GInstall($1->name, TYPE_USER_DEC, count, NULL);
+                            } */
 
-                            }
      ;
 
-TD : TD ',' ID      {
+/* TD : TD ',' ID              {                         
+                                struct TypeDef* tempTypeFieldList = (struct TypeDef*)malloc(sizeof(struct TypeDef));
+                                tempTypeFieldList->name = $3->name;
+                                tempTypeFieldList->next = NULL;
 
-                                struct Gsymbol* temp=GLookup($3->name);
-                                if(temp!=NULL)
+                                struct TypeDef* temp = $1;
+                                while(temp->next != NULL) 
                                 {
-                                    printf("Tuple element %s already defined\n", $3->name);
-                                    exit(1);
+                                    temp = temp->next;
                                 }
-                                
-                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
-                                tempParamList->name = $3->name;
-                                tempParamList->type = TYPE_TUPLE_VAR;
-                                tempParamList->next = NULL;
-                                struct Paramstruct* temp2 = $1;
-                                while(temp2->next != NULL)
-                                {
-                                    temp2 = temp2->next;
-                                }
-                                temp2->next = tempParamList;
+                                temp->next = tempTypeFieldList;
                                 $$ = $1;
-                            }
-    | ID                     {
-                                struct Gsymbol* temp=GLookup($1->name);
-                                if(temp!=NULL)
-                                {
-                                    printf("Tuple element %s already defined\n", $1->name);
-                                    exit(1);
-                                }
+
                                 
-                                struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
-                                tempParamList->name = $1->name;
-                                tempParamList->type = TYPE_TUPLE_VAR;
-                                tempParamList->next = NULL;
-                                $$ = tempParamList;
                             }
+    | ID                    {
+                                struct TypeDef* tempTypeFieldList = (struct TypeDef*)malloc(sizeof(struct TypeDef));
+                                tempTypeFieldList->name = $1->name;
+                                tempTypeFieldList->next = NULL;
+                                $$ = tempTypeFieldList;
+                                
+                            } */
     ;
 Type: INT   {declarationType = TYPE_INT;}
     | STR   {declarationType = TYPE_STR;}
+    | ID    {
+                declarationType = TYPE_USER_DEC;
+                struct TypeDef* tempTypeDef = TLookup($1->name);
+                if(tempTypeDef == NULL)
+                {
+                    printf("User-defined type %s not defined\n", $1->name);
+                    exit(1);
+                }
+                
+                strcpy(declaredType, $1->name);
+            }
+   
     ;
 
 FType: INT   {FDeclarationType = TYPE_INT;}
@@ -159,15 +402,38 @@ GIdList: GIdList ',' GId
 
 
 GId: ID '(' ParamList ')'   {
-                                declCount++;
-                                checkAvailability($1->name, 1);
-                                GInstall($1->name, declarationType, -1, Phead);
-                                Phead = NULL;
-                                Ptail = NULL;
+                                if(declarationType==TYPE_USER_DEC)
+                                {
+                                    checkAvailability($1->name, 1);
+                                    GInstallType($1->name, declarationType, -1, TLookup(declaredType));
+                                    declCount++;
+                                    Phead = NULL;
+                                    Ptail = NULL;
+                                    
+                                }
+                                else
+                                {
+                                    declCount++;
+                                    checkAvailability($1->name, 1);
+                                    GInstall($1->name, declarationType, -1, Phead);
+                                    Phead = NULL;
+                                    Ptail = NULL;
+                                }
+                                
+
+
                             }
    | ID                     {
+                                if(declarationType==TYPE_USER_DEC)
+                                {
+                                    checkAvailability($1->name, 1);
+                                    GInstallType($1->name, declarationType, 1, TLookup(declaredType));
+                                }
+                                else
+                                {   
                                 checkAvailability($1->name, 1);
                                 GInstall($1->name, declarationType, 1, NULL);
+                                }
                             }
    | ID '[' NUM ']'         {
                                 checkAvailability($1->name, 1);
@@ -178,13 +444,14 @@ GId: ID '(' ParamList ')'   {
                                 }
                                 GInstall($1->name, declarationType, $3->value.intval, NULL);
                             }
-    | MUL ID                {
+    /* | MUL ID                {
                                 checkAvailability($2->name, 1);
                                 GInstall($2->name, TYPE_INT_PTR, 1, NULL); 
-                            }
+                            } */
+      
 
    ;
-ARGS : Type ID {
+/* ARGS : Type ID {
                                 struct Paramstruct* tempParamList = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
                                 tempParamList->name = $2->name;
                                 tempParamList->type = declarationType;
@@ -207,7 +474,7 @@ ARGS : Type ID {
                                 $$ = $1;
                             }
   
-     ;
+     ; */
 
 FDefBlock: FDefBlock FDef
          | FDef
@@ -500,6 +767,7 @@ expr : expr PLUS expr	{
                             }
                             $$ = TreeCreate(TYPE_INT_PTR, NODE_ADDR, NULL, NULL, NULL, $2, NULL, NULL);
                         }
+    | Field             {$$ = $1;}
  
      ;
 
@@ -569,7 +837,7 @@ id: ID                  {
                             $$->Gentry = $2->Gentry;
                             $$->Lentry = $2->Lentry;
                         }
-    | ID '.' ID         {
+    /* | ID '.' ID         {
                             struct Gsymbol * temp=GLookup($1->name);
                             if(temp->type!=TYPE_TUPLE_VAR)
                             {
@@ -596,7 +864,7 @@ id: ID                  {
                             $$ = TreeCreate(tempParam->type, NODE_TUPLE, NULL, NULL, NULL, $1, $3, NULL);
                             $$->Gentry=temp;
 
-                        }       
+                        }        */
 
   ;
 

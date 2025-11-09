@@ -1,0 +1,9 @@
+decl 
+int x;
+enddecl
+int main() {
+begin
+    y = 10;
+    write(y);
+end
+}

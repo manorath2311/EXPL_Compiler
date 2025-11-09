@@ -1,0 +1,26 @@
+decl 
+  int n,arr[10],i,j,dup, BubbleSort(int first, int last); 
+enddecl
+
+int BubbleSort(int first, int last)
+{
+  decl
+    int temp;
+  enddecl
+
+  begin
+    return 0;
+  end
+}
+
+int main()
+{
+  decl
+    int r;
+  enddecl
+
+  begin
+    r = BubbleSort(0,5);
+    return 0;
+  end
+}

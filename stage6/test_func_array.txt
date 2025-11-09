@@ -1,0 +1,25 @@
+decl 
+  int arr[5], test(int idx);
+enddecl
+
+int test(int idx)
+{
+  begin
+    arr[idx] = 99;
+    return 0;
+  end
+}
+
+int main()
+{
+  decl
+    int r;
+  enddecl
+  begin
+    arr[0] = 5;
+    r = test(1);
+    write(arr[0]);
+    write(arr[1]);
+    return 0;
+  end
+}

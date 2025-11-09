@@ -1,0 +1,9 @@
+decl 
+int arr[0];
+enddecl
+int main() {
+begin
+    arr[0] = 10;
+    write(arr[0]);
+end
+}

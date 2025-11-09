@@ -1,0 +1,16 @@
+decl 
+  int x, y, z;
+enddecl
+
+int main()
+{
+  begin
+    x = 1;
+    y = 2;
+    if((x < y) and (y > 0)) then
+      z = 1;
+    endif;
+    write(z);
+    return 0;
+  end
+}

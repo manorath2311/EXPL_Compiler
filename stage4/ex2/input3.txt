@@ -3,6 +3,6 @@ int a;
 int *b;
 enddecl;
 begin
-a=*b;
+
 write(a);
 end;

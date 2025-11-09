@@ -1,0 +1,25 @@
+decl
+    int result,n,factorial(int n);
+    int *x;
+enddecl
+int factorial(int n)
+{
+    begin
+       read(result);
+       return result;
+    end
+}
+int main()
+{
+    decl
+        int p;
+    enddecl
+    begin
+    p=factorial(n);
+
+    write(p);
+    *x=p;
+    write(*x);
+    return 0;
+    end
+}

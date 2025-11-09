@@ -1,0 +1,27 @@
+decl
+    int x;
+    int temp(int p);
+enddecl
+
+int temp(int p)
+{
+    decl 
+    int x;
+      enddecl
+    begin
+        x=10;
+        write(x);
+       return 0;
+    end
+}
+int main()
+{
+    decl
+        int p;
+    enddecl
+    begin
+        x=5;
+        temp(p);
+    return 0;
+    end
+}

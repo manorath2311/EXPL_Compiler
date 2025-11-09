@@ -1,0 +1,37 @@
+decl
+    int result,n;
+    tuple my(int x,int y);
+    tuple student(str name,int marks);
+    student a,b,c,d;
+    int bye;
+    int i;
+    
+enddecl
+
+int main()
+{
+    begin 
+    i=0;
+    read(a.name);
+    read(a.marks);
+    read(b.name);
+    read(b.marks);
+    if(a.marks == b.marks) then
+    write("both");
+    write(a.name);
+    write("and");
+    write(b.name);
+    write("has same");
+    write("marks");
+    else
+    write(a.name);
+    write("has different");
+    write("marks than");
+    write(b.name);
+
+    endif;
+
+
+    return 0;
+    end
+}

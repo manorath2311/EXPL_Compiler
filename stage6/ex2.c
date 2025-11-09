@@ -10,6 +10,8 @@ struct Paramstruct* Ptemp = NULL;
 struct Gsymbol *Ghead = NULL, *Gtail = NULL;
 struct Lsymbol *Lhead = NULL, *Ltail = NULL;
 struct Paramstruct *Phead = NULL, *Ptail = NULL;
+struct TypeDef *Thead = NULL, *Ttail = NULL;
+struct Fieldstruct *Fhead = NULL, *Ftail = NULL;
 
 FILE *stream;
 int count = 0;
@@ -230,6 +232,7 @@ struct Paramstruct* PLookup(char *name)
 
 void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) 
 {
+    //printf("it came to start GInstall for %s\n",name);
     struct Gsymbol* temp;
     temp = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
     temp->name = (char*)malloc(sizeof(name));
@@ -262,8 +265,30 @@ void GInstall(char *name, int type, int size, struct Paramstruct *paramlist)
         Ghead = temp;
         Gtail = temp;
     }
+    //printf("it came to end GInstall for %s\n",name);
 
     return;
+}
+void GInstallType(char *name,int type ,int size,struct TypeDef* userDef) 
+{
+    struct Gsymbol* temp= (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
+    temp->name = (char*)malloc(sizeof(name));
+    strcpy(temp->name, name);
+    temp->type = type;
+    temp->size = size;
+    temp->binding = totalCount;
+    totalCount = totalCount + temp->size;
+    temp->userType=userDef;
+    temp->next = NULL;
+    
+    struct Gsymbol* t=Ghead;
+    while(t->next!=NULL)
+    {
+        t=t->next;
+    }
+    t->next=temp;
+    Gtail=temp;
+
 }
 
 void LInstall(char *name, int type) 
@@ -964,9 +989,11 @@ int codegen(struct ASTNode* t)
             r1 = getMemoryAddress(t);
             fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
             return r1;
-
+        case NODE_FIELD :
+            
+             break;
         default:
-            printf("%d: This shouldn't have happened", t->nodetype);
+            printf("%d: This shouldn't have happened\n", t->nodetype);
             exit(1);
     }
 }
@@ -979,4 +1006,39 @@ void print_header()
     fprintf(intermediate, "PUSH R0\n");
     fprintf(intermediate, "CALL MAIN\n");
     fprintf(intermediate, "MOV R0, 10\nPUSH R0\nINT 10\n");
+}
+
+void printTypeTable() 
+{
+    struct TypeDef* temp = Thead;
+    if (temp == NULL) 
+    {
+        printf("Type Definition Table is empty\n");
+        return;
+    }
+    printf("\nType Definitions:\n");
+    while (temp != NULL) 
+    {
+        printf("Type Name: %s\n", temp->name);
+        struct Fieldstruct* fieldTemp = temp->fields;
+        printf("Size of Type: %d\n", temp->size);
+        while (fieldTemp != NULL) 
+        {
+            printf("    Field Name: %s, Field Type: %d\n , Field Index: %d\n , Field TBV: %d\n", fieldTemp->name, fieldTemp->type, fieldTemp->fieldIndex, fieldTemp->tbv);
+            fieldTemp = fieldTemp->next;
+        }
+        temp = temp->next;
+    }
+}
+
+struct TypeDef* TLookup(char *name) 
+{
+    struct TypeDef *temp = Thead;
+
+    while (temp != NULL && (strcmp(temp->name, name) != 0))
+    {
+        temp = temp->next;
+    }
+
+    return temp;
 }

@@ -1,0 +1,15 @@
+decl
+    int result,n;
+    tuple my(int x,int y);
+    my t1,t2,t3;
+    
+enddecl
+
+int main()
+{
+    begin 
+    read(t1.y);
+    write(t1.y);
+    return 0;
+    end
+}

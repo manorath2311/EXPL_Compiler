@@ -1,0 +1,20 @@
+decl
+    int result,n;
+    int print(int *p);
+enddecl
+
+int print(int *p)
+{
+    begin
+     write(*p);
+      return n;
+    end
+}
+int main()
+{
+    begin
+    read(n); 
+    print(&n); 
+    return 0;
+    end
+}

@@ -1,0 +1,13 @@
+decl 
+  int arr[10], first;
+enddecl
+
+int main()
+{
+  begin
+    first = 0;
+    arr[first+1] = 5;
+    write(arr[first+1]);
+    return 0;
+  end
+}
