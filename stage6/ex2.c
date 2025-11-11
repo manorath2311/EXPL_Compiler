@@ -1,564 +1,45 @@
 // Global variable definitions
-int declarationType = 0;
-int FDeclarationType = 0;
-int totalCount = 4096;
-int localBindingStart = 1;
-int fLabelCount = 0;
 struct Gsymbol* Gtemp = NULL;
 struct Lsymbol* Ltemp = NULL;
 struct Paramstruct* Ptemp = NULL;
+struct ASTNode* tempASTNode = NULL;
+int totalCount = 4096;
+int localBindingStart = 1;
+int fLabelCount = 0;
+struct Typetable *Thead = NULL, *Ttail = NULL;
+struct Typetable *declarationType = NULL;
+struct Typetable *FDeclarationType = NULL;
+struct Fieldlist *Fhead = NULL, *Ftail = NULL;
+struct Paramstruct *Phead = NULL, *Ptail = NULL;
 struct Gsymbol *Ghead = NULL, *Gtail = NULL;
 struct Lsymbol *Lhead = NULL, *Ltail = NULL;
-struct Paramstruct *Phead = NULL, *Ptail = NULL;
-struct TypeDef *Thead = NULL, *Ttail = NULL;
-struct Fieldstruct *Fhead = NULL, *Ftail = NULL;
 
-FILE *stream;
-int count = 0;
-
-
-extern FILE *intermediate;
-struct ASTNode* TreeCreate(int type,int nodetype,char *name,union Constant *value,struct ASTNode *arglist,struct ASTNode *ptr1,struct ASTNode *ptr2,struct ASTNode *ptr3) 
-{
-    struct ASTNode* temp;
-    temp = (struct ASTNode*)malloc(sizeof(struct ASTNode));
-
-    if(value != NULL) 
-        temp->value = *value;
-
-    temp->type = type;
-    temp->nodetype = nodetype;
-    temp->name = name;
-    temp->ptr1 = ptr1;
-    temp->ptr2 = ptr2;
-    temp->ptr3 = ptr3;
-    temp->arglist = arglist;
-    return temp;
-}
-
-struct ASTNode* reverseList(struct ASTNode* head) 
-{
-    struct ASTNode *prev = NULL, *current;
-
-    while(head != NULL) {
-        current = head->arglist;
-        head->arglist = prev;
-        prev = head;
-        head = current;
-    }
-
-    return prev;
-}
-
-void initialize() 
-{
-    intermediate = fopen("machinecode.xsm", "w");
-    fprintf(intermediate, "0\n2056\n0\n0\n0\n0\n0\n0\n");
-    fprintf(intermediate, "MOV SP, %d\n", totalCount-1);
-    fprintf(intermediate, "PUSH R0\n");
-    fprintf(intermediate, "CALL MAIN\n");
-    fprintf(intermediate, "MOV R0, 10\nPUSH R0\nINT 10\n");
-}
-
-// void print_tree(struct ASTNode* node) 
-// {
-//     static int nullcount = 0;
-//     count += 1;
-//     int temp = count;
-
-//     if (node->ptr1) 
-//     {
-//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr1));
-//         print_tree(node->ptr1);
-//     }
-
-//     if (node->ptr2) 
-//     {
-//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr2));
-//         print_tree(node->ptr2);
-//     }
-
-//     if (node->ptr3) 
-//     {
-//         fprintf(stream, "    \"%d.%s\" -> \"%d.%s\";\n", temp, findKey(node), count + 1, findKey(node->ptr3));
-//         print_tree(node->ptr3);
-//     }
-
-//     if (node->arglist) 
-//     {
-//         fprintf(stream, "    \"%d.%s\":e -> \"%d.%s\":w;\n", temp, findKey(node), count + 1, findKey(node->arglist));
-//         print_tree(node->arglist);
-//    }
-// }
-
-
-
-char* findKey(struct ASTNode* head) 
-{
-    char *key = malloc(20);
-    switch(head->nodetype) {
-        case NODE_CONNECTOR:
-            strcpy(key, "_");
-            break;
-        case NODE_PLUS:
-            strcpy(key, "+");
-            break;
-        case NODE_MINUS:
-            strcpy(key, "-");
-            break;
-        case NODE_MUL:
-            strcpy(key, "*");
-            break;
-        case NODE_DIV:
-            strcpy(key, "/");
-            break;
-        case NODE_ID:
-            strcpy(key, head->name);
-            break;
-        case NODE_FUNC:
-            sprintf(key, "%s()", head->name);
-            break;
-        case NODE_NUM:
-            sprintf(key, "%d", head->value.intval);
-            break;
-        case NODE_ASSGN:
-            strcpy(key, "=");
-            break;
-        case NODE_READ:
-            strcpy(key, "read");
-            break;
-        case NODE_WRITE:
-            strcpy(key, "write");
-            break;
-        case NODE_IF:
-            strcpy(key, "if");
-            break;
-        case NODE_IF_ELSE:
-            strcpy(key, "if else");
-            break;
-        case NODE_WHILE:
-            strcpy(key, "while");
-            break;
-        case NODE_LT:
-            strcpy(key, "<");
-            break;
-        case NODE_GT:
-            strcpy(key, ">");
-            break;
-        case NODE_LE:
-            strcpy(key, "<=");
-            break;
-        case NODE_GE:
-            strcpy(key, ">=");
-            break;
-        case NODE_EQ:
-            strcpy(key, "==");
-            break;
-        case NODE_NEQ:
-            strcpy(key, "!=");
-            break;
-        case NODE_BREAK:
-            strcpy(key, "break");
-            break;
-        case NODE_CONT:
-            strcpy(key, "continue");
-            break;
-        case NODE_STRVAL:
-            strcpy(key, head->value.strval+1);
-            key[strlen(key)-1] = '\0';
-            break;
-        case NODE_ARRAY:
-            strcpy(key, "array");
-            break;
-        case NODE_RET:
-            strcpy(key, "return");
-            break;
-        case NODE_INT_PTR:
-            sprintf(key, "*%s", head->name);
-            break;
-        case NODE_TUPLE :
-            sprintf(key,"<%s>", head->name);
-
-    }
-    return key;        
-}
-
-void print_tree(struct ASTNode* node,int level)
-{
-    if(node == NULL)
-        return;
-    for(int i=0; i<level; i++)
-        printf("--");
-    printf("%s\n", findKey(node));
-    print_tree(node->ptr1, level + 1);
-    print_tree(node->ptr2, level + 1);
-    print_tree(node->ptr3, level + 1);
-}
-
-struct Gsymbol* GLookup(char *name) 
-{
-    struct Gsymbol *temp = Ghead;
-
-    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
-        temp = temp->next;
-    }
-
-    return temp;
-}
-
-struct Lsymbol* LLookup(char *name) 
-{
-    struct Lsymbol *temp = Lhead;
-
-    while (temp != NULL && (strcmp(temp->name, name) != 0)) 
-    {
-        temp = temp->next;
-    }
-
-    return temp;
-}
-
-struct Paramstruct* PLookup(char *name) 
-{
-    struct Paramstruct *temp = Phead;
-
-    while (temp != NULL && (strcmp(temp->name, name) != 0)) 
-    {
-        temp = temp->next;
-    }
-
-    return temp;
-}
-
-void GInstall(char *name, int type, int size, struct Paramstruct *paramlist) 
-{
-    //printf("it came to start GInstall for %s\n",name);
-    struct Gsymbol* temp;
-    temp = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
-    temp->name = (char*)malloc(sizeof(name));
-    strcpy(temp->name, name);
-    temp->type = type;
-    temp->size = size;
-    temp->next = NULL;
-
-    if(paramlist != NULL)
-        temp->paramlist = paramlist;
-
-    if(size != -1) 
-    {
-        temp->binding = totalCount;
-        totalCount = totalCount + temp->size;
-    }
-    else 
-    {
-        temp->flabel = fLabelCount;
-        fLabelCount++;
-    }
-
-    if (Ghead != NULL) 
-    {
-        Gtail->next = temp;
-        Gtail = temp;
-    }
-    else 
-    {
-        Ghead = temp;
-        Gtail = temp;
-    }
-    //printf("it came to end GInstall for %s\n",name);
-
-    return;
-}
-void GInstallType(char *name,int type ,int size,struct TypeDef* userDef) 
-{
-    struct Gsymbol* temp= (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
-    temp->name = (char*)malloc(sizeof(name));
-    strcpy(temp->name, name);
-    temp->type = type;
-    temp->size = size;
-    temp->binding = totalCount;
-    totalCount = totalCount + temp->size;
-    temp->userType=userDef;
-    temp->next = NULL;
-    
-    struct Gsymbol* t=Ghead;
-    while(t->next!=NULL)
-    {
-        t=t->next;
-    }
-    t->next=temp;
-    Gtail=temp;
-
-}
-
-void LInstall(char *name, int type) 
-{
-    struct Lsymbol *temp;
-    temp = (struct Lsymbol *)malloc(sizeof(struct Lsymbol));
-    temp->name = (char*)malloc(sizeof(name));
-    strcpy(temp->name, name);
-    temp->type = type;
-    temp->binding = localBindingStart;
-    localBindingStart++;
-
-    if (Lhead != NULL) 
-    {
-        Ltail->next = temp;
-        Ltail = temp;
-    }
-    else 
-    {
-        Lhead = temp;
-        Ltail = temp;
-    }
-
-    return;
-}
-
-void InstallParamsInLocal() 
-{
-    struct Paramstruct *temp = Phead;
-    int count = 0;
-
-    // Count parameters
-    while(temp != NULL) 
-    {
-        count++;
-        temp = temp->next;
-    }
-
-    // Parameters are at negative offsets below BP
-    // First param is at BP - (3 + count - 1), last is at BP - 3
-    temp = Phead;
-    while(temp != NULL) 
-    {
-        localBindingStart = -(3 + count - 1);
-        LInstall(temp->name, temp->type);
-        count--;
-        temp = temp->next;
-    }
-
-    // Local variables start at BP+1
-    localBindingStart = 1;
-    return;
-}
-
-void PInstall(char *name, int type) 
-{
-    struct Paramstruct *temp;
-    temp = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
-    temp->name = (char*)malloc(sizeof(name));
-    strcpy(temp->name, name);
-    temp->type = type;
-
-    if (Phead != NULL) 
-    {
-        Ptail->next = temp;
-        Ptail = temp;
-    }
-    else 
-    {
-        Phead = temp;
-        Ptail = temp;
-    }
-
-    return;
-}
-
-void printGSymbolTable() 
-{
-    struct Gsymbol* temp = Ghead;
-    printf("\nGlobal Variables:\n");
-    if(temp==NULL)
-    {
-        printf("NO Global variables\n");
-    }
-    while (temp != NULL) 
-    {
-        printf("%s --- %d --- %d\n", temp->name, temp->type, temp->binding);
-        temp = temp->next;
-    }
-}
-
-void printLSymbolTable() 
-{
-    struct Lsymbol* temp = Lhead;
-    printf("\nLocal Variables:\n");
-    if(temp == NULL) 
-    {
-        printf("No local variables.\n");
-        return;
-    }
-    while (temp != NULL) 
-    {
-        printf("%s --- %d --- %d\n", temp->name, temp->type, temp->binding);
-        temp = temp->next;
-    }
-}
-
-int checkAvailability(char *name, int global) 
-{
-    if(global) 
-    {
-        Gtemp = GLookup(name);
-        if(Gtemp != NULL) 
-        {
-            yyerror_impl("Re-initialization of variable/function:", name);
-            exit(1);
-        }
-    }
-    else 
-    {
-        Ltemp = LLookup(name);
-        Ptemp = PLookup(name);
-        if(Ptemp != NULL || Ltemp != NULL) 
-        {
-            yyerror_impl("Re-initialization of variable:", name);
-            exit(1);
-        }
-    }
-
-    return 1;
-}
-
-void assignType(struct ASTNode* node, int code) 
-{
-    // Code 0 - Local or Global Variable
-    // Code 1 - Function
-    // Code 2 - Array
-    
-    Ltemp = LLookup(node->name);
-    if(Ltemp != NULL && code == 0) 
-    {
-        node->Lentry = Ltemp;
-        node->type = Ltemp->type;
-        
-        // If this is a pointer dereference, the type should be the base type
-        if(node->nodetype == NODE_INT_PTR) 
-        {
-            node->type = TYPE_INT;
-        }
-    }
-    else 
-    {
-        Gtemp = GLookup(node->name);
-        
-        if(Gtemp != NULL) 
-        {
-            node->Gentry = Gtemp;
-            node->type = Gtemp->type;
-            
-            // If this is a pointer dereference, the type should be the base type
-            if(node->nodetype == NODE_INT_PTR) 
-            {
-                node->type = TYPE_INT;
-            }
-
-            if(code == 1 && Gtemp->size != -1) 
-            {
-                yyerror_impl("conflict in ID NodeType : Expected Function:", node->name);
-                exit(1);
-            }
-        }
-        else 
-        {
-            if(code == 1)
-                yyerror_impl("Function not declared:", node->name);
-            else
-                yyerror_impl("Variable not declared:", node->name);
-            exit(1);
-        }
-    }
-
-    return;
-}
-
-void typecheck(int t1, int t2, char c) 
-{
-    switch(c) {
-        case 'w': if(t1 != t2) {
-                      yyerror_impl("Expected Boolean in WHILE check", NULL);
-                      exit(1);
-                  }
-                  break;
-        case 'e': if(t1 != t2) {
-                      yyerror_impl("Expected Boolean in IF ELSE check", NULL);
-                      exit(1);
-                  }
-                  break;
-        case 'i': if(t1 != t2) {
-                      yyerror_impl("Expected Boolean in IF check", NULL);
-                      exit(1);
-                  }
-                  break;
-        case 'a': 
-                    if(t1 == TYPE_INT_PTR && t2 == TYPE_INT) {
-                        break;
-                    }
-                    if(t1 == TYPE_INT && t2 == TYPE_INT_PTR) {
-                        break;
-                    }
-                    if(t1 != TYPE_INT || t2 != TYPE_INT) {
-                      yyerror_impl("Invalid type for arithmetic operation", NULL);
-                      exit(1);
-                  }
-                  break;
-        case 'b': if(t1 != TYPE_INT || t2 != TYPE_INT) {
-                      yyerror_impl("Invalid type for comparing (<, >, <=..) operation", NULL);
-                      exit(1);
-                  }
-                  break;
-        case 'l': if(t1 != TYPE_BOOL || t2 != TYPE_BOOL) {
-                      yyerror_impl("Invalid type for logical AND/OR operation", NULL);
-                      exit(1);
-                  }
-                  break;
-        case '=': 
-                    // Allow assignment if types match, no special handling needed
-                    // Dereferencing is handled in codegen
-                    if(t1==TYPE_INT_PTR && t2==TYPE_INT)
-                    {
-                        break;
-                    }
-                    if(t1 != t2) 
-                    {
-                      yyerror_impl("Invalid type for assignment operation", NULL);
-                      exit(1);
-                    }
-                  break;
-    }
-}
-
-static int counter = -1, i, j, label=0;
+// extern FILE *intermediate;
+int counter = -1, j, label=0;
 int whileStart = -1, whileEnd = -1;
+struct Lsymbol* Ltemp;
 extern FILE *intermediate;
 
-int getlabel() 
-{
+int getlabel() {
     return ++label;
 }
-int getReg() 
-{
+int getReg() {
     if(counter < 20)
         return ++counter;
-    yyerror_impl("Out of Registers", NULL);
+    error("Out of Registers", NULL);
     exit(1);
 }
-int freeReg() 
-{
+int freeReg() {
     if(counter >= 0)
         counter--;
 }
-int freeAllReg() 
-{
+int freeAllReg() {
     counter = -1;
 }
 
-int pushArguments(struct ASTNode *t) 
-{
+int pushArguments(struct ASTNode *t) {
     int r;
-    while(t != NULL) 
-    {
+    while(t != NULL) {
         r = codegen(t);
         fprintf(intermediate, "PUSH R%d\n", r);
         freeReg();
@@ -566,160 +47,73 @@ int pushArguments(struct ASTNode *t)
     }
 }
 
-int popArguments(struct ASTNode *t) 
-{
+int popArguments(struct ASTNode *t) {
     int r = getReg();
-    while(t != NULL) 
-    {
+    while(t != NULL) {
         fprintf(intermediate, "POP R%d\n", r);
         t = t->arglist;
     }
     freeReg();
 }
 
-int getMemoryAddress(struct ASTNode* t) 
-{
+int getMemoryAddress(struct ASTNode* t) {
     int r;
-    if(t->nodetype == NODE_ID && t->Gentry != NULL) 
-    {
+    if(t->nodetype == NODE_FIELD) {
         r = getReg();
-        fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
-        return r;
-    }
-    else if(t->nodetype == NODE_ID) 
-    {
-        r = getReg();
-        fprintf(intermediate, "MOV R%d,BP\n", r);
-        fprintf(intermediate, "ADD R%d,%d\n", r, t->Lentry->binding);
-        return r;
-    }
-    else if(t->nodetype == NODE_ARRAY) 
-    {
-        r = codegen(t->ptr2);
-        if(t->Gentry != NULL) 
-        {
-            fprintf(intermediate, "ADD R%d, %d\n", r, t->Gentry->binding);
+        struct Fieldlist* ftemp;
+        if(t->ptr1->Gentry != NULL) {
+            fprintf(intermediate, "MOV R%d, %d\n", r, t->ptr1->Gentry->binding);
+        } else {
+            fprintf(intermediate, "MOV R%d,BP\n", r);
+            fprintf(intermediate, "ADD R%d,%d\n", r, t->ptr1->Lentry->binding);
         }
-        else 
-        {
-            int r2 = getReg();
-            fprintf(intermediate, "MOV R%d, BP\n", r2);
-            fprintf(intermediate, "ADD R%d, %d\n", r2, t->Lentry->binding);
-            fprintf(intermediate, "ADD R%d, R%d\n", r, r2);
-            freeReg();
+
+        while(t->ptr2->nodetype == NODE_FIELD) {
+            ftemp = FLookup(t->ptr2->ptr1->name, t->ptr1->type->fields); 
+            fprintf(intermediate, "MOV R%d, [R%d]\n", r, r);
+            fprintf(intermediate, "ADD R%d, %d\n", r, ftemp->fieldIndex);
+            t = t->ptr2;
         }
+
+        ftemp = FLookup(t->ptr2->name, t->ptr1->type->fields); 
+        fprintf(intermediate, "MOV R%d, [R%d]\n", r, r);
+        fprintf(intermediate, "ADD R%d, %d\n", r, ftemp->fieldIndex);
         return r;
-    }
-    else if(t->nodetype == NODE_INT_PTR) 
-    {
-        // Get the address stored in the pointer variable
-        r = getReg();
-        if(t->Gentry != NULL)
-        {
+    } else if(t->nodetype == NODE_ID) {
+        if(t->Gentry != NULL) {
+            r = getReg();
             fprintf(intermediate, "MOV R%d, %d\n", r, t->Gentry->binding);
-            
-            printf("Pointer variable found in Global symbol table: %s\n", t->name);
+            return r;
+        } else {
+            r = getReg();
+            fprintf(intermediate, "MOV R%d,BP\n", r);
+            fprintf(intermediate, "ADD R%d,%d\n", r, t->Lentry->binding);
+            return r;
         }
-        else if(t->Lentry != NULL)
-        {
-            fprintf(intermediate, "MOV R%d, BP\n", r);
-            fprintf(intermediate, "ADD R%d, %d\n", r, t->Lentry->binding);
-    
-            printf("Pointer variable found in local symbol table: %s\n", t->name);
-        }
-        else
-        {
-            printf("Error: Pointer variable not found in symbol table: %s\n", t->name);
-            exit(1);
-        }
+    } else if(t->nodetype == NODE_ARRAY) {
+        r = codegen(t->ptr2);
+        fprintf(intermediate, "ADD R%d, %d\n", r, t->ptr1->Gentry->binding);
         return r;
-    }
-    else if(t->nodetype == NODE_ADDR) 
-    {
-        // Get the address of the variable
-        r = getMemoryAddress(t->ptr1);
-        return r;
-    }
-    else if(t->nodetype == NODE_TUPLE)
-    {
-        r=getReg();
-        if(t->ptr1==NULL)
-        {
-            printf("ptr1 is null \n");
-            exit(1);
-        }
-        else
-        {
-            printf("ptr1 is not null\n");
-        }
-        if(t->Gentry==NULL)
-        {
-            printf("TUPLE Gentry is NULL\n");
-            exit(1);
-        }
-        else
-        {
-            printf("TUPLE Gentry is NOT NULL\n");
-
-        }
-        int baseAddress=t->Gentry->binding;
-        printf("Base Address of TUPLE %s is %d\n",t->name,baseAddress);
-        struct Paramstruct* tempParamList=t->Gentry->paramlist;
-        int offset=0;
-        if(tempParamList==NULL)
-        {
-            printf("tempParamList is NULL\n");
-        }
-        else
-        {
-            printf("tempParamList is not NULL\n");
-        }
-        while(tempParamList)
-        {
-            if(strcmp(tempParamList->name,t->ptr2->name)==0)
-            {
-                printf("found %s %s\n",tempParamList->name,t->ptr2->name);
-                break;
-            }
-            offset++;
-            tempParamList=tempParamList->next;
-        }
-        
-        printf("Offset of TUPLE %s is %d\n",t->name,offset);
-        // offset=0;
-        
-        int addr=baseAddress+offset;
-        fprintf(intermediate, "MOV R%d, %d\n", r,addr);
-        //fprintf(intermediate, "MOV R%d, %d\n", r,addr);
-        return r;
-
-    }
-    else 
-    {
+    } else {
         printf("Cannot find memory address of nodetype %d", t->nodetype);
         exit(1);
     }
     return -1;
 }
 
-int codegen(struct ASTNode* t) 
-{
+int codegen(struct ASTNode* t) {
     int r1, r2, r3, l1, l2, number, status=0;
     int prevWhileStart, prevWhileEnd;
 
-    if(t == NULL) 
-    {
+    if(t == NULL) {
         return -1;
-    } 
-    else if(t->nodetype == NODE_CONNECTOR) 
-    {
+    } else if(t->nodetype == NODE_CONNECTOR) {
         codegen(t->ptr1);
         codegen(t->ptr2);
         return -1;
     }
 
-    switch(t->nodetype) 
-    {
+    switch(t->nodetype) {
         case NODE_NUM:
             r1 = getReg();
             fprintf(intermediate, "MOV R%d, %d\n", r1, t->value.intval);
@@ -729,6 +123,10 @@ int codegen(struct ASTNode* t)
             fprintf(intermediate, "MOV R%d, %s\n", r1, t->value.strval);
             return r1;
         case NODE_ID:
+            r1 = getMemoryAddress(t);
+            fprintf(intermediate, "MOV R%d, [R%d]\n", r1, r1);
+            return r1;
+        case NODE_FIELD:
             r1 = getMemoryAddress(t);
             fprintf(intermediate, "MOV R%d, [R%d]\n", r1, r1);
             return r1;
@@ -810,40 +208,103 @@ int codegen(struct ASTNode* t)
             freeReg();
             return 0;
         case NODE_WRITE:
-            
+            for (int i = 0; i <= counter; i++)
+                fprintf(intermediate, "PUSH R%d\n", i);
+            status = counter;
 
             fprintf(intermediate, "MOV R0,\"Write\"\n");
-            fprintf(intermediate, "PUSH R0\n"); 
+            fprintf(intermediate, "PUSH R0\n"); // function code "Write"
             fprintf(intermediate, "MOV R0,-2\n");
-            fprintf(intermediate, "PUSH R0\n"); 
+            fprintf(intermediate, "PUSH R0\n"); //Argument 1
 
             r1 = codegen(t->ptr1);
-            fprintf(intermediate, "PUSH R%d\n", r1);
+            fprintf(intermediate, "PUSH R%d\n", r1); //Argument 2
             freeReg();
             fprintf(intermediate, "ADD SP,2\n");
             fprintf(intermediate, "CALL 0\n");
             fprintf(intermediate, "SUB SP,5\n");
 
-           
+            for (int i = status; i >= 0; i--)
+                fprintf(intermediate, "POP R%d\n", i);
+            counter = status;
             break;
         case NODE_READ:
-            
+            for (int i = 0; i <= counter; i++)
+                fprintf(intermediate, "PUSH R%d\n", i);
+            status = counter;
 
             fprintf(intermediate, "MOV R0,\"Read\"\n");
-            fprintf(intermediate, "PUSH R0\n"); 
+            fprintf(intermediate, "PUSH R0\n"); // function code "Read"
             fprintf(intermediate, "MOV R0,-1\n");
-            fprintf(intermediate, "PUSH R0\n"); 
+            fprintf(intermediate, "PUSH R0\n"); //Argument 1
 
             r1 = getMemoryAddress(t->ptr1);
-            fprintf(intermediate, "PUSH R%d\n", r1); 
+            fprintf(intermediate, "PUSH R%d\n", r1); //Argument 2
             freeReg();
 
             fprintf(intermediate, "ADD SP,2\n");
             fprintf(intermediate, "CALL 0\n");
             fprintf(intermediate, "SUB SP,5\n");
 
-            
+            for (int i = status; i >= 0; i--)
+                fprintf(intermediate, "POP R%d\n", i);
+            counter = status;
             break;
+        case NODE_FREE:
+            for (int i = 0; i <= counter; i++)
+                fprintf(intermediate, "PUSH R%d\n", i);
+            status = counter;
+
+            fprintf(intermediate, "MOV R0,\"Free\"\n");
+            fprintf(intermediate, "PUSH R0\n");
+
+            r1 = codegen(t->ptr1);
+            fprintf(intermediate, "PUSH R%d\n", r1); //Argument 1
+            freeReg();
+
+            fprintf(intermediate, "ADD SP,3\n");
+            fprintf(intermediate, "CALL 0\n");
+            fprintf(intermediate, "SUB SP,5\n");
+
+            for (int i = status; i >= 0; i--)
+                fprintf(intermediate, "POP R%d\n", i);
+            counter = status;
+            break;
+        case NODE_INIT:
+            for (int i = 0; i <= counter; i++)
+                fprintf(intermediate, "PUSH R%d\n", i);
+            status = counter;
+
+            fprintf(intermediate, "MOV R0,\"Heapset\"\n");
+            fprintf(intermediate, "PUSH R0\n");
+            fprintf(intermediate, "ADD SP,4\n");
+            fprintf(intermediate, "CALL 0\n");
+            fprintf(intermediate, "SUB SP,5\n");
+
+            for (int i = status; i >= 0; i--)
+                fprintf(intermediate, "POP R%d\n", i);
+            counter = status;
+            break;
+        case NODE_ALLOC:
+            for (int i = 0; i <= counter; i++)
+                fprintf(intermediate, "PUSH R%d\n", i);
+            status = counter;
+
+            fprintf(intermediate, "MOV R0,\"Alloc\"\n");
+            fprintf(intermediate, "PUSH R0\n");
+            fprintf(intermediate, "ADD SP,4\n");
+            fprintf(intermediate, "CALL 0\n");
+
+            r1 = status + 1;
+            fprintf(intermediate, "POP R%d\n", r1); // for return value
+            
+            fprintf(intermediate, "SUB SP,4\n");
+
+            for (int i = status; i >= 0; i--)
+                fprintf(intermediate, "POP R%d\n", i);
+            counter = status;
+            r1 = getReg();
+            return r1;
         case NODE_IF:
             r1 = codegen(t->ptr1); 
             l1 = getlabel();
@@ -851,40 +312,6 @@ int codegen(struct ASTNode* t)
             number = codegen(t->ptr2);
             fprintf(intermediate, "L%d:\n", l1);
             freeReg();
-            break;
-        case NODE_AND:
-            l1 = getlabel();
-            r1 = codegen(t->ptr1);
-            fprintf(intermediate, "JZ R%d,L%d\n", r1, l1);
-            freeReg();
-            r2 = codegen(t->ptr2);
-            fprintf(intermediate, "JZ R%d,L%d\n", r2, l1);
-            freeReg();
-            r3 = getReg();
-            fprintf(intermediate, "MOV R%d, 1\n", r3);
-            l2 = getlabel();
-            fprintf(intermediate, "JMP L%d\n", l2);
-            fprintf(intermediate, "L%d:\n", l1);
-            fprintf(intermediate, "MOV R%d, 0\n", r3);
-            fprintf(intermediate, "L%d:\n", l2);
-            return r3;
-            break;
-        case NODE_OR:
-            l1 = getlabel();
-            r1 = codegen(t->ptr1);
-            fprintf(intermediate, "JNZ R%d,L%d\n", r1, l1);
-            freeReg();
-            r2 = codegen(t->ptr2);
-            fprintf(intermediate, "JNZ R%d,L%d\n", r2, l1);
-            freeReg();
-            r3 = getReg();
-            fprintf(intermediate, "MOV R%d, 0\n", r3);
-            l2 = getlabel();
-            fprintf(intermediate, "JMP L%d\n", l2);
-            fprintf(intermediate, "L%d:\n", l1);
-            fprintf(intermediate, "MOV R%d, 1\n", r3);
-            fprintf(intermediate, "L%d:\n", l2);
-            return r3;
             break;
         case NODE_IF_ELSE:
             r1 = codegen(t->ptr1);
@@ -939,8 +366,7 @@ int codegen(struct ASTNode* t)
             freeReg();
 
             Ltemp = Lhead;
-            while(Ltemp != NULL) 
-            {
+            while(Ltemp != NULL) {
                 if(Ltemp->binding > 0)
                     fprintf(intermediate, "POP R0\n");
                 Ltemp = Ltemp->next;
@@ -950,14 +376,14 @@ int codegen(struct ASTNode* t)
             fprintf(intermediate, "RET\n");
             break;
         case NODE_FUNC:
-            for (i = 0; i <= counter; i++)
+            for (int i = 0; i <= counter; i++)
                 fprintf(intermediate, "PUSH R%d\n", i);
             status = counter;
             freeAllReg();
 
             pushArguments(t->ptr1); //Push Arguments
             fprintf(intermediate, "PUSH R0\n"); //Space for return value
-            fprintf(intermediate, "CALL F%d\n", t->Gentry->flabel); 
+            fprintf(intermediate, "CALL F%d\n", t->Gentry->flabel); //Space for return value
 
             r1 = status + 1;
             fprintf(intermediate, "POP R%d\n", r1); // for return value
@@ -969,37 +395,23 @@ int codegen(struct ASTNode* t)
             if (status == -1)
                 freeReg();
 
-            for (i = status; i >= 0; i--)
+            for ( int i = status; i >= 0; i--)
                 fprintf(intermediate, "POP R%d\n", i);
             counter = status;
             r1 = getReg();
             return r1;
-            break;
-        case NODE_INT_PTR:
-            r1 = getMemoryAddress(t);
-            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
+        case NODE_NULL:
+            r1 = getReg();
+            fprintf(intermediate, "MOV R%d,-1\n", r1);
             return r1;
             break;
-        case NODE_ADDR:
-            r1 = getMemoryAddress(t->ptr1);
-            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
-            return r1;
-            break;
-        case NODE_TUPLE:
-            r1 = getMemoryAddress(t);
-            fprintf(intermediate, "MOV R%d,[R%d]\n", r1, r1);
-            return r1;
-        case NODE_FIELD :
-            
-             break;
         default:
-            printf("%d: This shouldn't have happened\n", t->nodetype);
+            printf("%d: This shouldn't have happened", t->nodetype);
             exit(1);
     }
 }
 
-void print_header() 
-{
+void initialize() {
     intermediate = fopen("machinecode.xsm", "w");
     fprintf(intermediate, "0\n2056\n0\n0\n0\n0\n0\n0\n");
     fprintf(intermediate, "MOV SP, %d\n", totalCount-1);
@@ -1007,38 +419,514 @@ void print_header()
     fprintf(intermediate, "CALL MAIN\n");
     fprintf(intermediate, "MOV R0, 10\nPUSH R0\nINT 10\n");
 }
+FILE *stream;
+int count = 0;
 
-void printTypeTable() 
-{
-    struct TypeDef* temp = Thead;
-    if (temp == NULL) 
-    {
-        printf("Type Definition Table is empty\n");
-        return;
-    }
-    printf("\nType Definitions:\n");
-    while (temp != NULL) 
-    {
-        printf("Type Name: %s\n", temp->name);
-        struct Fieldstruct* fieldTemp = temp->fields;
-        printf("Size of Type: %d\n", temp->size);
-        while (fieldTemp != NULL) 
-        {
-            printf("    Field Name: %s, Field Type: %d\n , Field Index: %d\n , Field TBV: %d\n", fieldTemp->name, fieldTemp->type, fieldTemp->fieldIndex, fieldTemp->tbv);
-            fieldTemp = fieldTemp->next;
-        }
-        temp = temp->next;
-    }
+
+void print_dot_aux(struct ASTNode* node) {
+    
 }
 
-struct TypeDef* TLookup(char *name) 
-{
-    struct TypeDef *temp = Thead;
+void print_dot(struct ASTNode* tree, char* name) {
+   
+}
 
-    while (temp != NULL && (strcmp(temp->name, name) != 0))
-    {
+char* findKey(struct ASTNode* head) {
+    char *key = malloc(20);
+    switch(head->nodetype) {
+        case NODE_CONNECTOR:
+            strcpy(key, "_");
+            break;
+        case NODE_PLUS:
+            strcpy(key, "+");
+            break;
+        case NODE_MINUS:
+            strcpy(key, "-");
+            break;
+        case NODE_MUL:
+            strcpy(key, "*");
+            break;
+        case NODE_DIV:
+            strcpy(key, "/");
+            break;
+        case NODE_ID:
+            strcpy(key, head->name);
+            break;
+        case NODE_FUNC:
+            sprintf(key, "%s()", head->name);
+            break;
+        case NODE_NUM:
+            sprintf(key, "%d", head->value.intval);
+            break;
+        case NODE_ASSGN:
+            strcpy(key, "=");
+            break;
+        case NODE_READ:
+            strcpy(key, "read");
+            break;
+        case NODE_WRITE:
+            strcpy(key, "write");
+            break;
+        case NODE_IF:
+            strcpy(key, "if");
+            break;
+        case NODE_IF_ELSE:
+            strcpy(key, "if else");
+            break;
+        case NODE_WHILE:
+            strcpy(key, "while");
+            break;
+        case NODE_LT:
+            strcpy(key, "<");
+            break;
+        case NODE_GT:
+            strcpy(key, ">");
+            break;
+        case NODE_LE:
+            strcpy(key, "<=");
+            break;
+        case NODE_GE:
+            strcpy(key, ">=");
+            break;
+        case NODE_EQ:
+            strcpy(key, "==");
+            break;
+        case NODE_NEQ:
+            strcpy(key, "!=");
+            break;
+        case NODE_BREAK:
+            strcpy(key, "break");
+            break;
+        case NODE_CONT:
+            strcpy(key, "continue");
+            break;
+        case NODE_STRVAL:
+            strcpy(key, head->value.strval+1);
+            key[strlen(key)-1] = '\0';
+            break;
+        case NODE_ARRAY:
+            strcpy(key, "array");
+            break;
+        case NODE_RET:
+            strcpy(key, "return");
+            break;
+        case NODE_FIELD:
+            strcpy(key, "field");
+            break;
+        case NODE_NULL:
+            strcpy(key, "NULL");
+            break;
+        case NODE_ALLOC:
+            strcpy(key, "alloc()");
+            break;
+        case NODE_FREE:
+            strcpy(key, "free()");
+            break;
+        case NODE_INIT:
+            strcpy(key, "initialize()");
+            break;
+        default: 
+            printf("Graphviz: No Node found");
+            exit(1);
+    }
+    return key;        
+}
+
+struct Gsymbol* GLookup(char *name) {
+    struct Gsymbol *temp = Ghead;
+
+    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
         temp = temp->next;
     }
 
     return temp;
 }
+
+struct Lsymbol* LLookup(char *name) {
+    struct Lsymbol *temp = Lhead;
+
+    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
+        temp = temp->next;
+    }
+
+    return temp;
+}
+
+struct Paramstruct* PLookup(char *name) {
+    struct Paramstruct *temp = Phead;
+
+    while (temp != NULL && (strcmp(temp->name, name) != 0)) {
+        temp = temp->next;
+    }
+
+    return temp;
+}
+
+struct Typetable *TLookup(char *name) {
+    struct Typetable *temp = Thead;
+    while(temp != NULL && strcmp(temp->name, name) != 0) {
+        temp = temp->next;
+    }
+
+    return temp;
+}
+
+struct Fieldlist *FLookup(char *name, struct Fieldlist *list) {
+    while(list != NULL && strcmp(list->name, name) != 0) {
+        list = list->next;
+    }
+
+    return list;
+}
+
+void FInstall(char *name, struct Typetable *type) {
+    struct Fieldlist *ftemp;
+    ftemp = (struct Fieldlist*)malloc(sizeof(struct Fieldlist));
+
+    ftemp->name = (char*)malloc(sizeof(name));
+    strcpy(ftemp->name, name);
+    ftemp->type = type;
+    ftemp->next = NULL;
+
+    if(Fhead == NULL) {
+        Fhead = ftemp;
+        Ftail = ftemp;
+    } else {
+        Ftail->next = ftemp;
+        Ftail = ftemp;
+    }
+
+    return;
+}
+
+void TInstall(char *name, struct Fieldlist *fields) {
+    struct Typetable *temp;
+    struct Fieldlist *ftemp;
+    int counter = 0;
+    temp = (struct Typetable *)malloc(sizeof(struct Typetable));
+
+    temp->name = (char*)malloc(sizeof(name));
+    strcpy(temp->name, name);
+    temp->next = NULL;
+
+    if(Thead == NULL) {
+        Thead = temp;
+        Ttail = temp;
+    } else {
+        Ttail->next = temp;
+        Ttail = temp;
+    }
+
+    ftemp = fields;
+    while(ftemp != NULL) {
+        if (ftemp->type == TLookup("dummy")) {
+            ftemp->type = TLookup(name);
+        }
+
+        ftemp->fieldIndex = ++counter;
+        ftemp = ftemp->next;
+    }
+
+    temp->fields = fields;
+    temp->size = counter;
+
+    if(counter >= 8) {
+        error("Too many member fields", NULL);
+        exit(1);
+    }
+
+    Fhead = NULL;
+    Ftail = NULL;
+    return;
+}
+
+void GInstall(char *name, struct Typetable *type, int size, struct Paramstruct *paramlist) {
+    struct Gsymbol* temp;
+    temp = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
+    temp->name = (char*)malloc(sizeof(name));
+    strcpy(temp->name, name);
+    temp->type = type;
+    temp->size = size;
+    temp->next = NULL;
+
+    if(paramlist != NULL)
+        temp->paramlist = paramlist;
+
+    if(size != -1) {
+        temp->binding = totalCount;
+        totalCount = totalCount + temp->size;
+    } else {
+        temp->flabel = fLabelCount;
+        fLabelCount++;
+    }
+
+    if (Ghead != NULL) {
+        Gtail->next = temp;
+        Gtail = temp;
+    } else {
+        Ghead = temp;
+        Gtail = temp;
+    }
+
+    return;
+}
+
+void LInstall(char *name, struct Typetable *type) {
+    struct Lsymbol *temp;
+    temp = (struct Lsymbol *)malloc(sizeof(struct Lsymbol));
+    temp->name = (char*)malloc(sizeof(name));
+    strcpy(temp->name, name);
+    temp->type = type;
+    temp->binding = localBindingStart;
+    localBindingStart++;
+
+    if (Lhead != NULL) {
+        Ltail->next = temp;
+        Ltail = temp;
+    } else {
+        Lhead = temp;
+        Ltail = temp;
+    }
+
+    return;
+}
+
+void InstallParamsInLocal() {
+    struct Paramstruct *temp = Phead;
+    int count = 0;
+
+    while(temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+
+    localBindingStart = -1*count - 2;
+    temp = Phead;
+    while(temp != NULL) {
+        LInstall(temp->name, temp->type);
+        temp = temp->next;
+    }
+
+    localBindingStart = 1;
+    return;
+}
+
+void PInstall(char *name, struct Typetable *type) {
+    struct Paramstruct *temp;
+    temp = (struct Paramstruct*)malloc(sizeof(struct Paramstruct));
+    temp->name = (char*)malloc(sizeof(name));
+    strcpy(temp->name, name);
+    temp->type = type;
+
+    if (Phead != NULL) {
+        Ptail->next = temp;
+        Ptail = temp;
+    } else {
+        Phead = temp;
+        Ptail = temp;
+    }
+
+    return;
+}
+
+void printGSymbolTable() 
+{
+    struct Gsymbol* temp = Ghead;
+    printf("-----Global Variables-----\n");
+    while (temp != NULL) {
+        printf("%s --- %s --- %d\n", temp->name, temp->type->name, temp->binding);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+void printLSymbolTable(char* funcName) 
+{
+    struct Lsymbol* temp = Lhead;
+    printf("-----Local Variables (%s)-----\n", funcName);
+    while (temp != NULL) {
+        printf("%s --- %s --- %d\n", temp->name, temp->type->name, temp->binding);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+void printTypeTable() 
+{
+    printf("-----TYPE TABLE-----\n");
+    struct Typetable *temp = Thead;
+    struct Fieldlist *ftemp;
+    while(temp != NULL) {
+        printf("%s\t%d\n", temp->name, temp->size);
+        ftemp = temp->fields;
+        while(ftemp != NULL) {
+            printf("\t%d\t%s\t%s\n", ftemp->fieldIndex, ftemp->name, ftemp->type->name);
+            ftemp = ftemp->next;
+        }
+        temp = temp->next;
+    }
+    printf("\n");
+}
+int checkAvailability(char *name, int global) 
+{
+    if(global) {
+        Gtemp = GLookup(name);
+        if(Gtemp != NULL) {
+            error("Re-initialization of variable/function '%s'\n", name);
+            exit(1);
+        }
+    } else {
+        Ltemp = LLookup(name);
+        Ptemp = PLookup(name);
+        if(Ptemp != NULL || Ltemp != NULL) {
+            error("Re-initialization of variable '%s'\n", name);
+            exit(1);
+        }
+    }
+
+    return 1;
+}
+
+void assignTypeField(struct ASTNode* node, struct Fieldlist *fields) {
+    struct Fieldlist *temp = FLookup(node->name, fields);
+    if(temp == NULL) {
+        error("No member field named '%s'", node->name);
+        exit(1);
+    }
+    node->type = temp->type;
+}
+
+void assignType(struct ASTNode* node, int code) 
+{
+    // Code 0 - Local or Global Variable
+    // Code 1 - Function
+    // Code 2 - Array
+    
+    Ltemp = LLookup(node->name);
+    if(Ltemp != NULL && code == 0) 
+    {
+        node->Lentry = Ltemp;
+        node->type = Ltemp->type;
+    }
+    else 
+    {
+        Gtemp = GLookup(node->name);
+        if(Gtemp != NULL) {
+            node->Gentry = Gtemp;
+            node->type = Gtemp->type;
+
+            if(code == 1 && Gtemp->size != -1) {
+                error("conflict in ID NodeType : Expected Function \n",NULL);
+                printf("%s\n", node->name);
+                exit(1);
+            }
+        }
+        else 
+         {
+            if(code == 1)
+                error("Function '%s' not declared!", node->name);
+            else
+                error("Variable '%s' not declared!", node->name);
+            exit(1);
+        }
+    }
+
+    return;
+}
+
+void typecheck(struct Typetable *t1, struct Typetable *t2, char c) {
+    switch(c) {
+        case 'w': if(t1 != t2) {
+                      error("Expected Boolean in WHILE check\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case 'e': if(t1 != t2) {
+                      error("Expected Boolean in IF ELSE check\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case 'i': if(t1 != t2) {
+                      error("Expected Boolean in IF check\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case 'a': if(t1 != TLookup("integer") || t2 != TLookup("integer")) {
+                      error("Invalid type for arithmetic operation\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case 'b': if(t1 != TLookup("integer") || t2 != TLookup("integer")) {
+                      error("Invalid type for comparing (<, >, <=..) operation\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case '=': if(t1 != t2) {
+                      error("Invalid type for assignment operation\n", NULL);
+                      exit(1);
+                  }
+                  break;
+        case '!': if (t1 == TLookup("string") || t1 == TLookup("integer")) {
+                      error("Interger or String cannot be compared with NULL\n", NULL);
+                      exit(1);
+                  }
+                  break;
+    }
+}
+
+struct ASTNode* TreeCreate(
+    struct Typetable *type,
+    int nodetype,
+    char *name,
+    union Constant *value,
+    struct ASTNode *arglist,
+    struct ASTNode *ptr1,
+    struct ASTNode *ptr2,
+    struct ASTNode *ptr3
+) {
+    struct ASTNode *temp = (struct ASTNode*)malloc(sizeof(struct ASTNode));
+    temp->type = type;
+    temp->nodetype = nodetype;
+    temp->name = name;
+    if(value != NULL)
+        temp->value = *value;
+    temp->arglist = arglist;
+    temp->ptr1 = ptr1;
+    temp->ptr2 = ptr2;
+    temp->ptr3 = ptr3;
+    temp->Gentry = NULL;
+    temp->Lentry = NULL;
+    return temp;
+}
+
+struct ASTNode* reverseList(struct ASTNode *t) {
+    struct ASTNode *prev = NULL, *current = t, *next = NULL;
+    while(current != NULL) {
+        next = current->arglist;
+        current->arglist = prev;
+        prev = current;
+        current = next;
+    }
+    return prev;
+}
+
+struct ASTNode* insertFieldId(struct ASTNode *field, struct ASTNode *id) {
+    struct ASTNode *temp = field;
+    while(temp->ptr2->nodetype == NODE_FIELD) {
+        temp = temp->ptr2;
+    }
+    assignTypeField(id, temp->ptr2->type->fields);
+    temp->ptr2 = TreeCreate(id->type, NODE_FIELD, NULL, NULL, NULL, temp->ptr2, id, NULL);
+    return field;
+}
+
+// void yyerror(char const *s) {
+//     printf("yyerror: %s at line %d\n", s, lineno);
+// }
+
+// void error(const char *s, const char *var) {
+//     fprintf(stderr, "Error: ");
+//     fprintf(stderr, s, var);
+//     fprintf(stderr, " at line number %d\n", lineno);
+//     errorFlag = 1;
+// }

@@ -90,9 +90,14 @@ extern int yydebug;
     STR = 291,                     /* STR  */
     MAIN = 292,                    /* MAIN  */
     RETURN = 293,                  /* RETURN  */
-    ADDR = 294,                    /* ADDR  */
-    TYPE = 295,                    /* TYPE  */
-    ENDTYPE = 296                  /* ENDTYPE  */
+    TYPE = 294,                    /* TYPE  */
+    ENDTYPE = 295,                 /* ENDTYPE  */
+    NILL = 296,                    /* NILL  */
+    DEQNILL = 297,                 /* DEQNILL  */
+    NEQNILL = 298,                 /* NEQNILL  */
+    FREE = 299,                    /* FREE  */
+    ALLOC = 300,                   /* ALLOC  */
+    INIT = 301                     /* INIT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -137,22 +142,24 @@ extern int yydebug;
 #define STR 291
 #define MAIN 292
 #define RETURN 293
-#define ADDR 294
-#define TYPE 295
-#define ENDTYPE 296
+#define TYPE 294
+#define ENDTYPE 295
+#define NILL 296
+#define DEQNILL 297
+#define NEQNILL 298
+#define FREE 299
+#define ALLOC 300
+#define INIT 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "ex2.y"
+#line 21 "ex2.y"
 
     struct ASTNode *nptr;
-    struct Paramstruct *pptr;
-    struct Fieldstruct *fptr;
-    struct TypeDef *tptr;
 
-#line 156 "y.tab.h"
+#line 163 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

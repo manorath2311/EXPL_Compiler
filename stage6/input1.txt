@@ -1,55 +1,29 @@
 type
-struct 
-{
-    int p;
-};
-
-bst
-{
-    int x;
-    int y;
-    struct left;
-};
-
-linedList 
-{
-    int data;
-    linedList next; 
-};
 markList
 {
     str name;
     int avg;
-    linedList marks;
-};
+}
 endtype
 
 decl
-    int x;
-    int temp(int p);
     markList m1,m2,m3;
 enddecl
 
-int temp(int p)
-{
-    decl 
-    int x;
-      enddecl
-    begin
-        x=10;
-        write(x);
-       return 0;
-    end
-}
 int main()
 {
     decl
-        int p;
+        markList man1,man2;
     enddecl
     begin
-        x=5;
-        temp(p);
-        p=m1.marks.data;
+        read(man1.name);
+        read(man1.avg);
+
+        if(man1.avg == 20) then 
+          write("yes");
+        else
+          write("no");
+        endif;
     
     return 0;
     end

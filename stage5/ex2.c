@@ -478,10 +478,10 @@ void typecheck(int t1, int t2, char c)
                       exit(1);
                   }
                   break;
-        case 'b': if(t1 != TYPE_INT || t2 != TYPE_INT) {
-                      yyerror_impl("Invalid type for comparing (<, >, <=..) operation", NULL);
-                      exit(1);
-                  }
+         case 'b': //if(t1 != TYPE_INT || t2 != TYPE_INT) {
+        //               yyerror_impl("Invalid type for comparing (<, >, <=..) operation", NULL);
+        //               exit(1);
+        //           }
                   break;
         case 'l': if(t1 != TYPE_BOOL || t2 != TYPE_BOOL) {
                       yyerror_impl("Invalid type for logical AND/OR operation", NULL);

@@ -1,13 +1,12 @@
 %{
 	#include <stdlib.h>
 	#include <stdio.h>
-    #include <string.h>
 	#include "y.tab.h"
 	#include "ex2.h"
 
-	static int number, i, lineno = 1;
-    char *variable;
-    //int yyerror(const char *s);
+	int number, i, lineno = 1;
+        struct Typetable* temp;
+        char *variable;
 %}
 
 id [a-zA-Z_][0-9a-zA-Z_]*
@@ -19,7 +18,7 @@ str \"(\\.|[^\\\"])*\"
                 number = atoi(yytext);
                 union Constant *value = (union Constant*)malloc(sizeof(union Constant));
                 value->intval = number;
-                yylval.nptr = TreeCreate(TYPE_INT, NODE_NUM, NULL, value, NULL, NULL, NULL, NULL);
+                yylval.nptr = TreeCreate(TLookup("integer"), NODE_NUM, NULL, value, NULL, NULL, NULL, NULL);
                 return NUM;
             }
 "main"      {return MAIN;}
@@ -39,10 +38,28 @@ str \"(\\.|[^\\\"])*\"
 "continue"  {return CONT;}
 "decl"      {return DECL;}
 "enddecl"   {return ENDDECL;}
+"type"      {return TYPE;}
+"endtype"   {return ENDTYPE;}
 "and"       {return AND;}
-"AND"       {return AND;}
 "or"        {return OR;}
-"OR"        {return OR;}
+[nN][uU][lL][lL]          {
+                    yylval.nptr = TreeCreate(TLookup("integer"), NODE_NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                    return NILL;
+                }
+"=="[ ]*[nN][uU][lL][lL] 	{
+                    yylval.nptr = TreeCreate(TLookup("integer"), NODE_NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                    return DEQNILL;
+		}
+"!="[ ]*[nN][uU][lL][lL] 	{
+                    yylval.nptr = TreeCreate(TLookup("integer"), NODE_NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                    return NEQNILL;
+		}
+"free"          {return FREE;}
+"initialize"    {return INIT;}
+"alloc"     {
+                yylval.nptr = TreeCreate(TLookup("integer"), NODE_ALLOC, NULL, NULL, NULL, NULL, NULL, NULL);
+                return ALLOC;
+            }
 "int"       {return INT;}
 "str"       {return STR;}
 "=="        {return EQ;}
@@ -57,13 +74,10 @@ str \"(\\.|[^\\\"])*\"
 "/"         {return DIV;}
 "%"         {return MOD;}
 "="         {return ASSGN;}
-"&"         {return ADDR;}
-"type"      {return TYPE;}
-"endtype"   {return ENDTYPE;}
 {id}        {
                 variable = (char*)malloc(sizeof(yytext));
                 strcpy(variable, yytext);
-                yylval.nptr = TreeCreate(TYPE_INT, NODE_ID, variable, NULL, NULL, NULL, NULL, NULL);
+                yylval.nptr = TreeCreate(TLookup("integer"), NODE_ID, variable, NULL, NULL, NULL, NULL, NULL);
                 return ID;
             }
 {str}       {
@@ -71,16 +85,14 @@ str \"(\\.|[^\\\"])*\"
                 strcpy(variable, yytext);
                 union Constant *value = (union Constant*)malloc(sizeof(union Constant));
                 value->strval = variable;
-                yylval.nptr = TreeCreate(TYPE_STR, NODE_STRVAL, NULL, value, NULL, NULL, NULL, NULL);
+                yylval.nptr = TreeCreate(TLookup("string"), NODE_STRVAL, NULL, value, NULL, NULL, NULL, NULL);
                 return STRVAL;
             }
 [ \t]	    {}
 \n          {lineno++;}
 [{}()\[\];,.]  {return *yytext;}
-.	        {
-                char msg[50];
-                snprintf(msg, sizeof(msg), "unknown character: '%c'", yytext[0]);
-                yyerror_impl(msg, NULL);
+.	    {
+                error("unknown character\n", NULL);
                 exit(1);
             }
 

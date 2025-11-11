@@ -1,15 +1,17 @@
 decl
     int result,n;
-    tuple my(int x,int y);
-    my t1,t2,t3;
-    
+    str name1,name2;
 enddecl
 
 int main()
 {
     begin 
-    read(t1.y);
-    write(t1.y);
+
+        read(name1);
+        read(name2);
+          if(name1 > name2) then 
+            write("name 1 is big");
+         endif;
     return 0;
     end
 }

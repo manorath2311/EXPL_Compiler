@@ -24,57 +24,78 @@
 #define NODE_ARRAY 22
 #define NODE_RET 24
 #define NODE_FUNC 25
-#define NODE_AND 26
-#define NODE_OR 27
-#define NODE_2D_ARRAY 28
-#define NODE_ADDR 29
-#define NODE_INT_PTR 30
-#define NODE_TUPLE 31
-#define NODE_TUPLE_VAR 32
-#define NODE_FIELD 33
+#define NODE_FIELD 26
+#define NODE_NULL 27
+#define NODE_ALLOC 28
+#define NODE_FREE 29
+#define NODE_INIT 30
 
-
-#define TYPE_VOID 0
-#define TYPE_INT 1
-#define TYPE_STR 2
-#define TYPE_BOOL 3
-#define TYPE_INT_PTR 4
-#define TYPE_ADDR 5
-#define TYPE_TUPLE 6
-#define TYPE_TUPLE_VAR 7
-#define TYPE_USER_DEC 8
-
-union Constant
-{
+union Constant{
     int intval;
     char* strval;
 };
 
-extern int declarationType;   // To pass variable type in yacc
-extern int FDeclarationType;  // To pass variable type to functions in yacc
-extern int totalCount;  // Memory address of next variable
-extern int localBindingStart;
-extern int fLabelCount;
+struct Typetable{
+    char *name;                 //type name
+    int size;                   //size of the type
+    struct Fieldlist *fields;   //pointer to the head of fields list
+    struct Typetable *next;     // pointer to the next type table entry
+};
+
+struct Fieldlist{
+    char *name;              //name of the field
+    int fieldIndex;          //the position of the field in the field list
+    struct Typetable *type;  //pointer to type table entry of the field's type
+    struct Fieldlist *next;  //pointer to the next field
+};
+
+struct Paramstruct {
+    char *name;
+    struct Typetable *type;       //type of the variable:(Integer / String)
+    struct Paramstruct *next;
+};
+
+struct Gsymbol{
+    char *name;     //name of the variable or function
+    struct Typetable *type;       //type of the variable:(Integer / String)
+    int size;       //size of an array
+    int binding;    //static binding of global variables
+    struct Paramstruct *paramlist; //pointer to the head of the formal parameter list in the case of functions
+    int flabel;     //a label for identifying the starting address of a function's code
+    struct Gsymbol *next;   //points to the next Global Symbol Table entry
+};
+
+struct Lsymbol{
+    char *name;     //name of the variable
+    struct Typetable *type;       //type of the variable:(Integer / String)
+    int binding;    //local binding of the variable
+    struct Lsymbol *next;   //points to the next Local Symbol Table entry
+};
+
+struct ASTNode{
+    struct Typetable *type;                         //pointer to the type table entry
+    int nodetype;                     //node type information,eg : NODETYPE_WHILE,NODETYPE_PLUS,NODETYPE_STMT etc
+    char *name;                       //stores the variable/function name in case of variable/function nodes
+    union Constant value;             //stores the value of the constant if the node corresponds to a constant
+    struct ASTNode *arglist;          //pointer to the expression list given as arguments to a function call
+    struct ASTNode *ptr1,*ptr2,*ptr3; //Subtrees of the node. (Maximum Subtrees for IF THEN ELSE)
+    struct Gsymbol *Gentry;           //pointer to GST entry for global variables and functions
+    struct Lsymbol *Lentry;           //pointer to the function's LST for local variables and arguements
+};
+
 extern struct Gsymbol* Gtemp;
 extern struct Lsymbol* Ltemp;
 extern struct Paramstruct* Ptemp;
 
-struct ASTNode
-{
-    int type;                         //pointer to the type table entry
-    int nodetype;                     //node type information,eg : NODETYPE_WHILE,NODETYPE_PLUS,NODETYPE_STMT etc
-    char *name;                       //stores the variable/function name in case of variable/function nodes
-    union Constant value;             //stores the value of the constant if the node corresponds to a constant
-    struct ASTNode *arglist;   
-    struct TypeDef *userType;       //pointer to the expression list given as arguments to a function call
-    struct ASTNode *ptr1,*ptr2,*ptr3; //Subtrees of the node. (Maximum Subtrees for IF THEN ELSE)
-    struct Gsymbol *Gentry;           //pointer to GST entry for global variables and functions
-    struct Lsymbol *Lentry;           //pointer to the function's LST for local variables and arguments
-};
+int checkAvailability(char *name, int global);
+void assignType(struct ASTNode* node, int func);
+void assignTypeField(struct ASTNode* node, struct Fieldlist *fields);
+void typecheck(struct Typetable *t1,struct Typetable *t2, char c);
 
-struct ASTNode* TreeCreate
-(
-    int type,
+void error(const char *s,const char *var);
+void yyerror(char const *s);
+struct ASTNode* TreeCreate(
+    struct Typetable *type,
     int nodetype,
     char *name,
     union Constant *value,
@@ -83,89 +104,40 @@ struct ASTNode* TreeCreate
     struct ASTNode *ptr2,
     struct ASTNode *ptr3
 );
-	
-/*To evaluate an expression tree*/
+
 int codegen(struct ASTNode *t);
 void initialize();
+char* findKey(struct ASTNode*);
 struct ASTNode* reverseList(struct ASTNode *t);
+struct ASTNode* insertFieldId(struct ASTNode *field, struct ASTNode *id);
+extern struct ASTNode* tempASTNode;
 
+extern int totalCount;  // Memory address of next variable
+extern int localBindingStart;
+extern int fLabelCount;
 
-struct Paramstruct 
-{
-    char *name;
-    int type;
-    struct Paramstruct *next;
-};
+struct Typetable *TLookup(char *name);
+void TInstall(char *name, struct Fieldlist *fields);
+extern struct Typetable *Thead, *Ttail;
+extern struct Typetable *declarationType;   // To pass variable type in yacc
+extern struct Typetable *FDeclarationType;  // To pass variable type to functions in yacc
 
-struct Gsymbol
-{
-    char *name;     //name of the variable or function
-    int type;       //type of the variable:(Integer / String)
-    int size;       //size of an array
-    int binding;    //static binding of global variables
-    struct Paramstruct *paramlist; //pointer to the head of the formal parameter list in the case of functions
-    int flabel;  
-    struct TypeDef *userType;   // For user-defined types
-    struct Gsymbol *next;   //points to the next Global Symbol Table entry
-};
+struct Fieldlist *FLookup(char *name, struct Fieldlist *list);
+void FInstall(char *name, struct Typetable *type);
+extern struct Fieldlist *Fhead, *Ftail;
 
-struct Lsymbol
-{
-    char *name;     //name of the variable
-    int type;       //type of the variable:(Integer / String)
-    int binding;    //local binding of the variable
-    struct Lsymbol *next;   //points to the next Local Symbol Table entry
-};
+void PInstall(char* name, struct Typetable *type);
+extern struct Paramstruct *Phead, *Ptail;
 
-struct TypeDef
-{
-    char *name;     
-    struct Fieldstruct *fields; 
-    int size;
-    struct TypeDef *next; 
-};
-struct Fieldstruct
-{
-    char *name;     
-    int type;  
-    int fieldIndex;
-    int tbv;
-    char *typeName;
-    struct Fieldstruct *next; 
-};
-
-void printTypeTable(); // FOR TESTING
-struct TypeDef* TLookup(char *name);
-void TInstall(char *name, struct Fieldstruct *fields, int size);
-struct Fieldstruct* FLookup(struct TypeDef* typeDef, char *name);
-struct Fieldstruct* createFieldList(char *name, int type);
-void printFieldList(struct Fieldstruct* head);
-
-
-
- int yyerror_impl(const char *s, const char *var);
-int checkAvailability(char *name, int global);
-void assignType(struct ASTNode* node, int func);
-void typecheck(int t1, int t2, char c);
 struct Gsymbol* GLookup(char * name); // Returns a pointer to the symbol table entry for the variable, returns NULL otherwise.
-void GInstall(char *name, int type, int size, struct Paramstruct *paramlist); // Creates a symbol table entry.
+void GInstall(char *name, struct Typetable *type, int size, struct Paramstruct *paramlist); // Creates a symbol table entry.
 extern struct Gsymbol *Ghead, *Gtail;
 
 struct Lsymbol* LLookup(char *name);
-void LInstall(char* name, int type);
+void LInstall(char* name, struct Typetable *type);
 extern struct Lsymbol *Lhead, *Ltail;
 
-void PInstall(char* name, int type);
-extern struct Paramstruct *Phead, *Ptail;
 
-void printLSymbolTable(); // FOR TESTING
-void printGSymbolTable(); // FOR TESTING
-
-char* findKey(struct ASTNode*);
-
-int pushArguments(struct ASTNode *t);
-int popArguments(struct ASTNode *t);
-int codegen(struct ASTNode* t);
-
-void print_header();
-
+void printLSymbolTable(char* name);   // FOR TESTING
+void printGSymbolTable();   // FOR TESTING
+void printTypeTable();      // FOR TESTING
